@@ -1,0 +1,664 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Git &amp; GitHub — Command Reference Notes</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&family=Playfair+Display:wght@700&display=swap');
+  :root {
+    --bg:#ffffff;--surface:#f8f9fc;--surface2:#eef1f8;--border:#e2e8f0;
+    --accent:#2563eb;--accent2:#7c3aed;--accent3:#059669;--accent4:#dc2626;--accent5:#d97706;--accent6:#0891b2;
+    --text:#0f172a;--text2:#475569;--text3:#94a3b8;
+    --code-bg:#1e293b;--code-text:#e2e8f0;
+    --tag-blue:#dbeafe;--tag-blue-text:#1d4ed8;
+    --tag-orange:#fef3c7;--tag-orange-text:#92400e;
+    --tag-red:#fee2e2;--tag-red-text:#991b1b;
+  }
+  *{box-sizing:border-box;margin:0;padding:0;}
+  body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);line-height:1.6;font-size:15px;}
+  .page{width:210mm;min-height:297mm;margin:0 auto;padding:14mm 16mm;background:var(--bg);position:relative;page-break-after:always;}
+  @media print{body{background:white;}.page{margin:0;padding:12mm 14mm;page-break-after:always;box-shadow:none!important;}}
+  @media screen{body{background:#dde3ed;padding:20px 0;}.page{box-shadow:0 4px 32px rgba(0,0,0,.12);margin:0 auto 20px;}}
+
+  /* Cover (white, clean — not dark gradient) */
+  .cover{text-align:center;padding-top:18mm;}
+  .cover-badge{display:inline-block;background:var(--surface2);border:1px solid var(--border);border-radius:100px;padding:6px 18px;font-size:11px;font-weight:700;letter-spacing:2px;text-transform:uppercase;margin-bottom:22px;color:var(--accent);}
+  .cover h1{font-family:'Playfair Display',serif;font-size:38px;line-height:1.18;margin-bottom:10px;color:var(--text);}
+  .cover h1 span{color:var(--accent);}
+  .cover-sub{font-size:14.5px;color:var(--text2);margin-bottom:24px;font-weight:400;}
+  .cover-divider{width:56px;height:3px;background:linear-gradient(90deg,var(--accent),var(--accent2));border-radius:2px;margin:0 auto 24px;}
+  .legend-box{background:var(--code-bg);border-radius:10px;padding:16px 20px;margin:0 auto 26px;max-width:480px;text-align:left;font-family:'JetBrains Mono',monospace;font-size:12.5px;}
+  .legend-title{color:#64748b;font-size:10px;text-transform:uppercase;letter-spacing:1px;margin-bottom:10px;font-family:'Inter',sans-serif;font-weight:700;}
+  .legend-row{display:flex;align-items:center;gap:10px;margin-bottom:7px;}
+  .legend-swatch{width:10px;height:10px;border-radius:3px;flex-shrink:0;}
+  .legend-row span.lbl{font-family:'Inter',sans-serif;color:#cbd5e1;font-size:11.5px;}
+  .cover-topics{display:grid;grid-template-columns:1fr 1fr;gap:9px;max-width:420px;margin:0 auto 22px;text-align:left;}
+  .cover-topic{background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:9px 14px;font-size:12px;font-weight:600;color:var(--text2);display:flex;align-items:center;gap:8px;}
+  .cover-topic .num{background:var(--accent);color:white;width:18px;height:18px;border-radius:5px;display:flex;align-items:center;justify-content:center;font-size:10px;flex-shrink:0;}
+  .cover-foot{font-size:11.5px;color:var(--text3);border-top:1px solid var(--border);padding-top:16px;max-width:420px;margin:10px auto 0;}
+
+  h1.section-title{font-family:'Playfair Display',serif;font-size:24px;color:var(--text);margin-bottom:4px;line-height:1.2;}
+  h2{font-size:15.5px;font-weight:700;color:var(--text);margin:18px 0 4px;}
+  h2 .sub{display:block;font-size:11px;font-weight:500;color:var(--text3);margin-top:2px;text-transform:none;letter-spacing:0;}
+  p.intro{color:var(--text2);font-size:12.5px;margin-bottom:10px;}
+  strong{color:var(--text);font-weight:600;}
+  .page-header{display:flex;align-items:center;justify-content:space-between;padding-bottom:10px;border-bottom:2px solid var(--border);margin-bottom:14px;}
+  .page-header-left{display:flex;align-items:center;gap:10px;}
+  .section-num{background:var(--accent);color:white;width:30px;height:30px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;flex-shrink:0;}
+  .section-num.purple{background:var(--accent2);}
+  .section-num.green{background:var(--accent3);}
+  .section-num.red{background:var(--accent4);}
+  .section-num.orange{background:var(--accent5);}
+  .section-num.teal{background:var(--accent6);}
+  .breadcrumb{font-size:10.5px;color:var(--text3);font-weight:500;letter-spacing:.5px;}
+  .page-num{font-size:11px;color:var(--text3);font-weight:500;}
+
+  /* Command card: dark code head + light explanation body */
+  .cmd-grid{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin:10px 0;}
+  .cmd-grid.single{grid-template-columns:1fr;}
+  .cmd-card{background:var(--surface);border:1px solid var(--border);border-radius:9px;overflow:hidden;}
+  .cmd-head{background:var(--code-bg);padding:8px 12px;font-family:'JetBrains Mono',monospace;font-size:11.3px;line-height:1.5;word-break:break-word;}
+  .cmd-head .cmd{color:#60a5fa;font-weight:600;}
+  .cmd-head .flag{color:#f59e0b;}
+  .cmd-head .str{color:#34d399;}
+  .cmd-head .comment{color:#64748b;}
+  .cmd-body{padding:8px 12px 10px;}
+  .cmd-body p{margin:0;font-size:11.6px;color:var(--text2);line-height:1.45;}
+  .cmd-body p strong{color:var(--text);font-size:11.6px;}
+
+  /* multi-line code block for files / yaml / output samples */
+  .code-block{background:var(--code-bg);border-radius:8px;padding:12px 16px;margin:8px 0;font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--code-text);overflow-x:auto;line-height:1.55;white-space:pre;}
+  .code-block .comment{color:#64748b;}
+  .code-block .cmd{color:#60a5fa;font-weight:600;}
+  .code-block .flag{color:#f59e0b;}
+  .code-block .str{color:#34d399;}
+  .code-block .key{color:#a78bfa;}
+  .explain-box{background:var(--surface);border-left:4px solid var(--accent);border-radius:0 8px 8px 0;padding:9px 14px;margin:0 0 14px;}
+  .explain-box p{margin:0;font-size:11.8px;color:var(--text2);line-height:1.5;}
+  .explain-box p strong{color:var(--text);}
+
+  .warn-box{background:#fff1f2;border:1px solid #fecdd3;border-radius:8px;padding:9px 14px;margin:8px 0 4px;display:flex;gap:9px;align-items:flex-start;}
+  .warn-box .icon{font-size:14px;line-height:1.4;}
+  .warn-box p{margin:0;font-size:11.5px;color:#991b1b;line-height:1.5;}
+
+  code{font-family:'JetBrains Mono',monospace;font-size:11px;background:var(--surface2);padding:1px 5px;border-radius:4px;color:var(--accent);font-weight:500;}
+  .section-divider{height:1px;background:var(--border);margin:14px 0 12px;}
+
+  .cheat-table{width:100%;border-collapse:collapse;margin:8px 0;font-size:11.5px;}
+  .cheat-table th{background:var(--code-bg);color:white;padding:7px 10px;text-align:left;font-weight:600;font-size:11px;}
+  .cheat-table th:first-child{border-radius:7px 0 0 0;}
+  .cheat-table th:last-child{border-radius:0 7px 0 0;}
+  .cheat-table td{padding:6px 10px;border-bottom:1px solid var(--border);color:var(--text2);vertical-align:top;}
+  .cheat-table tr:nth-child(even) td{background:var(--surface);}
+  .cheat-table code{font-size:10.5px;}
+</style>
+</head>
+<body>
+
+<!-- PAGE 1: COVER -->
+<div class="page">
+  <div class="cover">
+    <div class="cover-badge">Command Reference &middot; Companion Notes</div>
+    <h1>Git &amp; <span>GitHub</span><br>Commands &amp; Code</h1>
+    <div class="cover-sub">Every command explained — what it does, in plain words</div>
+    <div class="cover-divider"></div>
+
+    <div class="legend-box">
+      <div class="legend-title">How commands are colour-coded in this guide</div>
+      <div class="legend-row"><div class="legend-swatch" style="background:#60a5fa;"></div><span class="lbl"><span style="color:#60a5fa;">blue</span> — the command itself, e.g. <span style="color:#60a5fa;">git commit</span></span></div>
+      <div class="legend-row"><div class="legend-swatch" style="background:#f59e0b;"></div><span class="lbl"><span style="color:#f59e0b;">orange</span> — an option/flag, e.g. <span style="color:#f59e0b;">--amend</span></span></div>
+      <div class="legend-row"><div class="legend-swatch" style="background:#34d399;"></div><span class="lbl"><span style="color:#34d399;">green</span> — an argument/value you supply, e.g. <span style="color:#34d399;">"message"</span></span></div>
+      <div class="legend-row"><div class="legend-swatch" style="background:#64748b;"></div><span class="lbl"><span style="color:#64748b;">grey</span> — an inline note explaining that line</span></div>
+    </div>
+
+    <div class="cover-topics">
+      <div class="cover-topic"><span class="num">1</span>Setup, Init &amp; Clone</div>
+      <div class="cover-topic"><span class="num">2</span>Staging, Commit &amp; History</div>
+      <div class="cover-topic"><span class="num">3</span>Branching &amp; Merging</div>
+      <div class="cover-topic"><span class="num">4</span>Remote Ops &amp; Stash</div>
+      <div class="cover-topic"><span class="num">5</span>Undoing Changes &amp; Tags</div>
+      <div class="cover-topic"><span class="num">6</span>GitHub CLI, Actions &amp; DVC</div>
+    </div>
+    <div class="cover-foot">Companion to the Theory Notes &middot; 7 pages &middot; commands and code only &middot; no theory</div>
+  </div>
+</div>
+
+<!-- PAGE 2: SETUP, INIT & CLONE -->
+<div class="page">
+  <div class="page-header">
+    <div class="page-header-left">
+      <div class="section-num">1</div>
+      <div>
+        <div style="font-weight:700;font-size:15.5px;">Setup, Initialise &amp; Clone</div>
+        <div class="breadcrumb">CONFIG &middot; STARTING A REPOSITORY &middot; CHECKING STATE</div>
+      </div>
+    </div>
+    <div class="page-num">Page 2</div>
+  </div>
+
+  <h2>Configuring Git (one-time setup)</h2>
+  <div class="cmd-grid">
+    <div class="cmd-card">
+      <div class="cmd-head"><span class="cmd">git config</span> <span class="flag">--global</span> <span class="str">user.name "Riya Sharma"</span></div>
+      <div class="cmd-body"><p><strong>What it does:</strong> Sets the name attached to every commit you make on this machine, across all repositories.</p></div>
+    </div>
+    <div class="cmd-card">
+      <div class="cmd-head"><span class="cmd">git config</span> <span class="flag">--global</span> <span class="str">user.email "riya@ai.com"</span></div>
+      <div class="cmd-body"><p><strong>What it does:</strong> Sets the email recorded with each commit. GitHub uses this to match commits to your account.</p></div>
+    </div>
+    <div class="cmd-card">
+      <div class="cmd-head"><span class="cmd">git config</span> <span class="flag">--global</span> <span class="str">init.defaultBranch main</span></div>
+      <div class="cmd-body"><p><strong>What it does:</strong> Makes every new repo start with a branch named <code>main</code> instead of the older default <code>master</code>.</p></div>
+    </div>
+    <div class="cmd-card">
+      <div class="cmd-head"><span class="cmd">git config</span> <span class="flag">--global</span> <span class="str">core.editor "code --wait"</span></div>
+      <div class="cmd-body"><p><strong>What it does:</strong> Sets VS Code as the editor Git opens for commit messages, merge messages, and interactive rebase.</p></div>
+    </div>
+    <div class="cmd-card">
+      <div class="cmd-head"><span class="cmd">git config</span> <span class="flag">--list</span></div>
+      <div class="cmd-body"><p><strong>What it does:</strong> Prints every Git setting currently active (global + local), so you can check what is configured.</p></div>
+    </div>
+    <div class="cmd-card">
+      <div class="cmd-head"><span class="cmd">git config</span> <span class="flag">--global</span> <span class="str">alias.co checkout</span></div>
+      <div class="cmd-body"><p><strong>What it does:</strong> Creates a shortcut — typing <code>git co</code> now runs <code>git checkout</code>. Useful for any frequently typed command.</p></div>
+    </div>
+  </div>
+
+  <div class="section-divider"></div>
+  <h2>Starting / Downloading a Repository</h2>
+  <div class="cmd-grid">
+    <div class="cmd-card">
+      <div class="cmd-head"><span class="cmd">git init</span></div>
+      <div class="cmd-body"><p><strong>What it does:</strong> Creates a brand-new, empty Git repository in the current folder by adding a hidden <code>.git</code> directory.</p></div>
+    </div>
+    <div class="cmd-card">
+      <div class="cmd-head"><span class="cmd">git clone</span> <span class="str">&lt;repo-url&gt;</span></div>
+      <div class="cmd-body"><p><strong>What it does:</strong> Downloads a full copy of an existing remote repository — code, branches, and entire commit history — into a new folder.</p></div>
+    </div>
+    <div class="cmd-card">
+      <div class="cmd-head"><span class="cmd">git clone</span> <span class="str">&lt;repo-url&gt; my-folder</span></div>
+      <div class="cmd-body"><p><strong>What it does:</strong> Same as a normal clone, but saves the project into <code>my-folder</code> instead of the repository's default name.</p></div>
+    </div>
+    <div class="cmd-card">
+      <div class="cmd-head"><span class="cmd">git clone</span> <span class="flag">--depth 1</span> <span class="str">&lt;repo-url&gt;</span></div>
+      <div class="cmd-body"><p><strong>What it does:</strong> A "shallow clone" — downloads only the latest snapshot, skipping full history. Much faster for huge AI/ML repos.</p></div>
+    </div>
+  </div>
+
+  <div class="section-divider"></div>
+  <h2>Checking the Current State</h2>
+  <div class="cmd-grid">
+    <div class="cmd-card">
+      <div class="cmd-head"><span class="cmd">git status</span></div>
+      <div class="cmd-body"><p><strong>What it does:</strong> Shows which files are modified, staged, or untracked right now — the command you run before every commit.</p></div>
+    </div>
+    <div class="cmd-card">
+      <div class="cmd-head"><span class="cmd">git status</span> <span class="flag">-s</span></div>
+      <div class="cmd-body"><p><strong>What it does:</strong> Same information as <code>git status</code>, but in a compact, short-form layout — one line per file.</p></div>
+    </div>
+  </div>
+</div>
+
+<!-- PAGE 3: STAGING, COMMITTING & HISTORY -->
+<div class="page">
+  <div class="page-header">
+    <div class="page-header-left">
+      <div class="section-num purple">2</div>
+      <div>
+        <div style="font-weight:700;font-size:15.5px;">Staging, Committing &amp; History</div>
+        <div class="breadcrumb">SAVING CHANGES &middot; VIEWING DIFFS &middot; READING LOGS</div>
+      </div>
+    </div>
+    <div class="page-num">Page 3</div>
+  </div>
+
+  <h2>Staging Files</h2>
+  <div class="cmd-grid">
+    <div class="cmd-card">
+      <div class="cmd-head"><span class="cmd">git add</span> <span class="str">train.py</span></div>
+      <div class="cmd-body"><p><strong>What it does:</strong> Stages one specific file — moves a snapshot of it into the staging area, ready to be committed.</p></div>
+    </div>
+    <div class="cmd-card">
+      <div class="cmd-head"><span class="cmd">git add</span> <span class="flag">.</span></div>
+      <div class="cmd-body"><p><strong>What it does:</strong> Stages every modified and new file in the current directory and its subfolders, all at once.</p></div>
+    </div>
+    <div class="cmd-card">
+      <div class="cmd-head"><span class="cmd">git add</span> <span class="flag">-p</span></div>
+      <div class="cmd-body"><p><strong>What it does:</strong> Interactively walks through each change in a file and lets you stage only specific chunks, not the whole file.</p></div>
+    </div>
+    <div class="cmd-card">
+      <div class="cmd-head"><span class="cmd">git restore</span> <span class="flag">--staged</span> <span class="str">train.py</span></div>
+      <div class="cmd-body"><p><strong>What it does:</strong> Unstages a file — removes it from the staging area without touching your actual edits.</p></div>
+    </div>
+  </div>
+
+  <div class="section-divider"></div>
+  <h2>Committing</h2>
+  <div class="cmd-grid">
+    <div class="cmd-card">
+      <div class="cmd-head"><span class="cmd">git commit</span> <span class="flag">-m</span> <span class="str">"feat: add LSTM model"</span></div>
+      <div class="cmd-body"><p><strong>What it does:</strong> Permanently saves all staged changes as a new commit, with the given message describing what changed.</p></div>
+    </div>
+    <div class="cmd-card">
+      <div class="cmd-head"><span class="cmd">git commit</span> <span class="flag">-am</span> <span class="str">"fix: NaN loss bug"</span></div>
+      <div class="cmd-body"><p><strong>What it does:</strong> Stages every already-tracked, modified file and commits in one step — skips a separate <code>git add</code>.</p></div>
+    </div>
+    <div class="cmd-card">
+      <div class="cmd-head"><span class="cmd">git commit</span> <span class="flag">--amend</span></div>
+      <div class="cmd-body"><p><strong>What it does:</strong> Replaces the most recent commit with a new one — lets you fix its message or add forgotten files.</p></div>
+    </div>
+    <div class="cmd-card">
+      <div class="cmd-head"><span class="cmd">git commit</span> <span class="flag">--amend --no-edit</span></div>
+      <div class="cmd-body"><p><strong>What it does:</strong> Adds newly staged files into the last commit while keeping its original message unchanged.</p></div>
+    </div>
+  </div>
+
+  <div class="section-divider"></div>
+  <h2>Viewing Differences</h2>
+  <div class="cmd-grid">
+    <div class="cmd-card">
+      <div class="cmd-head"><span class="cmd">git diff</span></div>
+      <div class="cmd-body"><p><strong>What it does:</strong> Shows line-by-line changes in tracked files that are <strong>not yet staged</strong>, compared to the last commit.</p></div>
+    </div>
+    <div class="cmd-card">
+      <div class="cmd-head"><span class="cmd">git diff</span> <span class="flag">--staged</span></div>
+      <div class="cmd-body"><p><strong>What it does:</strong> Shows exactly what is sitting in the staging area — i.e. what the next commit will contain.</p></div>
+    </div>
+    <div class="cmd-card">
+      <div class="cmd-head"><span class="cmd">git diff</span> <span class="str">main..feature/lstm</span></div>
+      <div class="cmd-body"><p><strong>What it does:</strong> Compares two branches directly and shows every line that differs between them.</p></div>
+    </div>
+    <div class="cmd-card">
+      <div class="cmd-head"><span class="cmd">git show</span> <span class="str">a3f2c1d</span></div>
+      <div class="cmd-body"><p><strong>What it does:</strong> Displays the full details and exact changes introduced by one specific commit hash.</p></div>
+    </div>
+  </div>
+
+  <div class="section-divider"></div>
+  <h2>Reading History</h2>
+  <div class="cmd-grid">
+    <div class="cmd-card">
+      <div class="cmd-head"><span class="cmd">git log</span></div>
+      <div class="cmd-body"><p><strong>What it does:</strong> Lists all commits on the current branch — hash, author, date, and message — newest first.</p></div>
+    </div>
+    <div class="cmd-card">
+      <div class="cmd-head"><span class="cmd">git log</span> <span class="flag">--oneline --graph --all</span></div>
+      <div class="cmd-body"><p><strong>What it does:</strong> Shows a compact, one-line-per-commit history with a visual branch/merge graph across all branches.</p></div>
+    </div>
+    <div class="cmd-card">
+      <div class="cmd-head"><span class="cmd">git log</span> <span class="flag">--author=</span><span class="str">"Riya"</span></div>
+      <div class="cmd-body"><p><strong>What it does:</strong> Filters the commit history to show only commits made by a specific person.</p></div>
+    </div>
+    <div class="cmd-card">
+      <div class="cmd-head"><span class="cmd">git log</span> <span class="flag">--since=</span><span class="str">"2 weeks ago"</span></div>
+      <div class="cmd-body"><p><strong>What it does:</strong> Filters commit history to a date range — handy for writing a weekly progress report.</p></div>
+    </div>
+    <div class="cmd-card">
+      <div class="cmd-head"><span class="cmd">git blame</span> <span class="str">model.py</span></div>
+      <div class="cmd-body"><p><strong>What it does:</strong> Shows, line by line, which commit and author last changed each line of a file.</p></div>
+    </div>
+  </div>
+</div>
+
+<!-- PAGE 4: BRANCHING & MERGING -->
+<div class="page">
+  <div class="page-header">
+    <div class="page-header-left">
+      <div class="section-num green">3</div>
+      <div>
+        <div style="font-weight:700;font-size:15.5px;">Branching, Merging &amp; Rebasing</div>
+        <div class="breadcrumb">CREATING BRANCHES &middot; SWITCHING &middot; COMBINING WORK</div>
+      </div>
+    </div>
+    <div class="page-num">Page 4</div>
+  </div>
+
+  <h2>Creating &amp; Switching Branches</h2>
+  <div class="cmd-grid">
+    <div class="cmd-card">
+      <div class="cmd-head"><span class="cmd">git branch</span></div>
+      <div class="cmd-body"><p><strong>What it does:</strong> Lists all local branches and highlights the one you are currently on.</p></div>
+    </div>
+    <div class="cmd-card">
+      <div class="cmd-head"><span class="cmd">git branch</span> <span class="str">feature-attention</span></div>
+      <div class="cmd-body"><p><strong>What it does:</strong> Creates a new branch named <code>feature-attention</code> but does <strong>not</strong> switch to it yet.</p></div>
+    </div>
+    <div class="cmd-card">
+      <div class="cmd-head"><span class="cmd">git checkout</span> <span class="str">feature-attention</span></div>
+      <div class="cmd-body"><p><strong>What it does:</strong> Switches your working directory to an existing branch, updating all files to match it.</p></div>
+    </div>
+    <div class="cmd-card">
+      <div class="cmd-head"><span class="cmd">git checkout</span> <span class="flag">-b</span> <span class="str">feature-attention</span></div>
+      <div class="cmd-body"><p><strong>What it does:</strong> Creates a new branch <em>and</em> switches to it immediately — one command instead of two.</p></div>
+    </div>
+    <div class="cmd-card">
+      <div class="cmd-head"><span class="cmd">git switch</span> <span class="str">main</span></div>
+      <div class="cmd-body"><p><strong>What it does:</strong> The newer, dedicated command for switching branches — does the same job as <code>git checkout &lt;branch&gt;</code>.</p></div>
+    </div>
+    <div class="cmd-card">
+      <div class="cmd-head"><span class="cmd">git switch</span> <span class="flag">-c</span> <span class="str">feature-attention</span></div>
+      <div class="cmd-body"><p><strong>What it does:</strong> The modern equivalent of <code>git checkout -b</code> — creates and switches to a new branch.</p></div>
+    </div>
+    <div class="cmd-card">
+      <div class="cmd-head"><span class="cmd">git branch</span> <span class="flag">-d</span> <span class="str">feature-attention</span></div>
+      <div class="cmd-body"><p><strong>What it does:</strong> Deletes a branch, but only if it has already been fully merged — a safety check against losing work.</p></div>
+    </div>
+    <div class="cmd-card">
+      <div class="cmd-head"><span class="cmd">git branch</span> <span class="flag">-D</span> <span class="str">feature-attention</span></div>
+      <div class="cmd-body"><p><strong>What it does:</strong> Force-deletes a branch even if it has unmerged commits. Those commits become hard to recover.</p></div>
+    </div>
+  </div>
+
+  <div class="section-divider"></div>
+  <h2>Merging</h2>
+  <div class="cmd-grid">
+    <div class="cmd-card">
+      <div class="cmd-head"><span class="cmd">git merge</span> <span class="str">feature-attention</span></div>
+      <div class="cmd-body"><p><strong>What it does:</strong> Combines the commits from <code>feature-attention</code> into your current branch, integrating both histories.</p></div>
+    </div>
+    <div class="cmd-card">
+      <div class="cmd-head"><span class="cmd">git merge</span> <span class="flag">--no-ff</span> <span class="str">feature-attention</span></div>
+      <div class="cmd-body"><p><strong>What it does:</strong> Forces a merge commit to be created even if a simpler fast-forward merge was possible — keeps branch history visible.</p></div>
+    </div>
+    <div class="cmd-card">
+      <div class="cmd-head"><span class="cmd">git merge</span> <span class="flag">--abort</span></div>
+      <div class="cmd-body"><p><strong>What it does:</strong> Cancels a merge that is stuck in conflicts and returns the branch to its state before the merge started.</p></div>
+    </div>
+    <div class="cmd-card">
+      <div class="cmd-head"><span class="cmd">git cherry-pick</span> <span class="str">c7d4e8a</span></div>
+      <div class="cmd-body"><p><strong>What it does:</strong> Copies one specific commit from another branch onto your current branch, without merging everything else.</p></div>
+    </div>
+  </div>
+
+  <div class="section-divider"></div>
+  <h2>Rebasing</h2>
+  <div class="cmd-grid">
+    <div class="cmd-card">
+      <div class="cmd-head"><span class="cmd">git rebase</span> <span class="str">main</span></div>
+      <div class="cmd-body"><p><strong>What it does:</strong> Moves your current branch's commits so they sit on top of the latest <code>main</code>, producing a straight, linear history.</p></div>
+    </div>
+    <div class="cmd-card">
+      <div class="cmd-head"><span class="cmd">git rebase</span> <span class="flag">-i</span> <span class="str">HEAD~3</span></div>
+      <div class="cmd-body"><p><strong>What it does:</strong> Opens an interactive editor to reorder, edit, squash, or delete your last 3 commits before they're finalised.</p></div>
+    </div>
+    <div class="cmd-card">
+      <div class="cmd-head"><span class="cmd">git rebase</span> <span class="flag">--abort</span></div>
+      <div class="cmd-body"><p><strong>What it does:</strong> Stops an in-progress rebase and restores the branch to exactly how it was before the rebase began.</p></div>
+    </div>
+  </div>
+  <div class="warn-box">
+    <div class="icon">&#9888;&#65039;</div>
+    <p><strong>Never rebase a shared branch:</strong> <code>git rebase</code> rewrites commit history. If teammates have already pulled the branch, rebasing it creates conflicting histories for everyone. Only rebase branches that exist solely on your machine.</p>
+  </div>
+</div>
+
+<!-- PAGE 5: REMOTE OPERATIONS & STASH -->
+<div class="page">
+  <div class="page-header">
+    <div class="page-header-left">
+      <div class="section-num red">4</div>
+      <div>
+        <div style="font-weight:700;font-size:15.5px;">Remote Operations &amp; Stash</div>
+        <div class="breadcrumb">SYNCING WITH GITHUB &middot; TEMPORARY SAVES</div>
+      </div>
+    </div>
+    <div class="page-num">Page 5</div>
+  </div>
+
+  <h2>Managing Remotes</h2>
+  <div class="cmd-grid">
+    <div class="cmd-card">
+      <div class="cmd-head"><span class="cmd">git remote</span> <span class="flag">-v</span></div>
+      <div class="cmd-body"><p><strong>What it does:</strong> Lists all remote repositories linked to your local repo, along with their URLs (fetch and push).</p></div>
+    </div>
+    <div class="cmd-card">
+      <div class="cmd-head"><span class="cmd">git remote add</span> <span class="str">origin &lt;url&gt;</span></div>
+      <div class="cmd-body"><p><strong>What it does:</strong> Links a remote repository to your local one, naming it <code>origin</code> so future commands can refer to it by name.</p></div>
+    </div>
+    <div class="cmd-card">
+      <div class="cmd-head"><span class="cmd">git remote remove</span> <span class="str">origin</span></div>
+      <div class="cmd-body"><p><strong>What it does:</strong> Removes the link to a remote repository. Your local commit history is completely unaffected.</p></div>
+    </div>
+  </div>
+
+  <div class="section-divider"></div>
+  <h2>Sending &amp; Receiving Changes</h2>
+  <div class="cmd-grid">
+    <div class="cmd-card">
+      <div class="cmd-head"><span class="cmd">git push</span> <span class="str">origin main</span></div>
+      <div class="cmd-body"><p><strong>What it does:</strong> Uploads your local commits on <code>main</code> to the <code>origin</code> remote, making them visible to your team.</p></div>
+    </div>
+    <div class="cmd-card">
+      <div class="cmd-head"><span class="cmd">git push</span> <span class="flag">-u</span> <span class="str">origin main</span></div>
+      <div class="cmd-body"><p><strong>What it does:</strong> Pushes and also sets <code>origin main</code> as the default upstream, so future plain <code>git push</code> commands know where to go.</p></div>
+    </div>
+    <div class="cmd-card">
+      <div class="cmd-head"><span class="cmd">git push origin</span> <span class="flag">--tags</span></div>
+      <div class="cmd-body"><p><strong>What it does:</strong> Uploads all your local tags (e.g. release versions) to the remote — tags are not pushed automatically.</p></div>
+    </div>
+    <div class="cmd-card">
+      <div class="cmd-head"><span class="cmd">git pull</span> <span class="str">origin main</span></div>
+      <div class="cmd-body"><p><strong>What it does:</strong> Downloads new commits from the remote and immediately merges them into your current branch — fetch + merge in one step.</p></div>
+    </div>
+    <div class="cmd-card">
+      <div class="cmd-head"><span class="cmd">git pull</span> <span class="flag">--rebase</span></div>
+      <div class="cmd-body"><p><strong>What it does:</strong> Downloads remote commits and rebases your local commits on top of them, instead of creating a merge commit.</p></div>
+    </div>
+    <div class="cmd-card">
+      <div class="cmd-head"><span class="cmd">git fetch</span> <span class="str">origin</span></div>
+      <div class="cmd-body"><p><strong>What it does:</strong> Downloads new commits from the remote but does <strong>not</strong> merge them — lets you inspect changes before integrating.</p></div>
+    </div>
+  </div>
+  <div class="warn-box">
+    <div class="icon">&#9888;&#65039;</div>
+    <p><strong><code>git push --force</code>:</strong> Overwrites the remote branch's history with your local one, permanently deleting any commits that existed there but not on your machine. Avoid on shared branches like <code>main</code>.</p>
+  </div>
+
+  <div class="section-divider"></div>
+  <h2>Stashing Uncommitted Work</h2>
+  <div class="cmd-grid">
+    <div class="cmd-card">
+      <div class="cmd-head"><span class="cmd">git stash</span></div>
+      <div class="cmd-body"><p><strong>What it does:</strong> Temporarily shelves all uncommitted changes and gives you a clean working directory, without committing anything.</p></div>
+    </div>
+    <div class="cmd-card">
+      <div class="cmd-head"><span class="cmd">git stash</span> <span class="flag">list</span></div>
+      <div class="cmd-body"><p><strong>What it does:</strong> Shows every stash you currently have saved, each labelled like <code>stash@{0}</code>, <code>stash@{1}</code>.</p></div>
+    </div>
+    <div class="cmd-card">
+      <div class="cmd-head"><span class="cmd">git stash pop</span></div>
+      <div class="cmd-body"><p><strong>What it does:</strong> Re-applies the most recent stash to your working directory and removes it from the stash list.</p></div>
+    </div>
+    <div class="cmd-card">
+      <div class="cmd-head"><span class="cmd">git stash apply</span> <span class="str">stash@{1}</span></div>
+      <div class="cmd-body"><p><strong>What it does:</strong> Re-applies a specific older stash, but keeps it in the stash list (does not delete it).</p></div>
+    </div>
+  </div>
+</div>
+
+<!-- PAGE 6: UNDOING CHANGES & TAGS -->
+<div class="page">
+  <div class="page-header">
+    <div class="page-header-left">
+      <div class="section-num orange">5</div>
+      <div>
+        <div style="font-weight:700;font-size:15.5px;">Undoing Changes &amp; Tags</div>
+        <div class="breadcrumb">FIXING MISTAKES &middot; MARKING RELEASES</div>
+      </div>
+    </div>
+    <div class="page-num">Page 6</div>
+  </div>
+
+  <h2>Undoing &amp; Resetting</h2>
+  <div class="cmd-grid">
+    <div class="cmd-card">
+      <div class="cmd-head"><span class="cmd">git reset</span> <span class="flag">--soft</span> <span class="str">HEAD~1</span></div>
+      <div class="cmd-body"><p><strong>What it does:</strong> Undoes the last commit but keeps all its changes staged, ready to be re-committed differently.</p></div>
+    </div>
+    <div class="cmd-card">
+      <div class="cmd-head"><span class="cmd">git reset</span> <span class="str">HEAD~1</span></div>
+      <div class="cmd-body"><p><strong>What it does:</strong> Undoes the last commit and unstages its changes, but keeps them in your working directory as edits.</p></div>
+    </div>
+    <div class="cmd-card">
+      <div class="cmd-head"><span class="cmd">git reset</span> <span class="flag">--hard</span> <span class="str">HEAD~1</span></div>
+      <div class="cmd-body"><p><strong>What it does:</strong> Permanently deletes the last commit <em>and</em> all its changes from your files. There is no staging-area safety net here.</p></div>
+    </div>
+    <div class="cmd-card">
+      <div class="cmd-head"><span class="cmd">git revert</span> <span class="str">a3f2c1d</span></div>
+      <div class="cmd-body"><p><strong>What it does:</strong> Creates a brand-new commit that undoes the changes from a specific past commit — safe for shared/public history.</p></div>
+    </div>
+    <div class="cmd-card">
+      <div class="cmd-head"><span class="cmd">git restore</span> <span class="str">train.py</span></div>
+      <div class="cmd-body"><p><strong>What it does:</strong> Discards uncommitted edits in a file, resetting it back to its last committed version.</p></div>
+    </div>
+    <div class="cmd-card">
+      <div class="cmd-head"><span class="cmd">git clean</span> <span class="flag">-fd</span></div>
+      <div class="cmd-body"><p><strong>What it does:</strong> Permanently deletes untracked files and folders (e.g. stray temp/log files) that Git has never seen committed.</p></div>
+    </div>
+  </div>
+  <div class="warn-box">
+    <div class="icon">&#9888;&#65039;</div>
+    <p><strong><code>git reset --hard</code> and <code>git clean -fd</code>:</strong> Both permanently delete work with no undo. Always run <code>git status</code> first to confirm exactly what will be removed.</p>
+  </div>
+
+  <div class="section-divider"></div>
+  <h2>Tagging Releases</h2>
+  <div class="cmd-grid">
+    <div class="cmd-card">
+      <div class="cmd-head"><span class="cmd">git tag</span> <span class="str">v1.0.0</span></div>
+      <div class="cmd-body"><p><strong>What it does:</strong> Creates a lightweight tag — a simple, fixed label pointing at the current commit. Good for quick personal markers.</p></div>
+    </div>
+    <div class="cmd-card">
+      <div class="cmd-head"><span class="cmd">git tag</span> <span class="flag">-a</span> <span class="str">v1.0.0 -m "Release v1.0.0"</span></div>
+      <div class="cmd-body"><p><strong>What it does:</strong> Creates an annotated tag — stores the tagger's name, date, and message. The standard choice for official releases.</p></div>
+    </div>
+    <div class="cmd-card">
+      <div class="cmd-head"><span class="cmd">git tag</span> <span class="flag">-d</span> <span class="str">v1.0.0</span></div>
+      <div class="cmd-body"><p><strong>What it does:</strong> Deletes a tag from your local repository (use <code>git push origin :refs/tags/v1.0.0</code> to also remove it from the remote).</p></div>
+    </div>
+    <div class="cmd-card">
+      <div class="cmd-head"><span class="cmd">git push</span> <span class="str">origin</span> <span class="flag">--tags</span></div>
+      <div class="cmd-body"><p><strong>What it does:</strong> Uploads all local tags to the remote so they're visible to the whole team on GitHub.</p></div>
+    </div>
+  </div>
+</div>
+
+<!-- PAGE 7: GITHUB CLI, ACTIONS, DVC & CHEAT SHEET -->
+<div class="page">
+  <div class="page-header">
+    <div class="page-header-left">
+      <div class="section-num teal">6</div>
+      <div>
+        <div style="font-weight:700;font-size:15.5px;">GitHub CLI, Actions &amp; DVC for AI Projects</div>
+        <div class="breadcrumb">PR WORKFLOW &middot; CI/CD YAML &middot; DATA VERSIONING</div>
+      </div>
+    </div>
+    <div class="page-num">Page 7</div>
+  </div>
+
+  <h2>GitHub CLI (<code>gh</code>) — Pull Requests &amp; Issues</h2>
+  <div class="cmd-grid">
+    <div class="cmd-card">
+      <div class="cmd-head"><span class="cmd">gh repo create</span> <span class="str">my-ai-app</span> <span class="flag">--public</span></div>
+      <div class="cmd-body"><p><strong>What it does:</strong> Creates a new repository directly on GitHub from the terminal — no need to open the browser.</p></div>
+    </div>
+    <div class="cmd-card">
+      <div class="cmd-head"><span class="cmd">gh pr create</span> <span class="flag">--title</span> <span class="str">"Add attention layer"</span></div>
+      <div class="cmd-body"><p><strong>What it does:</strong> Opens a Pull Request from your current branch into <code>main</code>, straight from the command line.</p></div>
+    </div>
+    <div class="cmd-card">
+      <div class="cmd-head"><span class="cmd">gh pr list</span></div>
+      <div class="cmd-body"><p><strong>What it does:</strong> Lists all open Pull Requests on the repository, with their status and reviewers.</p></div>
+    </div>
+    <div class="cmd-card">
+      <div class="cmd-head"><span class="cmd">gh pr checkout</span> <span class="str">42</span></div>
+      <div class="cmd-body"><p><strong>What it does:</strong> Fetches and switches your local repo to the exact branch used in Pull Request #42, for local testing.</p></div>
+    </div>
+    <div class="cmd-card">
+      <div class="cmd-head"><span class="cmd">gh pr merge</span> <span class="str">42</span> <span class="flag">--squash</span></div>
+      <div class="cmd-body"><p><strong>What it does:</strong> Merges Pull Request #42 into the base branch, squashing all its commits into one clean commit.</p></div>
+    </div>
+    <div class="cmd-card">
+      <div class="cmd-head"><span class="cmd">gh issue create</span> <span class="flag">--title</span> <span class="str">"NaN loss bug"</span></div>
+      <div class="cmd-body"><p><strong>What it does:</strong> Creates a new GitHub Issue to track a bug, task, or feature request, without opening a browser.</p></div>
+    </div>
+  </div>
+
+  <div class="section-divider"></div>
+  <h2>.gitignore — Excluding Files for AI Projects</h2>
+  <div class="code-block"><span class="comment"># Ignore Python build artifacts</span>
+<span class="key">__pycache__/</span>
+<span class="key">*.pyc</span>
+
+<span class="comment"># Ignore virtual environments</span>
+<span class="key">venv/</span>
+
+<span class="comment"># Ignore large model & data files (track these with DVC instead)</span>
+<span class="key">*.pt</span>
+<span class="key">*.h5</span>
+<span class="key">*.pkl</span>
+<span class="key">data/raw/</span>
+
+<span class="comment"># Never commit secrets</span>
+<span class="key">.env</span>
+<span class="key">*.pem</span></div>
+  <div class="explain-box"><p><strong>What this file does:</strong> Each line is a pattern Git will never track or stage, no matter how many times you run <code>git add .</code>. Essential in AI projects to keep model weights, datasets, and API keys out of the repository.</p></div>
+
+  <div class="section-divider"></div>
+  <h2>GitHub Actions — Minimal CI Workflow</h2>
+  <div class="code-block"><span class="key">name:</span> Run Tests
+<span class="key">on:</span> [push]
+<span class="key">jobs:</span>
+  <span class="key">test:</span>
+    <span class="key">runs-on:</span> ubuntu-latest
+    <span class="key">steps:</span>
+      - <span class="key">uses:</span> actions/checkout@v4
+      - <span class="key">run:</span> pip install -r requirements.txt
+      - <span class="key">run:</span> pytest</div>
+  <div class="explain-box"><p><strong>What this file does:</strong> Saved as <code>.github/workflows/test.yml</code>, it tells GitHub to automatically install dependencies and run your test suite every time code is pushed — catching breakages before they reach <code>main</code>.</p></div>
+
+  <div class="section-divider"></div>
+  <h2>DVC — Versioning Large Datasets &amp; Models</h2>
+  <div class="cmd-grid">
+    <div class="cmd-card">
+      <div class="cmd-head"><span class="cmd">dvc init</span></div>
+      <div class="cmd-body"><p><strong>What it does:</strong> Sets up DVC tracking inside a Git repository, alongside your normal Git setup.</p></div>
+    </div>
+    <div class="cmd-card">
+      <div class="cmd-head"><span class="cmd">dvc add</span> <span class="str">data.csv</span></div>
+      <div class="cmd-body"><p><strong>What it does:</strong> Tracks a large file with DVC instead of Git — Git stores only a small pointer file (<code>data.csv.dvc</code>).</p></div>
+    </div>
+    <div class="cmd-card">
+      <div class="cmd-head"><span class="cmd">dvc push</span></div>
+      <div class="cmd-body"><p><strong>What it does:</strong> Uploads the actual large data/model files to remote storage (e.g. S3, Google Drive) — not GitHub itself.</p></div>
+    </div>
+    <div class="cmd-card">
+      <div class="cmd-head"><span class="cmd">dvc pull</span></div>
+      <div class="cmd-body"><p><strong>What it does:</strong> Downloads the large files referenced by DVC pointer files — used right after <code>git clone</code> or <code>git pull</code>.</p></div>
+    </div>
+  </div>
+
+  <div class="section-divider"></div>
+  <h2>Quick Cheat Sheet — Most-Used Commands</h2>
+  <table class="cheat-table">
+    <thead><tr><th>Goal</th><th>Command</th></tr></thead>
+    <tbody>
+      <tr><td>Start tracking a folder</td><td><code>git init</code></td></tr>
+      <tr><td>Copy a remote repo</td><td><code>git clone &lt;url&gt;</code></td></tr>
+      <tr><td>See what changed</td><td><code>git status</code> / <code>git diff</code></td></tr>
+      <tr><td>Save changes</td><td><code>git add .</code> then <code>git commit -m "msg"</code></td></tr>
+      <tr><td>New branch &amp; switch</td><td><code>git checkout -b name</code></td></tr>
+      <tr><td>Combine branches</td><td><code>git merge name</code></td></tr>
+      <tr><td>Upload to GitHub</td><td><code>git push origin main</code></td></tr>
+      <tr><td>Download latest</td><td><code>git pull origin main</code></td></tr>
+      <tr><td>Undo last commit (keep edits)</td><td><code>git reset HEAD~1</code></td></tr>
+      <tr><td>Safely undo a public commit</td><td><code>git revert &lt;hash&gt;</code></td></tr>
+      <tr><td>Temporarily shelve work</td><td><code>git stash</code> / <code>git stash pop</code></td></tr>
+      <tr><td>Mark a release</td><td><code>git tag -a v1.0.0 -m "msg"</code></td></tr>
+    </tbody>
+  </table>
+</div>
+
+</body>
+</html>
