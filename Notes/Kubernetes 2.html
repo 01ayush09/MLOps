@@ -1,0 +1,1307 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Kubernetes Level 2 — AI Engineer Notes</title>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:ital,wght@0,300;0,400;0,600;0,700;0,800;0,900;1,400;1,700&family=Zilla+Slab:ital,wght@0,400;0,500;0,600;0,700;1,400;1,600&family=Roboto+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --white:#ffffff; --off:#f7f9fc; --off2:#eef2f8; --surface:#e4ecf7;
+  --border:#cdd8ec; --border2:#b0c2de;
+  --ink:#09131f; --ink2:#1a2a3f; --muted:#5a6e88; --ghost:#9aaabb;
+  --blue:#1253a4; --blue-lt:#eaf1fb; --blue-md:#b8cef0;
+  --cyan:#0695a4; --cyan-lt:#e7f9fb; --cyan-md:#9de5ec;
+  --green:#0a7245; --green-lt:#e8f7f0; --green-md:#8ed8b4;
+  --amber:#a06000; --amber-lt:#fdf7e8; --amber-md:#f0d080;
+  --red:#a01828; --red-lt:#fdf0f2; --red-md:#f0b0bc;
+  --violet:#5a18a8; --violet-lt:#f3eefa; --violet-md:#ceaaec;
+  --navy:#071830; --teal:#065868;
+  --mono:'Roboto Mono',monospace;
+  --display:'Zilla Slab',serif;
+  --body:'Nunito',sans-serif;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:var(--body);background:#c8d4e4;color:var(--ink);font-size:13.5px;line-height:1.7;}
+.page{width:210mm;min-height:297mm;margin:0 auto 3px;padding:13mm 14mm 16mm;background:var(--white);position:relative;page-break-after:always;break-after:page;overflow:hidden;}
+.page::before{content:'';position:absolute;inset:0;background-image:radial-gradient(circle,var(--border) 1px,transparent 1px);background-size:8mm 8mm;background-position:4mm 4mm;opacity:.25;pointer-events:none;z-index:0;}
+.page>*{position:relative;z-index:1;}
+.page-stripe{position:absolute;top:0;left:0;bottom:0;width:4px;background:linear-gradient(180deg,var(--violet) 0%,var(--blue) 100%);z-index:10;}
+.page::after{content:attr(data-page);position:absolute;bottom:9mm;right:14mm;font-family:var(--mono);font-size:9px;color:var(--ghost);letter-spacing:.06em;z-index:2;}
+@media screen{body{padding:22px 0;}.page{box-shadow:0 4px 32px rgba(9,19,31,.14),0 0 0 1px rgba(9,19,31,.06);margin-bottom:18px;}}
+@media print{body{background:white;padding:0;}.page{box-shadow:none;margin:0;}}
+.ph{display:flex;align-items:center;justify-content:space-between;margin-bottom:7mm;padding-bottom:2.5mm;border-bottom:2px solid var(--navy);}
+.ph-s{font-family:var(--mono);font-size:9px;color:var(--violet);letter-spacing:.16em;text-transform:uppercase;font-weight:600;}
+.ph-c{font-family:var(--mono);font-size:9px;color:var(--muted);}
+.cover-band{position:absolute;top:0;left:0;right:0;height:78mm;background:linear-gradient(135deg,#1a0a38 0%,#2d1060 60%,#1253a4 100%);overflow:hidden;}
+.cover-band::before{content:'';position:absolute;inset:0;background-image:linear-gradient(rgba(255,255,255,.04) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.04) 1px,transparent 1px);background-size:10mm 10mm;}
+.cover-band::after{content:'L2';position:absolute;right:-5mm;bottom:-8mm;font-family:var(--display);font-size:140px;font-weight:700;color:rgba(255,255,255,.04);line-height:1;letter-spacing:-.04em;}
+.cover-band-inner{position:absolute;top:0;left:0;right:0;bottom:0;padding:14mm 14mm 10mm;display:flex;flex-direction:column;justify-content:center;}
+.cover-eyebrow{font-family:var(--mono);font-size:9px;letter-spacing:.2em;text-transform:uppercase;color:rgba(255,255,255,.5);margin-bottom:8px;}
+.cover h1{font-family:var(--display);font-size:52px;font-weight:700;line-height:.98;color:white;letter-spacing:-.02em;margin-bottom:6px;}
+.cover h1 em{color:#c9a0f5;font-style:italic;}
+.cover-sub{font-family:var(--body);font-size:13.5px;font-weight:300;color:rgba(255,255,255,.65);max-width:380px;line-height:1.6;}
+.cover-body{margin-top:82mm;padding:0;}
+.cover-intro{font-family:var(--body);font-size:13.5px;color:var(--muted);line-height:1.72;max-width:430px;margin-bottom:8mm;border-left:3px solid var(--violet-md);padding-left:12px;}
+.cover-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:5px;margin-bottom:8mm;}
+.cover-chip{background:var(--off);border:1px solid var(--border);border-top:2px solid var(--violet);border-radius:2px;padding:7px 9px;font-family:var(--mono);font-size:9px;color:var(--navy);line-height:1.45;}
+.cover-chip .cn{color:var(--violet);font-size:8px;display:block;margin-bottom:1px;font-weight:600;}
+.cover-meta{display:flex;gap:8px;flex-wrap:wrap;border-top:1px solid var(--border);padding-top:5mm;margin-top:auto;}
+.cover-pill{font-family:var(--mono);font-size:9px;background:var(--navy);color:white;padding:3px 10px;border-radius:1px;letter-spacing:.06em;}
+.toc-h{font-family:var(--display);font-size:38px;font-weight:700;color:var(--navy);margin-bottom:7mm;letter-spacing:-.02em;}
+.toc-sec{font-family:var(--mono);font-size:8.5px;letter-spacing:.18em;text-transform:uppercase;color:var(--violet);margin:5.5mm 0 1.5mm;display:flex;align-items:center;gap:8px;}
+.toc-sec::after{content:'';flex:1;height:1px;background:var(--border);}
+.toc-item{display:flex;align-items:baseline;gap:5px;padding:3.5px 0;border-bottom:1px dotted var(--border);}
+.toc-n{font-family:var(--mono);font-size:9px;color:var(--violet);min-width:24px;font-weight:700;}
+.toc-l{font-family:var(--display);font-size:13px;font-weight:600;flex:1;color:var(--ink);}
+.toc-sub{font-family:var(--mono);font-size:8px;color:var(--muted);}
+.toc-p{font-family:var(--mono);font-size:9px;color:var(--ghost);min-width:16px;text-align:right;}
+h2{font-family:var(--display);font-size:28px;font-weight:700;color:var(--navy);line-height:1.1;margin-bottom:4mm;letter-spacing:-.02em;}
+h2 .n{color:var(--violet);font-weight:400;font-style:italic;margin-right:3px;font-size:24px;}
+h3{font-family:var(--mono);font-size:9px;font-weight:700;letter-spacing:.18em;text-transform:uppercase;color:var(--navy);margin:4.5mm 0 2mm;display:flex;align-items:center;gap:8px;}
+h3::after{content:'';flex:1;height:1px;background:var(--border);}
+h4{font-family:var(--display);font-size:14px;font-weight:600;color:var(--violet);margin:2.5mm 0 1mm;}
+p{margin-bottom:2.5mm;font-size:13.5px;color:var(--ink2);line-height:1.7;}
+.box{border-radius:3px;padding:8px 12px;margin:3mm 0;font-size:12.5px;border:1px solid;border-left:3.5px solid;line-height:1.65;}
+.bl{font-family:var(--mono);font-size:8.5px;letter-spacing:.12em;text-transform:uppercase;margin-bottom:3px;font-weight:700;display:block;}
+.def{background:var(--blue-lt);border-color:var(--blue-md);border-left-color:var(--blue);} .def .bl{color:var(--blue);}
+.tip{background:var(--green-lt);border-color:var(--green-md);border-left-color:var(--green);} .tip .bl{color:var(--green);}
+.warn{background:var(--amber-lt);border-color:var(--amber-md);border-left-color:var(--amber);} .warn .bl{color:var(--amber);}
+.note{background:var(--off2);border-color:var(--border2);border-left-color:var(--muted);} .note .bl{color:var(--muted);}
+.key{background:var(--cyan-lt);border-color:var(--cyan-md);border-left-color:var(--cyan);} .key .bl{color:var(--cyan);}
+.vio{background:var(--violet-lt);border-color:var(--violet-md);border-left-color:var(--violet);} .vio .bl{color:var(--violet);}
+.crit{background:var(--red-lt);border-color:var(--red-md);border-left-color:var(--red);} .crit .bl{color:var(--red);}
+.cmd-block{background:#0d1520;border-radius:4px;margin:3mm 0;overflow:hidden;border:1px solid #1e2f48;}
+.cmd-head{background:#121d30;border-bottom:1px solid #1e2f48;padding:5px 12px;display:flex;align-items:center;justify-content:space-between;}
+.cmd-label{font-family:var(--mono);font-size:9px;color:#c9a0f5;letter-spacing:.08em;}
+.cmd-dots{display:flex;gap:5px;}
+.cmd-dot{width:8px;height:8px;border-radius:50%;}
+.cmd-dot:nth-child(1){background:#ff5f57;} .cmd-dot:nth-child(2){background:#febc2e;} .cmd-dot:nth-child(3){background:#28c840;}
+.cmd-body{padding:9px 13px;font-family:var(--mono);font-size:11px;line-height:1.85;color:#cdd9ed;white-space:pre;}
+.cmd-prompt{color:#9a70c4;} .cmd-cmd{color:#c9a0f5;font-weight:600;} .cmd-flag{color:#f0c860;} .cmd-out{color:#8aab7a;} .cmd-cmt{color:#3a5068;font-style:italic;}
+.yaml-block{background:#0a1a0a;border-radius:4px;margin:3mm 0;overflow:hidden;border:1px solid #1e3a1e;}
+.yaml-head{background:#0d1f0d;border-bottom:1px solid #1e3a1e;padding:5px 12px;display:flex;align-items:center;justify-content:space-between;}
+.yaml-label{font-family:var(--mono);font-size:9px;color:#8aab7a;letter-spacing:.08em;}
+.yaml-body{padding:9px 13px;font-family:var(--mono);font-size:10.5px;line-height:1.85;color:#cdd9ed;white-space:pre;}
+.y-key{color:#8aab7a;} .y-val{color:#f0e080;} .y-str{color:#f0c860;} .y-cmt{color:#2a4a2a;font-style:italic;} .y-num{color:#a0d0ff;} .y-top{color:#c9a0f5;font-weight:600;} .y-api{color:#7ab8f5;}
+.diag{background:var(--off);border:1px solid var(--border);border-top:2.5px solid var(--violet);border-radius:3px;padding:6mm;margin:3mm 0;}
+.diag-t{font-family:var(--mono);font-size:8.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--navy);text-align:center;margin-bottom:4mm;font-weight:700;}
+.flow{display:flex;align-items:center;justify-content:center;flex-wrap:wrap;}
+.fb{background:var(--white);border:1.5px solid var(--border2);border-radius:3px;padding:6px 8px;text-align:center;font-family:var(--mono);font-size:9px;line-height:1.4;min-width:62px;color:var(--ink2);}
+.fb.blue{border-color:var(--blue);background:var(--blue-lt);color:var(--blue);font-weight:600;}
+.fb.navy{border-color:var(--navy);background:var(--off2);color:var(--navy);font-weight:600;}
+.fb.cyan{border-color:var(--cyan);background:var(--cyan-lt);color:var(--cyan);font-weight:600;}
+.fb.green{border-color:var(--green);background:var(--green-lt);color:var(--green);font-weight:600;}
+.fb.amber{border-color:var(--amber);background:var(--amber-lt);color:var(--amber);font-weight:600;}
+.fb.violet{border-color:var(--violet);background:var(--violet-lt);color:var(--violet);font-weight:600;}
+.fb.red{border-color:var(--red);background:var(--red-lt);color:var(--red);font-weight:600;}
+.fb.dark{border-color:var(--navy);background:var(--navy);color:white;font-weight:600;}
+.fa{font-size:13px;color:var(--border2);padding:0 4px;}
+table{width:100%;border-collapse:collapse;font-size:12px;margin:2.5mm 0;}
+th{background:var(--navy);color:white;font-family:var(--mono);font-size:8.5px;letter-spacing:.1em;text-transform:uppercase;padding:6px 9px;text-align:left;}
+td{padding:5px 9px;border-bottom:1px solid var(--border);vertical-align:top;color:var(--ink2);}
+tr:nth-child(even) td{background:var(--off);}
+.tag{display:inline-block;font-family:var(--mono);font-size:8.5px;letter-spacing:.05em;padding:2px 6px;border-radius:2px;text-transform:uppercase;border:1px solid;margin:1px;}
+.tb{color:var(--blue);border-color:var(--blue);background:var(--blue-lt);}
+.tv{color:var(--violet);border-color:var(--violet);background:var(--violet-lt);}
+.tg{color:var(--green);border-color:var(--green);background:var(--green-lt);}
+.ta{color:var(--amber);border-color:var(--amber);background:var(--amber-lt);}
+.tn{color:white;border-color:var(--navy);background:var(--navy);}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:5mm;}
+.three{display:grid;grid-template-columns:1fr 1fr 1fr;gap:4mm;}
+.hr{border:none;border-top:1px solid var(--border);margin:4mm 0;}
+ul,ol{padding-left:17px;margin:1.5mm 0 2.5mm;}
+li{margin-bottom:2px;font-size:13px;}
+strong{color:var(--navy);}
+.sm{display:inline-flex;align-items:center;gap:5px;font-family:var(--mono);font-size:8.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--violet);border:1px solid var(--violet);padding:3px 9px;border-radius:2px;margin-bottom:3mm;}
+.gn{position:absolute;top:10mm;right:12mm;font-family:var(--display);font-size:88px;font-weight:700;color:rgba(7,24,48,.04);line-height:1;pointer-events:none;letter-spacing:-.04em;z-index:0;}
+.arch-box{background:var(--white);border:1px solid var(--border);border-left:4px solid;border-radius:3px;padding:6px 10px;margin:2px 0;display:flex;align-items:flex-start;gap:9px;}
+.ab-t{font-family:var(--mono);font-size:9px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;min-width:90px;margin-top:1px;}
+.ab-d{font-size:12px;color:var(--muted);line-height:1.5;flex:1;}
+.analogy{background:var(--violet-lt);border:1px solid var(--violet-md);border-left:3px solid var(--violet);border-radius:2px;padding:8px 12px;margin:3mm 0;font-style:italic;font-size:13px;line-height:1.7;color:var(--ink2);}
+.sr{display:flex;gap:7px;align-items:flex-start;margin-bottom:3px;}
+.si{font-size:13px;min-width:18px;margin-top:1px;}
+.st{font-size:13px;line-height:1.55;}
+.sb{font-weight:700;color:var(--navy);font-family:var(--display);font-size:13px;}
+.comp-card{background:var(--off);border:1px solid var(--border);border-top:2px solid var(--violet);border-radius:3px;padding:8px 10px;}
+.comp-name{font-family:var(--display);font-size:13px;font-weight:700;color:var(--navy);margin-bottom:2px;}
+.comp-role{font-family:var(--mono);font-size:8.5px;color:var(--violet);margin-bottom:3px;}
+.comp-desc{font-size:12px;color:var(--muted);line-height:1.5;}
+.lc-step{display:flex;gap:10px;margin:2mm 0;align-items:flex-start;}
+.lc-num{min-width:22px;height:22px;background:var(--violet);color:white;border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:var(--mono);font-size:9px;font-weight:600;flex-shrink:0;margin-top:1px;}
+.lc-body{flex:1;}
+.lc-title{font-family:var(--display);font-size:13px;font-weight:600;color:var(--navy);}
+.lc-desc{font-size:12.5px;color:var(--muted);line-height:1.55;}
+</style>
+</head>
+<body>
+
+<!-- PAGE 1: COVER -->
+<div class="page" data-page="1">
+<div class="page-stripe"></div>
+<div class="cover-band">
+  <div class="cover-band-inner">
+    <div class="cover-eyebrow">AI Engineer Notes · Level 2 · Container Orchestration Series</div>
+    <h1 class="cover">Kubernetes<br><em>YAML, Helm</em><br>&amp; Beyond</h1>
+    <p class="cover-sub">The intermediate guide — writing YAML manifests, StatefulSets, Jobs, Ingress, RBAC, Helm, and Network Policies.</p>
+  </div>
+</div>
+<div class="cover-body">
+  <p class="cover-intro">Level 1 taught you what Kubernetes does and the imperative kubectl commands. Level 2 is where you stop clicking and start declaring — writing the YAML manifests that define your entire AI system as code, and using Helm to package and deploy it repeatably across environments.</p>
+  <div class="cover-grid">
+    <div class="cover-chip"><span class="cn">§ 01</span>YAML Manifests</div>
+    <div class="cover-chip"><span class="cn">§ 02</span>Deployment &amp; Service YAML</div>
+    <div class="cover-chip"><span class="cn">§ 03</span>ConfigMaps &amp; Secrets as YAML</div>
+    <div class="cover-chip"><span class="cn">§ 04</span>StatefulSets</div>
+    <div class="cover-chip"><span class="cn">§ 05</span>DaemonSets</div>
+    <div class="cover-chip"><span class="cn">§ 06</span>Jobs &amp; CronJobs</div>
+    <div class="cover-chip"><span class="cn">§ 07</span>Init Containers</div>
+    <div class="cover-chip"><span class="cn">§ 08</span>Ingress Controllers</div>
+    <div class="cover-chip"><span class="cn">§ 09</span>Network Policies</div>
+    <div class="cover-chip"><span class="cn">§ 10</span>RBAC</div>
+    <div class="cover-chip"><span class="cn">§ 11</span>Helm</div>
+    <div class="cover-chip"><span class="cn">§ 12</span>Writing Helm Charts</div>
+  </div>
+  <div class="cover-meta">
+    <div class="cover-pill">Level 2</div>
+    <div class="cover-pill">18 Pages</div>
+    <div class="cover-pill">YAML + Helm Focus</div>
+    <div class="cover-pill">AI Engineer Patterns</div>
+    <div class="cover-pill">Builds on Level 1</div>
+  </div>
+</div>
+</div>
+
+<!-- PAGE 2: TOC -->
+<div class="page" data-page="2">
+<div class="page-stripe"></div>
+<div class="ph"><span class="ph-s">Kubernetes Level 2</span><span class="ph-c">Table of Contents</span></div>
+<div class="toc-h">Contents</div>
+<div class="toc-sec">Declarative Configuration</div>
+<div class="toc-item"><span class="toc-n">01</span><span class="toc-l">YAML Manifests — The Kubernetes Config Language</span><span class="toc-sub">apiVersion, kind, metadata, spec</span><span class="toc-p">3</span></div>
+<div class="toc-item"><span class="toc-n">02</span><span class="toc-l">Writing Deployments &amp; Services in YAML</span><span class="toc-sub">Full annotated manifests</span><span class="toc-p">4</span></div>
+<div class="toc-item"><span class="toc-n">03</span><span class="toc-l">ConfigMaps &amp; Secrets as YAML</span><span class="toc-sub">File injection, env vars, live updates</span><span class="toc-p">5</span></div>
+<div class="toc-sec">Workload Types</div>
+<div class="toc-item"><span class="toc-n">04</span><span class="toc-l">StatefulSets — Ordered, Stable Workloads</span><span class="toc-sub">Databases &amp; vector stores</span><span class="toc-p">6</span></div>
+<div class="toc-item"><span class="toc-n">05</span><span class="toc-l">DaemonSets — One Pod Per Node</span><span class="toc-sub">Logging agents &amp; GPU monitors</span><span class="toc-p">7</span></div>
+<div class="toc-item"><span class="toc-n">06</span><span class="toc-l">Jobs &amp; CronJobs — Batch &amp; Scheduled Tasks</span><span class="toc-sub">Indexing pipelines &amp; fine-tuning runs</span><span class="toc-p">8</span></div>
+<div class="toc-item"><span class="toc-n">07</span><span class="toc-l">Init Containers — Pre-flight Checks</span><span class="toc-sub">Model downloading &amp; DB migration</span><span class="toc-p">9</span></div>
+<div class="toc-sec">Networking &amp; Access</div>
+<div class="toc-item"><span class="toc-n">08</span><span class="toc-l">Ingress Controllers — HTTP Routing</span><span class="toc-sub">Path routing, TLS &amp; rate limiting</span><span class="toc-p">10</span></div>
+<div class="toc-item"><span class="toc-n">09</span><span class="toc-l">Network Policies — Pod Firewalls</span><span class="toc-sub">Zero-trust pod networking</span><span class="toc-p">11</span></div>
+<div class="toc-sec">Security &amp; Access Control</div>
+<div class="toc-item"><span class="toc-n">10</span><span class="toc-l">RBAC — Role-Based Access Control</span><span class="toc-sub">Roles, Bindings &amp; ServiceAccounts</span><span class="toc-p">12</span></div>
+<div class="toc-item"><span class="toc-n">11</span><span class="toc-l">Security Contexts &amp; Pod Security</span><span class="toc-sub">Non-root containers, read-only filesystems</span><span class="toc-p">13</span></div>
+<div class="toc-sec">Package Management</div>
+<div class="toc-item"><span class="toc-n">12</span><span class="toc-l">Helm — The Kubernetes Package Manager</span><span class="toc-sub">Charts, values &amp; releases</span><span class="toc-p">14</span></div>
+<div class="toc-item"><span class="toc-n">13</span><span class="toc-l">Writing Your Own Helm Chart</span><span class="toc-sub">Templates, values.yaml &amp; helpers</span><span class="toc-p">15</span></div>
+<div class="toc-sec">Advanced Topics &amp; AI Patterns</div>
+<div class="toc-item"><span class="toc-n">14</span><span class="toc-l">Advanced Probes &amp; Graceful Shutdown</span><span class="toc-sub">terminationGracePeriod, preStop hooks</span><span class="toc-p">16</span></div>
+<div class="toc-item"><span class="toc-n">15</span><span class="toc-l">Resource Quotas &amp; LimitRanges</span><span class="toc-sub">Namespace-level guardrails</span><span class="toc-p">17</span></div>
+<div class="toc-item"><span class="toc-n">16</span><span class="toc-l">AI Patterns &amp; Common Mistakes</span><span class="toc-sub">vLLM, Qdrant, batch indexing + pitfalls</span><span class="toc-p">18</span></div>
+</div>
+
+<!-- PAGE 3: YAML MANIFESTS -->
+<div class="page" data-page="3">
+<div class="page-stripe"></div>
+<div class="ph"><span class="ph-s">Kubernetes Level 2</span><span class="ph-c">01 — YAML Manifests</span></div>
+<div class="gn">01</div>
+<div class="sm">Concept #1</div>
+<h2><span class="n">01.</span>YAML Manifests — The K8s Config Language</h2>
+<div class="box def">
+<span class="bl">📖 What Is a Manifest?</span>
+A <strong>Kubernetes manifest</strong> is a YAML file that declares the <em>desired state</em> of a Kubernetes object. Instead of imperative commands like <code>kubectl create deployment</code>, you describe <em>what you want</em> in a file and apply it. This enables <strong>GitOps</strong> — your entire infrastructure is code, stored in git, reproducible and auditable.
+</div>
+<h3>The Four Required Fields Every Manifest Has</h3>
+<div class="yaml-block">
+<div class="yaml-head"><div class="cmd-dots"><div class="cmd-dot"></div><div class="cmd-dot"></div><div class="cmd-dot"></div></div><div class="yaml-label">any-resource.yaml · The Four Root Fields</div></div>
+<div class="yaml-body"><span class="y-top">apiVersion</span><span class="y-key">:</span> <span class="y-str">apps/v1</span>          <span class="y-cmt"># Which K8s API group handles this resource</span>
+<span class="y-top">kind</span><span class="y-key">:</span> <span class="y-str">Deployment</span>          <span class="y-cmt"># What type of K8s object this is</span>
+<span class="y-top">metadata</span><span class="y-key">:</span>                   <span class="y-cmt"># Identity: name, namespace, labels</span>
+  <span class="y-key">name:</span> <span class="y-str">my-rag-app</span>
+  <span class="y-key">namespace:</span> <span class="y-str">production</span>
+  <span class="y-key">labels:</span>
+    <span class="y-key">app:</span> <span class="y-str">rag-app</span>
+    <span class="y-key">version:</span> <span class="y-str">v2</span>
+<span class="y-top">spec</span><span class="y-key">:</span>                       <span class="y-cmt"># Desired state — differs per resource type</span>
+  <span class="y-key">replicas:</span> <span class="y-num">3</span></div>
+</div>
+<h3>apiVersion Reference</h3>
+<table>
+<tr><th>Object Type</th><th>apiVersion</th><th>Notes</th></tr>
+<tr><td>Deployment, ReplicaSet, DaemonSet, StatefulSet</td><td><code>apps/v1</code></td><td>Core app workloads, stable</td></tr>
+<tr><td>Pod, Service, ConfigMap, Secret, Namespace, PVC</td><td><code>v1</code></td><td>No group prefix — core objects</td></tr>
+<tr><td>Job, CronJob</td><td><code>batch/v1</code></td><td>Batch workloads</td></tr>
+<tr><td>Ingress, NetworkPolicy</td><td><code>networking.k8s.io/v1</code></td><td>Network routing &amp; firewall rules</td></tr>
+<tr><td>HorizontalPodAutoscaler</td><td><code>autoscaling/v2</code></td><td>Autoscaling objects</td></tr>
+<tr><td>Role, ClusterRole, RoleBinding</td><td><code>rbac.authorization.k8s.io/v1</code></td><td>Access control</td></tr>
+</table>
+<h3>Labels vs Annotations</h3>
+<div class="two">
+<div class="box def" style="margin:0;font-size:12px;">
+<span class="bl">Labels — For Selecting &amp; Filtering</span>
+Key-value pairs used by Kubernetes to <em>identify and group</em> objects. Services use label selectors to find which Pods to route traffic to. Must match exactly between selector and Pod template. Keep them short and machine-readable.
+</div>
+<div class="box note" style="margin:0;font-size:12px;">
+<span class="bl">Annotations — For Metadata Only</span>
+Arbitrary metadata K8s doesn't use for selection. Use for: build number, git SHA, Prometheus scrape config, cert-manager directives. Values can be long strings. Example: <code>prometheus.io/scrape: "true"</code>.
+</div>
+</div>
+<h3>The kubectl apply Workflow</h3>
+<div class="cmd-block">
+<div class="cmd-head"><div class="cmd-dots"><div class="cmd-dot"></div><div class="cmd-dot"></div><div class="cmd-dot"></div></div><div class="cmd-label">Terminal · apply-based workflow</div></div>
+<div class="cmd-body"><span class="cmd-prompt">$ </span><span class="cmd-cmd">kubectl apply</span> <span class="cmd-flag">-f</span> deployment.yaml          <span class="cmd-cmt"># Create or update from YAML</span>
+<span class="cmd-prompt">$ </span><span class="cmd-cmd">kubectl apply</span> <span class="cmd-flag">-f</span> ./k8s/                   <span class="cmd-cmt"># Apply every .yaml in a directory</span>
+<span class="cmd-prompt">$ </span><span class="cmd-cmd">kubectl apply</span> <span class="cmd-flag">-f</span> ./k8s/ <span class="cmd-flag">--dry-run=client</span>  <span class="cmd-cmt"># Validate without applying</span>
+<span class="cmd-prompt">$ </span><span class="cmd-cmd">kubectl diff</span> <span class="cmd-flag">-f</span> deployment.yaml          <span class="cmd-cmt"># Show what WOULD change</span>
+<span class="cmd-prompt">$ </span><span class="cmd-cmd">kubectl get deployment</span> my-rag <span class="cmd-flag">-o yaml</span>    <span class="cmd-cmt"># Export live resource as YAML</span></div>
+</div>
+<div class="box tip">
+<span class="bl">💡 Always Use apply, Not create</span>
+<code>kubectl create -f</code> fails if the resource already exists. <code>kubectl apply -f</code> creates if absent, updates if present. <strong>Always use apply</strong> — it's safe to run repeatedly and is the foundation of GitOps.
+</div>
+</div>
+
+<!-- PAGE 4: DEPLOYMENT & SERVICE YAML -->
+<div class="page" data-page="4">
+<div class="page-stripe"></div>
+<div class="ph"><span class="ph-s">Kubernetes Level 2</span><span class="ph-c">02 — Deployment &amp; Service in YAML</span></div>
+<div class="gn">02</div>
+<div class="sm">Concept #2</div>
+<h2><span class="n">02.</span>Writing Deployments &amp; Services in YAML</h2>
+<p>Complete, annotated YAML for a production-ready RAG API Deployment paired with its Service. Every field explained.</p>
+<div class="yaml-block">
+<div class="yaml-head"><div class="cmd-dots"><div class="cmd-dot"></div><div class="cmd-dot"></div><div class="cmd-dot"></div></div><div class="yaml-label">rag-deployment.yaml · Fully Annotated</div></div>
+<div class="yaml-body"><span class="y-api">apiVersion</span>: apps/v1
+<span class="y-api">kind</span>: Deployment
+<span class="y-api">metadata</span>:
+  <span class="y-key">name:</span> <span class="y-str">rag-api</span>
+  <span class="y-key">namespace:</span> <span class="y-str">production</span>
+  <span class="y-key">labels:</span>
+    <span class="y-key">app:</span> <span class="y-str">rag-api</span>
+<span class="y-api">spec</span>:
+  <span class="y-key">replicas:</span> <span class="y-num">3</span>
+  <span class="y-key">selector:</span>
+    <span class="y-key">matchLabels:</span>
+      <span class="y-key">app:</span> <span class="y-str">rag-api</span>          <span class="y-cmt"># MUST match template.metadata.labels below</span>
+  <span class="y-key">strategy:</span>
+    <span class="y-key">type:</span> <span class="y-str">RollingUpdate</span>
+    <span class="y-key">rollingUpdate:</span>
+      <span class="y-key">maxSurge:</span> <span class="y-num">1</span>           <span class="y-cmt"># Allow 1 extra Pod during update</span>
+      <span class="y-key">maxUnavailable:</span> <span class="y-num">0</span>     <span class="y-cmt"># Never drop below desired count</span>
+  <span class="y-key">template:</span>
+    <span class="y-key">metadata:</span>
+      <span class="y-key">labels:</span>
+        <span class="y-key">app:</span> <span class="y-str">rag-api</span>        <span class="y-cmt"># Must match selector.matchLabels</span>
+    <span class="y-key">spec:</span>
+      <span class="y-key">containers:</span>
+      <span class="y-key">- name:</span> <span class="y-str">rag-api</span>
+        <span class="y-key">image:</span> <span class="y-str">myregistry/rag-api:v2.1.0</span>  <span class="y-cmt"># Always pin a specific tag</span>
+        <span class="y-key">ports:</span>
+        <span class="y-key">- containerPort:</span> <span class="y-num">8080</span>
+        <span class="y-key">env:</span>
+        <span class="y-key">- name:</span> <span class="y-str">MODEL_NAME</span>
+          <span class="y-key">valueFrom:</span>
+            <span class="y-key">configMapKeyRef:</span>
+              <span class="y-key">name:</span> <span class="y-str">rag-config</span>
+              <span class="y-key">key:</span> <span class="y-str">MODEL_NAME</span>
+        <span class="y-key">- name:</span> <span class="y-str">OPENAI_API_KEY</span>
+          <span class="y-key">valueFrom:</span>
+            <span class="y-key">secretKeyRef:</span>
+              <span class="y-key">name:</span> <span class="y-str">api-keys</span>
+              <span class="y-key">key:</span> <span class="y-str">OPENAI_KEY</span>
+        <span class="y-key">resources:</span>
+          <span class="y-key">requests:</span>
+            <span class="y-key">cpu:</span> <span class="y-str">500m</span>
+            <span class="y-key">memory:</span> <span class="y-str">512Mi</span>
+          <span class="y-key">limits:</span>
+            <span class="y-key">cpu:</span> <span class="y-str">2000m</span>
+            <span class="y-key">memory:</span> <span class="y-str">2Gi</span>
+        <span class="y-key">readinessProbe:</span>
+          <span class="y-key">httpGet:</span>
+            <span class="y-key">path:</span> <span class="y-str">/health</span>
+            <span class="y-key">port:</span> <span class="y-num">8080</span>
+          <span class="y-key">initialDelaySeconds:</span> <span class="y-num">10</span>
+          <span class="y-key">periodSeconds:</span> <span class="y-num">5</span>
+        <span class="y-key">livenessProbe:</span>
+          <span class="y-key">httpGet:</span>
+            <span class="y-key">path:</span> <span class="y-str">/health</span>
+            <span class="y-key">port:</span> <span class="y-num">8080</span>
+          <span class="y-key">initialDelaySeconds:</span> <span class="y-num">30</span>
+          <span class="y-key">periodSeconds:</span> <span class="y-num">15</span>
+<span class="y-cmt">---</span>                       <span class="y-cmt"># Three dashes separate multiple resources in one file</span>
+<span class="y-api">apiVersion</span>: v1
+<span class="y-api">kind</span>: Service
+<span class="y-api">metadata</span>:
+  <span class="y-key">name:</span> <span class="y-str">rag-api-svc</span>
+  <span class="y-key">namespace:</span> <span class="y-str">production</span>
+<span class="y-api">spec</span>:
+  <span class="y-key">selector:</span>
+    <span class="y-key">app:</span> <span class="y-str">rag-api</span>           <span class="y-cmt"># Routes to Pods with this label</span>
+  <span class="y-key">ports:</span>
+  <span class="y-key">- port:</span> <span class="y-num">80</span>               <span class="y-cmt"># Service port (what callers use)</span>
+    <span class="y-key">targetPort:</span> <span class="y-num">8080</span>       <span class="y-cmt"># Container port (what app listens on)</span>
+  <span class="y-key">type:</span> <span class="y-str">ClusterIP</span>          <span class="y-cmt"># Internal only; use LoadBalancer for external</span></div>
+</div>
+<!-- PAGE 5: CONFIGMAPS & SECRETS -->
+<div class="page" data-page="5">
+<div class="page-stripe"></div>
+<div class="ph"><span class="ph-s">Kubernetes Level 2</span><span class="ph-c">03 — ConfigMaps &amp; Secrets as YAML</span></div>
+<div class="gn">03</div>
+<div class="sm">Concept #3</div>
+<h2><span class="n">03.</span>ConfigMaps &amp; Secrets as YAML</h2>
+<p>At Level 1 you created ConfigMaps and Secrets imperatively. In production you write them as YAML and commit them to git (with Secrets encrypted or managed by a secrets tool).</p>
+<div class="yaml-block">
+<div class="yaml-head"><div class="cmd-dots"><div class="cmd-dot"></div><div class="cmd-dot"></div><div class="cmd-dot"></div></div><div class="yaml-label">rag-config.yaml · ConfigMap + Secret</div></div>
+<div class="yaml-body"><span class="y-api">apiVersion</span>: v1
+<span class="y-api">kind</span>: ConfigMap
+<span class="y-api">metadata</span>:
+  <span class="y-key">name:</span> <span class="y-str">rag-config</span>
+  <span class="y-key">namespace:</span> <span class="y-str">production</span>
+<span class="y-api">data</span>:
+  <span class="y-key">MODEL_NAME:</span> <span class="y-str">"gpt-4o"</span>
+  <span class="y-key">CHUNK_SIZE:</span> <span class="y-str">"500"</span>         <span class="y-cmt"># Numbers must be quoted strings</span>
+  <span class="y-key">LOG_LEVEL:</span> <span class="y-str">"INFO"</span>
+  <span class="y-key">app.config.yaml:</span> |         <span class="y-cmt"># Entire config FILE stored as a key</span>
+    <span class="y-str">retrieval:</span>
+      <span class="y-str">top_k: 5</span>
+      <span class="y-str">score_threshold: 0.75</span>
+    <span class="y-str">embedding:</span>
+      <span class="y-str">model: text-embedding-3-small</span>
+<span class="y-cmt">---</span>
+<span class="y-api">apiVersion</span>: v1
+<span class="y-api">kind</span>: Secret
+<span class="y-api">metadata</span>:
+  <span class="y-key">name:</span> <span class="y-str">api-keys</span>
+  <span class="y-key">namespace:</span> <span class="y-str">production</span>
+<span class="y-api">type</span>: Opaque               <span class="y-cmt"># Generic secret type</span>
+<span class="y-api">data</span>:                      <span class="y-cmt"># Values MUST be base64 encoded</span>
+  <span class="y-key">OPENAI_KEY:</span> <span class="y-str">c2stcHJvai0...</span>  <span class="y-cmt"># echo -n "sk-proj-..." | base64</span>
+  <span class="y-key">PINECONE_KEY:</span> <span class="y-str">cGMtdGVzdC4u</span></div>
+</div>
+<h3>Mounting a ConfigMap as a File Inside a Container</h3>
+<div class="yaml-block">
+<div class="yaml-head"><div class="cmd-dots"><div class="cmd-dot"></div><div class="cmd-dot"></div><div class="cmd-dot"></div></div><div class="yaml-label">Pod spec · Mounting ConfigMap as File</div></div>
+<div class="yaml-body"><span class="y-key">spec:</span>
+  <span class="y-key">volumes:</span>
+  <span class="y-key">- name:</span> <span class="y-str">config-volume</span>
+    <span class="y-key">configMap:</span>
+      <span class="y-key">name:</span> <span class="y-str">rag-config</span>
+      <span class="y-key">items:</span>
+      <span class="y-key">- key:</span> <span class="y-str">app.config.yaml</span>     <span class="y-cmt"># Which key to mount</span>
+        <span class="y-key">path:</span> <span class="y-str">config.yaml</span>        <span class="y-cmt"># Filename inside the container</span>
+  <span class="y-key">containers:</span>
+  <span class="y-key">- name:</span> <span class="y-str">rag-api</span>
+    <span class="y-key">volumeMounts:</span>
+    <span class="y-key">- name:</span> <span class="y-str">config-volume</span>
+      <span class="y-key">mountPath:</span> <span class="y-str">/app/config</span>   <span class="y-cmt"># Container sees /app/config/config.yaml</span>
+      <span class="y-key">readOnly:</span> <span class="y-num">true</span></div>
+</div>
+<div class="box key">
+<span class="bl">🔑 ConfigMap Live Updates</span>
+When mounted as a volume, ConfigMap changes are automatically reflected inside the running container within ~60 seconds — without a Pod restart. <strong>Environment variable injection does NOT update live</strong> — env vars are only read at Pod startup. For config that changes frequently, use volume mounts over env vars.
+</div>
+<div class="box warn">
+<span class="bl">⚠ Never Commit Raw Secrets to Git</span>
+base64 is trivially reversible — it is not encryption. Use <strong>Sealed Secrets</strong> (Bitnami), <strong>External Secrets Operator</strong> (pulls from AWS Secrets Manager / GCP Secret Manager), or <strong>Mozilla SOPS</strong> to encrypt secret values before committing. In CI/CD, inject secrets from your secret store at deploy time.
+</div>
+</div>
+
+<!-- PAGE 6: STATEFULSETS -->
+<div class="page" data-page="6">
+<div class="page-stripe"></div>
+<div class="ph"><span class="ph-s">Kubernetes Level 2</span><span class="ph-c">04 — StatefulSets</span></div>
+<div class="gn">04</div>
+<div class="sm">Concept #4</div>
+<h2><span class="n">04.</span>StatefulSets — Ordered, Stable Workloads</h2>
+<div class="box def">
+<span class="bl">📖 Definition</span>
+A <strong>StatefulSet</strong> manages Pods that require stable, persistent identities. Unlike a Deployment (where Pods are interchangeable with random names), a StatefulSet gives each Pod a <em>stable name</em> (my-db-0, my-db-1), a <em>stable DNS hostname</em>, and a <em>dedicated PersistentVolume</em> that stays bound to that Pod even when it restarts.
+</div>
+<h3>StatefulSet vs Deployment — When to Use Each</h3>
+<table>
+<tr><th>Property</th><th>Deployment</th><th>StatefulSet</th></tr>
+<tr><td>Pod identity</td><td>Random names (my-app-7d4f-abc)</td><td>Stable ordered names (my-db-0, my-db-1)</td></tr>
+<tr><td>Storage</td><td>Shared or no persistent storage</td><td>Each Pod gets its own dedicated PVC</td></tr>
+<tr><td>Startup order</td><td>All start simultaneously</td><td>Ordered: 0 must be Ready before 1 starts</td></tr>
+<tr><td>Shutdown order</td><td>All terminate simultaneously</td><td>Reverse order: N, N-1, … 0</td></tr>
+<tr><td>Use for</td><td>Stateless apps: APIs, web servers, ML inference</td><td>Databases, vector stores, message queues</td></tr>
+<tr><td>AI example</td><td>RAG API, embedding service, vLLM</td><td>Qdrant, Redis, PostgreSQL, Kafka</td></tr>
+</table>
+<div class="analogy">💡 A StatefulSet is like a team of specialists at assigned desks — Engineer #0 always sits at Desk 0, has their own filing cabinet (PVC), and colleagues know exactly where to find them. A Deployment is like a pool of temp workers who sit wherever there's a free desk.</div>
+<h3>StatefulSet YAML — Qdrant Vector Database</h3>
+<div class="yaml-block">
+<div class="yaml-head"><div class="cmd-dots"><div class="cmd-dot"></div><div class="cmd-dot"></div><div class="cmd-dot"></div></div><div class="yaml-label">qdrant-statefulset.yaml</div></div>
+<div class="yaml-body"><span class="y-api">apiVersion</span>: apps/v1
+<span class="y-api">kind</span>: StatefulSet
+<span class="y-api">metadata</span>:
+  <span class="y-key">name:</span> <span class="y-str">qdrant</span>
+  <span class="y-key">namespace:</span> <span class="y-str">production</span>
+<span class="y-api">spec</span>:
+  <span class="y-key">serviceName:</span> <span class="y-str">"qdrant"</span>     <span class="y-cmt"># Headless Service name (required for stable DNS)</span>
+  <span class="y-key">replicas:</span> <span class="y-num">1</span>
+  <span class="y-key">selector:</span>
+    <span class="y-key">matchLabels:</span>
+      <span class="y-key">app:</span> <span class="y-str">qdrant</span>
+  <span class="y-key">template:</span>
+    <span class="y-key">metadata:</span>
+      <span class="y-key">labels:</span>
+        <span class="y-key">app:</span> <span class="y-str">qdrant</span>
+    <span class="y-key">spec:</span>
+      <span class="y-key">containers:</span>
+      <span class="y-key">- name:</span> <span class="y-str">qdrant</span>
+        <span class="y-key">image:</span> <span class="y-str">qdrant/qdrant:v1.9.0</span>
+        <span class="y-key">ports:</span>
+        <span class="y-key">- containerPort:</span> <span class="y-num">6333</span>  <span class="y-cmt"># REST API</span>
+        <span class="y-key">- containerPort:</span> <span class="y-num">6334</span>  <span class="y-cmt"># gRPC</span>
+        <span class="y-key">resources:</span>
+          <span class="y-key">requests:</span>
+            <span class="y-key">cpu:</span> <span class="y-str">500m</span>
+            <span class="y-key">memory:</span> <span class="y-str">4Gi</span>
+          <span class="y-key">limits:</span>
+            <span class="y-key">memory:</span> <span class="y-str">16Gi</span>
+        <span class="y-key">volumeMounts:</span>
+        <span class="y-key">- name:</span> <span class="y-str">qdrant-storage</span>
+          <span class="y-key">mountPath:</span> <span class="y-str">/qdrant/storage</span>
+  <span class="y-key">volumeClaimTemplates:</span>     <span class="y-cmt"># KEY DIFFERENCE: each Pod gets its OWN PVC</span>
+  <span class="y-key">- metadata:</span>
+      <span class="y-key">name:</span> <span class="y-str">qdrant-storage</span>
+    <span class="y-key">spec:</span>
+      <span class="y-key">accessModes:</span> <span class="y-key">[</span><span class="y-str">"ReadWriteOnce"</span><span class="y-key">]</span>
+      <span class="y-key">resources:</span>
+        <span class="y-key">requests:</span>
+          <span class="y-key">storage:</span> <span class="y-str">100Gi</span></div>
+</div>
+</div>
+
+<!-- PAGE 7: DAEMONSETS -->
+<div class="page" data-page="7">
+<div class="page-stripe"></div>
+<div class="ph"><span class="ph-s">Kubernetes Level 2</span><span class="ph-c">05 — DaemonSets</span></div>
+<div class="gn">05</div>
+<div class="sm">Concept #5</div>
+<h2><span class="n">05.</span>DaemonSets — One Pod Per Node</h2>
+<div class="box def">
+<span class="bl">📖 Definition</span>
+A <strong>DaemonSet</strong> ensures exactly <em>one copy</em> of a Pod runs on <em>every node</em> in the cluster. When a new node joins, the DaemonSet automatically schedules its Pod onto it. When a node is removed, the Pod is garbage-collected. DaemonSets are for infrastructure-level concerns that must be present on every machine.
+</div>
+<h3>Classic DaemonSet Use Cases</h3>
+<div class="three">
+<div class="comp-card">
+  <div class="comp-name">Log Collectors</div>
+  <div class="comp-role">Fluentd / Fluent Bit</div>
+  <div class="comp-desc">Every node's container logs need collecting and shipping to Elasticsearch or Loki. One DaemonSet Pod per node tails all container logs on that node.</div>
+</div>
+<div class="comp-card">
+  <div class="comp-name">Node Monitoring</div>
+  <div class="comp-role">Prometheus node-exporter</div>
+  <div class="comp-desc">CPU, memory, disk, and network metrics need scraping from every node. Node-exporter runs as a DaemonSet, exposing hardware-level metrics for Prometheus.</div>
+</div>
+<div class="comp-card">
+  <div class="comp-name">GPU Device Plugin</div>
+  <div class="comp-role">NVIDIA device plugin</div>
+  <div class="comp-desc">Lets K8s see and allocate GPUs. Runs as a DaemonSet on GPU nodes. Without it, no Pod can request <code>nvidia.com/gpu</code> resources.</div>
+</div>
+</div>
+<h3>DaemonSet YAML — Fluent Bit Log Collector</h3>
+<div class="yaml-block">
+<div class="yaml-head"><div class="cmd-dots"><div class="cmd-dot"></div><div class="cmd-dot"></div><div class="cmd-dot"></div></div><div class="yaml-label">fluent-bit-daemonset.yaml</div></div>
+<div class="yaml-body"><span class="y-api">apiVersion</span>: apps/v1
+<span class="y-api">kind</span>: DaemonSet
+<span class="y-api">metadata</span>:
+  <span class="y-key">name:</span> <span class="y-str">fluent-bit</span>
+  <span class="y-key">namespace:</span> <span class="y-str">kube-system</span>  <span class="y-cmt"># Infrastructure goes in kube-system</span>
+<span class="y-api">spec</span>:
+  <span class="y-key">selector:</span>
+    <span class="y-key">matchLabels:</span>
+      <span class="y-key">app:</span> <span class="y-str">fluent-bit</span>
+  <span class="y-key">template:</span>
+    <span class="y-key">metadata:</span>
+      <span class="y-key">labels:</span>
+        <span class="y-key">app:</span> <span class="y-str">fluent-bit</span>
+    <span class="y-key">spec:</span>
+      <span class="y-key">tolerations:</span>           <span class="y-cmt"># Allow scheduling on control plane nodes too</span>
+      <span class="y-key">- key:</span> <span class="y-str">node-role.kubernetes.io/control-plane</span>
+        <span class="y-key">operator:</span> <span class="y-str">Exists</span>
+        <span class="y-key">effect:</span> <span class="y-str">NoSchedule</span>
+      <span class="y-key">containers:</span>
+      <span class="y-key">- name:</span> <span class="y-str">fluent-bit</span>
+        <span class="y-key">image:</span> <span class="y-str">fluent/fluent-bit:3.0</span>
+        <span class="y-key">volumeMounts:</span>
+        <span class="y-key">- name:</span> <span class="y-str">varlog</span>
+          <span class="y-key">mountPath:</span> <span class="y-str">/var/log</span>
+          <span class="y-key">readOnly:</span> <span class="y-num">true</span>
+      <span class="y-key">volumes:</span>
+      <span class="y-key">- name:</span> <span class="y-str">varlog</span>
+        <span class="y-key">hostPath:</span>             <span class="y-cmt"># Mount from the NODE's filesystem (not a PVC)</span>
+          <span class="y-key">path:</span> <span class="y-str">/var/log</span></div>
+</div>
+<h3>Taints &amp; Tolerations — Why DaemonSets Need Them</h3>
+<p>Control plane nodes have a <strong>taint</strong> (<code>node-role.kubernetes.io/control-plane:NoSchedule</code>) that prevents regular Pods from landing on them. DaemonSets that must run everywhere declare a matching <strong>toleration</strong> to be scheduled past this taint.</p>
+<table>
+<tr><th>Taint Effect</th><th>Meaning</th><th>Override With</th></tr>
+<tr><td><strong>NoSchedule</strong></td><td>New Pods will not be placed on this node</td><td>Toleration with effect: NoSchedule</td></tr>
+<tr><td><strong>PreferNoSchedule</strong></td><td>K8s tries to avoid the node, uses it if needed</td><td>Optional toleration</td></tr>
+<tr><td><strong>NoExecute</strong></td><td>Existing Pods evicted; new Pods won't be placed</td><td>Toleration with effect: NoExecute</td></tr>
+</table>
+</div>
+
+<!-- PAGE 8: JOBS & CRONJOBS -->
+<div class="page" data-page="8">
+<div class="page-stripe"></div>
+<div class="ph"><span class="ph-s">Kubernetes Level 2</span><span class="ph-c">06 — Jobs &amp; CronJobs</span></div>
+<div class="gn">06</div>
+<div class="sm">Concept #6</div>
+<h2><span class="n">06.</span>Jobs &amp; CronJobs — Batch &amp; Scheduled Tasks</h2>
+<div class="box def">
+<span class="bl">📖 Definitions</span>
+A <strong>Job</strong> runs one or more Pods to <em>completion</em> — once all Pods finish successfully, the Job is done. Unlike a Deployment (restarts crashed Pods forever), a Job stops once work is complete. A <strong>CronJob</strong> schedules a Job on a cron schedule (e.g., nightly at 2am).
+</div>
+<div class="two">
+<div class="box note" style="margin:0;font-size:12px;">
+<span class="bl">Deployment: Run Forever</span>
+Use for long-running services. If a Pod exits for any reason, the Deployment restarts it immediately. Goal: N replicas always running. Never "done."
+</div>
+<div class="box key" style="margin:0;font-size:12px;">
+<span class="bl">Job: Run to Completion</span>
+Use for finite tasks. Runs until N Pods succeed. If a Pod fails, K8s retries (up to backoffLimit). Once all succeed, Job is done — Pods kept for log inspection, then cleaned up.
+</div>
+</div>
+<h3>Job YAML — Document Indexing Pipeline</h3>
+<div class="yaml-block">
+<div class="yaml-head"><div class="cmd-dots"><div class="cmd-dot"></div><div class="cmd-dot"></div><div class="cmd-dot"></div></div><div class="yaml-label">indexing-job.yaml</div></div>
+<div class="yaml-body"><span class="y-api">apiVersion</span>: batch/v1
+<span class="y-api">kind</span>: Job
+<span class="y-api">metadata</span>:
+  <span class="y-key">name:</span> <span class="y-str">index-documents-v2</span>
+<span class="y-api">spec</span>:
+  <span class="y-key">completions:</span> <span class="y-num">1</span>          <span class="y-cmt"># How many Pods must succeed</span>
+  <span class="y-key">parallelism:</span> <span class="y-num">1</span>         <span class="y-cmt"># How many run simultaneously</span>
+  <span class="y-key">backoffLimit:</span> <span class="y-num">3</span>        <span class="y-cmt"># Retry failed Pods up to 3 times</span>
+  <span class="y-key">activeDeadlineSeconds:</span> <span class="y-num">3600</span>    <span class="y-cmt"># Kill Job if it runs over 1 hour</span>
+  <span class="y-key">ttlSecondsAfterFinished:</span> <span class="y-num">86400</span> <span class="y-cmt"># Auto-delete 24h after completion</span>
+  <span class="y-key">template:</span>
+    <span class="y-key">spec:</span>
+      <span class="y-key">restartPolicy:</span> <span class="y-str">OnFailure</span>  <span class="y-cmt"># Jobs: OnFailure or Never (not Always)</span>
+      <span class="y-key">containers:</span>
+      <span class="y-key">- name:</span> <span class="y-str">indexer</span>
+        <span class="y-key">image:</span> <span class="y-str">myregistry/doc-indexer:v3.0</span>
+        <span class="y-key">command:</span> <span class="y-key">[</span><span class="y-str">"python"</span><span class="y-key">,</span> <span class="y-str">"index.py"</span><span class="y-key">,</span> <span class="y-str">"--source=s3://my-docs/"</span><span class="y-key">]</span>
+        <span class="y-key">resources:</span>
+          <span class="y-key">requests:</span>
+            <span class="y-key">cpu:</span> <span class="y-str">2000m</span>
+            <span class="y-key">memory:</span> <span class="y-str">8Gi</span></div>
+</div>
+<h3>CronJob YAML — Nightly Embedding Refresh</h3>
+<div class="yaml-block">
+<div class="yaml-head"><div class="cmd-dots"><div class="cmd-dot"></div><div class="cmd-dot"></div><div class="cmd-dot"></div></div><div class="yaml-label">nightly-reindex.yaml</div></div>
+<div class="yaml-body"><span class="y-api">apiVersion</span>: batch/v1
+<span class="y-api">kind</span>: CronJob
+<span class="y-api">metadata</span>:
+  <span class="y-key">name:</span> <span class="y-str">nightly-reindex</span>
+<span class="y-api">spec</span>:
+  <span class="y-key">schedule:</span> <span class="y-str">"0 2 * * *"</span>     <span class="y-cmt"># Run at 2:00 AM every day (UTC)</span>
+  <span class="y-key">concurrencyPolicy:</span> <span class="y-str">Forbid</span> <span class="y-cmt"># Don't start if previous run still running</span>
+  <span class="y-key">successfulJobsHistoryLimit:</span> <span class="y-num">3</span>
+  <span class="y-key">failedJobsHistoryLimit:</span> <span class="y-num">1</span>
+  <span class="y-key">jobTemplate:</span>
+    <span class="y-key">spec:</span>
+      <span class="y-key">template:</span>
+        <span class="y-key">spec:</span>
+          <span class="y-key">restartPolicy:</span> <span class="y-str">OnFailure</span>
+          <span class="y-key">containers:</span>
+          <span class="y-key">- name:</span> <span class="y-str">reindexer</span>
+            <span class="y-key">image:</span> <span class="y-str">myregistry/doc-indexer:v3.0</span>
+            <span class="y-key">command:</span> <span class="y-key">[</span><span class="y-str">"python"</span><span class="y-key">,</span> <span class="y-str">"reindex.py"</span><span class="y-key">,</span> <span class="y-str">"--incremental"</span><span class="y-key">]</span></div>
+</div>
+<div class="box tip">
+<span class="bl">💡 AI Engineering Use Cases for Jobs</span>
+Jobs are perfect for: one-time document indexing after a major upload, fine-tuning or training runs that terminate on completion, nightly embedding refresh (CronJob), embedding model migration when switching providers, and database schema migrations before a new API deployment.
+</div>
+</div>
+
+<!-- PAGE 9: INIT CONTAINERS -->
+<div class="page" data-page="9">
+<div class="page-stripe"></div>
+<div class="ph"><span class="ph-s">Kubernetes Level 2</span><span class="ph-c">07 — Init Containers</span></div>
+<div class="gn">07</div>
+<div class="sm">Concept #7</div>
+<h2><span class="n">07.</span>Init Containers — Pre-flight Checks</h2>
+<div class="box def">
+<span class="bl">📖 Definition</span>
+<strong>Init containers</strong> run and complete successfully <em>before</em> the main container starts. They run in sequence — each must exit with code 0 before the next begins. If any fails, K8s restarts the Pod. Once all complete, they are not run again for that Pod's lifetime.
+</div>
+<h3>Problems Init Containers Solve</h3>
+<div style="display:flex;flex-direction:column;gap:4px;margin-bottom:3mm;">
+<div class="arch-box" style="border-left-color:var(--blue);">
+  <span class="ab-t" style="color:var(--blue);">Wait for DB</span>
+  <span class="ab-d">Loop <code>curl http://qdrant:6333/health</code> until it returns 200. Main container only starts after Qdrant is ready — prevents connection errors on startup.</span>
+</div>
+<div class="arch-box" style="border-left-color:var(--green);">
+  <span class="ab-t" style="color:var(--green);">Download Model</span>
+  <span class="ab-d">Run <code>huggingface-cli download mistralai/Mistral-7B</code> and save to a shared volume. Main vLLM container starts with model already present — no download at runtime.</span>
+</div>
+<div class="arch-box" style="border-left-color:var(--amber);">
+  <span class="ab-t" style="color:var(--amber);">Run DB Migrations</span>
+  <span class="ab-d">Run <code>alembic upgrade head</code> to migrate the schema. Only after success does the API server start — preventing schema mismatch errors on rollouts.</span>
+</div>
+<div class="arch-box" style="border-left-color:var(--cyan);">
+  <span class="ab-t" style="color:var(--cyan);">Set Permissions</span>
+  <span class="ab-d">Run as root to <code>chown</code> a volume directory before the main container (which runs as non-root) mounts it. Main container then has correct write permissions.</span>
+</div>
+</div>
+<h3>Init Container YAML — Model Download + DB Wait</h3>
+<div class="yaml-block">
+<div class="yaml-head"><div class="cmd-dots"><div class="cmd-dot"></div><div class="cmd-dot"></div><div class="cmd-dot"></div></div><div class="yaml-label">vllm-with-init.yaml · Init containers before main app</div></div>
+<div class="yaml-body"><span class="y-key">spec:</span>
+  <span class="y-key">initContainers:</span>            <span class="y-cmt"># All must succeed before main starts</span>
+
+  <span class="y-key">- name:</span> <span class="y-str">wait-for-qdrant</span>     <span class="y-cmt"># Init 1: wait for vector DB</span>
+    <span class="y-key">image:</span> <span class="y-str">curlimages/curl:8.6.0</span>
+    <span class="y-key">command:</span>
+    <span class="y-key">- /bin/sh</span>
+    <span class="y-key">- -c</span>
+    <span class="y-key">- |</span>
+      <span class="y-str">until curl -sf http://qdrant:6333/health; do</span>
+        <span class="y-str">echo "Waiting..."; sleep 5; done</span>
+
+  <span class="y-key">- name:</span> <span class="y-str">download-model</span>       <span class="y-cmt"># Init 2: pull model weights</span>
+    <span class="y-key">image:</span> <span class="y-str">huggingface/transformers-pytorch-gpu:4.40</span>
+    <span class="y-key">command:</span> <span class="y-key">[</span><span class="y-str">"python"</span><span class="y-key">,</span> <span class="y-str">"-c"</span><span class="y-key">]</span>
+    <span class="y-key">args:</span>
+    <span class="y-key">- |</span>
+      <span class="y-str">from huggingface_hub import snapshot_download</span>
+      <span class="y-str">snapshot_download("mistralai/Mistral-7B-Instruct-v0.3",</span>
+      <span class="y-str">                   local_dir="/model-cache")</span>
+    <span class="y-key">volumeMounts:</span>
+    <span class="y-key">- name:</span> <span class="y-str">model-cache</span>        <span class="y-cmt"># Shared volume with main container</span>
+      <span class="y-key">mountPath:</span> <span class="y-str">/model-cache</span>
+    <span class="y-key">env:</span>
+    <span class="y-key">- name:</span> <span class="y-str">HF_TOKEN</span>
+      <span class="y-key">valueFrom:</span>
+        <span class="y-key">secretKeyRef:</span>
+          <span class="y-key">name:</span> <span class="y-str">hf-secret</span>
+          <span class="y-key">key:</span> <span class="y-str">token</span>
+
+  <span class="y-key">containers:</span>                <span class="y-cmt"># Starts after BOTH init containers succeed</span>
+  <span class="y-key">- name:</span> <span class="y-str">vllm</span>
+    <span class="y-key">image:</span> <span class="y-str">vllm/vllm-openai:v0.4.2</span>
+    <span class="y-key">args:</span> <span class="y-key">[</span><span class="y-str">"--model"</span><span class="y-key">,</span> <span class="y-str">"/model-cache"</span><span class="y-key">]</span>
+    <span class="y-key">volumeMounts:</span>
+    <span class="y-key">- name:</span> <span class="y-str">model-cache</span>
+      <span class="y-key">mountPath:</span> <span class="y-str">/model-cache</span>
+  <span class="y-key">volumes:</span>
+  <span class="y-key">- name:</span> <span class="y-str">model-cache</span>
+    <span class="y-key">emptyDir:</span> <span class="y-key">{}</span>             <span class="y-cmt"># Shared between init and main, Pod-lifetime</span></div>
+</div>
+</div>
+
+<!-- PAGE 10: INGRESS -->
+<div class="page" data-page="10">
+<div class="page-stripe"></div>
+<div class="ph"><span class="ph-s">Kubernetes Level 2</span><span class="ph-c">08 — Ingress Controllers</span></div>
+<div class="gn">08</div>
+<div class="sm">Concept #8</div>
+<h2><span class="n">08.</span>Ingress Controllers — HTTP Routing</h2>
+<div class="box def">
+<span class="bl">📖 Definition</span>
+An <strong>Ingress</strong> manages external HTTP/HTTPS access to cluster services. It acts as a smart L7 load balancer — routing traffic based on hostname, URL path, or headers. An <strong>Ingress Controller</strong> (nginx, Traefik, AWS ALB) is the software that reads Ingress objects and implements the routing.
+</div>
+<h3>LoadBalancer Service vs Ingress</h3>
+<table>
+<tr><th>Aspect</th><th>LoadBalancer Service</th><th>Ingress</th></tr>
+<tr><td>Layer</td><td>L4 (TCP/UDP) — no HTTP awareness</td><td>L7 (HTTP) — sees URLs, headers, hostnames</td></tr>
+<tr><td>Path-based routing</td><td>❌ Not possible</td><td>✅ /api → svc A, /docs → svc B</td></tr>
+<tr><td>Host-based routing</td><td>❌ Not possible</td><td>✅ api.app.com vs admin.app.com</td></tr>
+<tr><td>TLS termination</td><td>Per-service, manual</td><td>✅ Single point with cert-manager</td></tr>
+<tr><td>Cloud cost</td><td>One cloud LB per Service (expensive)</td><td>One cloud LB for ALL services (economical)</td></tr>
+<tr><td>Rate limiting</td><td>❌ Not possible</td><td>✅ Via nginx annotations</td></tr>
+</table>
+<div class="analogy">💡 A LoadBalancer Service is like a separate entrance door for every office in a building. An Ingress is a single main entrance with a receptionist who reads your badge and directs you to the right office.</div>
+<h3>Ingress YAML — Multi-Service RAG Application</h3>
+<div class="yaml-block">
+<div class="yaml-head"><div class="cmd-dots"><div class="cmd-dot"></div><div class="cmd-dot"></div><div class="cmd-dot"></div></div><div class="yaml-label">rag-ingress.yaml · Path-based routing + TLS</div></div>
+<div class="yaml-body"><span class="y-api">apiVersion</span>: networking.k8s.io/v1
+<span class="y-api">kind</span>: Ingress
+<span class="y-api">metadata</span>:
+  <span class="y-key">name:</span> <span class="y-str">rag-ingress</span>
+  <span class="y-key">namespace:</span> <span class="y-str">production</span>
+  <span class="y-key">annotations:</span>
+    <span class="y-key">kubernetes.io/ingress.class:</span> <span class="y-str">"nginx"</span>
+    <span class="y-key">nginx.ingress.kubernetes.io/ssl-redirect:</span> <span class="y-str">"true"</span>
+    <span class="y-key">nginx.ingress.kubernetes.io/limit-rps:</span> <span class="y-str">"100"</span>
+    <span class="y-key">cert-manager.io/cluster-issuer:</span> <span class="y-str">"letsencrypt-prod"</span>
+<span class="y-api">spec</span>:
+  <span class="y-key">tls:</span>
+  <span class="y-key">- hosts:</span>
+    <span class="y-key">- api.myragapp.com</span>
+    <span class="y-key">secretName:</span> <span class="y-str">rag-tls-cert</span>  <span class="y-cmt"># cert-manager stores TLS cert here</span>
+  <span class="y-key">rules:</span>
+  <span class="y-key">- host:</span> <span class="y-str">api.myragapp.com</span>
+    <span class="y-key">http:</span>
+      <span class="y-key">paths:</span>
+      <span class="y-key">- path:</span> <span class="y-str">/v1/query</span>
+        <span class="y-key">pathType:</span> <span class="y-str">Prefix</span>
+        <span class="y-key">backend:</span>
+          <span class="y-key">service:</span>
+            <span class="y-key">name:</span> <span class="y-str">rag-api-svc</span>
+            <span class="y-key">port:</span>
+              <span class="y-key">number:</span> <span class="y-num">80</span>
+      <span class="y-key">- path:</span> <span class="y-str">/v1/ingest</span>
+        <span class="y-key">pathType:</span> <span class="y-str">Prefix</span>
+        <span class="y-key">backend:</span>
+          <span class="y-key">service:</span>
+            <span class="y-key">name:</span> <span class="y-str">ingest-svc</span>
+            <span class="y-key">port:</span>
+              <span class="y-key">number:</span> <span class="y-num">80</span>
+      <span class="y-key">- path:</span> <span class="y-str">/</span>
+        <span class="y-key">pathType:</span> <span class="y-str">Prefix</span>
+        <span class="y-key">backend:</span>
+          <span class="y-key">service:</span>
+            <span class="y-key">name:</span> <span class="y-str">frontend-svc</span>
+            <span class="y-key">port:</span>
+              <span class="y-key">number:</span> <span class="y-num">80</span></div>
+</div>
+<div class="box tip">
+<span class="bl">💡 cert-manager — Automatic Free TLS</span>
+Install cert-manager and it automatically provisions and renews Let's Encrypt TLS certificates for any Ingress with the <code>cert-manager.io/cluster-issuer</code> annotation. No manual certificate management needed.
+</div>
+</div>
+<!-- PAGE 11: NETWORK POLICIES -->
+<div class="page" data-page="11">
+<div class="page-stripe"></div>
+<div class="ph"><span class="ph-s">Kubernetes Level 2</span><span class="ph-c">09 — Network Policies</span></div>
+<div class="gn">09</div>
+<div class="sm">Concept #9</div>
+<h2><span class="n">09.</span>Network Policies — Pod-Level Firewalls</h2>
+<div class="box def">
+<span class="bl">📖 Definition</span>
+A <strong>NetworkPolicy</strong> controls which Pods can send traffic to which other Pods. By default, Kubernetes has <em>no network restrictions</em> — every Pod can reach every other Pod. NetworkPolicies add firewall rules at the Pod level, enabling zero-trust networking.
+</div>
+<div class="box warn">
+<span class="bl">⚠ Why This Matters for Security</span>
+Without NetworkPolicies: if an attacker compromises your frontend Pod, they can directly reach your vector database, model API, and admin services. Nothing blocks lateral movement inside the cluster. NetworkPolicies implement least-privilege networking.
+</div>
+<h3>NetworkPolicy YAML — Deny All Then Allow Selectively</h3>
+<div class="yaml-block">
+<div class="yaml-head"><div class="cmd-dots"><div class="cmd-dot"></div><div class="cmd-dot"></div><div class="cmd-dot"></div></div><div class="yaml-label">network-policies.yaml · Zero-trust pattern</div></div>
+<div class="yaml-body"><span class="y-api">apiVersion</span>: networking.k8s.io/v1
+<span class="y-api">kind</span>: NetworkPolicy
+<span class="y-api">metadata</span>:
+  <span class="y-key">name:</span> <span class="y-str">default-deny-all</span>   <span class="y-cmt"># Step 1: lock down the namespace</span>
+  <span class="y-key">namespace:</span> <span class="y-str">production</span>
+<span class="y-api">spec</span>:
+  <span class="y-key">podSelector:</span> <span class="y-key">{}</span>          <span class="y-cmt"># Empty = select ALL pods in namespace</span>
+  <span class="y-key">policyTypes:</span>
+  <span class="y-key">- Ingress</span>
+  <span class="y-key">- Egress</span>
+  <span class="y-cmt"># No ingress/egress rules = deny everything</span>
+<span class="y-cmt">---</span>
+<span class="y-api">apiVersion</span>: networking.k8s.io/v1
+<span class="y-api">kind</span>: NetworkPolicy
+<span class="y-api">metadata</span>:
+  <span class="y-key">name:</span> <span class="y-str">allow-rag-to-qdrant</span>  <span class="y-cmt"># Step 2: selectively allow</span>
+  <span class="y-key">namespace:</span> <span class="y-str">production</span>
+<span class="y-api">spec</span>:
+  <span class="y-key">podSelector:</span>
+    <span class="y-key">matchLabels:</span>
+      <span class="y-key">app:</span> <span class="y-str">qdrant</span>           <span class="y-cmt"># Policy applies TO qdrant Pods</span>
+  <span class="y-key">policyTypes:</span>
+  <span class="y-key">- Ingress</span>
+  <span class="y-key">ingress:</span>
+  <span class="y-key">- from:</span>
+    <span class="y-key">- podSelector:</span>
+        <span class="y-key">matchLabels:</span>
+          <span class="y-key">app:</span> <span class="y-str">rag-api</span>        <span class="y-cmt"># Only rag-api Pods can reach qdrant</span>
+    <span class="y-key">ports:</span>
+    <span class="y-key">- protocol:</span> <span class="y-str">TCP</span>
+      <span class="y-key">port:</span> <span class="y-num">6333</span></div>
+</div>
+<div class="box warn">
+<span class="bl">⚠ NetworkPolicy Requires a Supported CNI</span>
+NetworkPolicies only work with a CNI that enforces them: <strong>Calico, Cilium, or Weave Net</strong>. The default CNI in many clusters (Flannel, kubenet) silently ignores NetworkPolicies — they'll exist but do nothing. Check your CNI before relying on network isolation.
+</div>
+<div class="box crit">
+<span class="bl">❌ Common Pitfall: Forgetting DNS Egress</span>
+After applying default-deny-all, your Pods can no longer resolve DNS names. They can't reach <code>qdrant-svc</code>, can't call OpenAI, can't reach anything. Always add an egress rule allowing port 53 (UDP/TCP) to <code>kube-dns</code> in <code>kube-system</code> after locking down a namespace.
+</div>
+</div>
+
+<!-- PAGE 12: RBAC -->
+<div class="page" data-page="12">
+<div class="page-stripe"></div>
+<div class="ph"><span class="ph-s">Kubernetes Level 2</span><span class="ph-c">10 — RBAC</span></div>
+<div class="gn">10</div>
+<div class="sm">Concept #10</div>
+<h2><span class="n">10.</span>RBAC — Role-Based Access Control</h2>
+<div class="box def">
+<span class="bl">📖 Definition</span>
+<strong>RBAC</strong> controls which users, groups, or Pods (via ServiceAccounts) can perform which actions (get, list, create, delete) on which Kubernetes resources (pods, secrets, deployments). It enforces least-privilege access to your cluster.
+</div>
+<h3>The Four RBAC Objects</h3>
+<div class="two" style="gap:4mm;">
+<div style="display:flex;flex-direction:column;gap:4px;">
+<div class="comp-card">
+  <div class="comp-name">Role</div>
+  <div class="comp-role">Namespace-scoped permissions</div>
+  <div class="comp-desc">Grants permissions within <em>one namespace</em>. "In namespace production, allow get/list pods."</div>
+</div>
+<div class="comp-card">
+  <div class="comp-name">RoleBinding</div>
+  <div class="comp-role">Attaches a Role to a subject</div>
+  <div class="comp-desc">Binds a Role to a User, Group, or ServiceAccount. "Give 'pod-reader' Role to ServiceAccount 'deployer'."</div>
+</div>
+</div>
+<div style="display:flex;flex-direction:column;gap:4px;">
+<div class="comp-card">
+  <div class="comp-name">ClusterRole</div>
+  <div class="comp-role">Cluster-wide permissions</div>
+  <div class="comp-desc">Like Role but applies <em>across all namespaces</em> or to cluster-scoped resources like Nodes.</div>
+</div>
+<div class="comp-card">
+  <div class="comp-name">ServiceAccount</div>
+  <div class="comp-role">Identity for Pods</div>
+  <div class="comp-desc">An identity for Pods to use when calling the K8s API. Every Pod runs as a ServiceAccount (default or custom).</div>
+</div>
+</div>
+</div>
+<h3>RBAC YAML — CI/CD Pipeline Access</h3>
+<div class="yaml-block">
+<div class="yaml-head"><div class="cmd-dots"><div class="cmd-dot"></div><div class="cmd-dot"></div><div class="cmd-dot"></div></div><div class="yaml-label">rbac.yaml · ServiceAccount + Role + Binding</div></div>
+<div class="yaml-body"><span class="y-api">apiVersion</span>: v1
+<span class="y-api">kind</span>: ServiceAccount
+<span class="y-api">metadata</span>:
+  <span class="y-key">name:</span> <span class="y-str">deployer</span>
+  <span class="y-key">namespace:</span> <span class="y-str">production</span>
+<span class="y-cmt">---</span>
+<span class="y-api">apiVersion</span>: rbac.authorization.k8s.io/v1
+<span class="y-api">kind</span>: Role
+<span class="y-api">metadata</span>:
+  <span class="y-key">name:</span> <span class="y-str">deployment-manager</span>
+  <span class="y-key">namespace:</span> <span class="y-str">production</span>
+<span class="y-api">rules</span>:
+<span class="y-key">- apiGroups:</span> <span class="y-key">[</span><span class="y-str">"apps"</span><span class="y-key">]</span>
+  <span class="y-key">resources:</span> <span class="y-key">[</span><span class="y-str">"deployments"</span><span class="y-key">]</span>
+  <span class="y-key">verbs:</span> <span class="y-key">[</span><span class="y-str">"get"</span><span class="y-key">,</span> <span class="y-str">"list"</span><span class="y-key">,</span> <span class="y-str">"update"</span><span class="y-key">,</span> <span class="y-str">"patch"</span><span class="y-key">]</span>
+<span class="y-key">- apiGroups:</span> <span class="y-key">[</span><span class="y-str">""</span><span class="y-key">]</span>             <span class="y-cmt"># "" = core API group (Pods, Services)</span>
+  <span class="y-key">resources:</span> <span class="y-key">[</span><span class="y-str">"pods"</span><span class="y-key">]</span>
+  <span class="y-key">verbs:</span> <span class="y-key">[</span><span class="y-str">"get"</span><span class="y-key">,</span> <span class="y-str">"list"</span><span class="y-key">]</span>
+<span class="y-cmt">---</span>
+<span class="y-api">apiVersion</span>: rbac.authorization.k8s.io/v1
+<span class="y-api">kind</span>: RoleBinding
+<span class="y-api">metadata</span>:
+  <span class="y-key">name:</span> <span class="y-str">deployer-binding</span>
+  <span class="y-key">namespace:</span> <span class="y-str">production</span>
+<span class="y-api">subjects</span>:
+<span class="y-key">- kind:</span> <span class="y-str">ServiceAccount</span>
+  <span class="y-key">name:</span> <span class="y-str">deployer</span>
+  <span class="y-key">namespace:</span> <span class="y-str">production</span>
+<span class="y-api">roleRef</span>:
+  <span class="y-key">kind:</span> <span class="y-str">Role</span>
+  <span class="y-key">name:</span> <span class="y-str">deployment-manager</span>
+  <span class="y-key">apiGroup:</span> <span class="y-str">rbac.authorization.k8s.io</span></div>
+</div>
+<div class="cmd-block">
+<div class="cmd-head"><div class="cmd-dots"><div class="cmd-dot"></div><div class="cmd-dot"></div><div class="cmd-dot"></div></div><div class="cmd-label">kubectl · RBAC Debugging</div></div>
+<div class="cmd-body"><span class="cmd-prompt">$ </span><span class="cmd-cmd">kubectl auth can-i</span> get pods <span class="cmd-flag">--as</span>=system:serviceaccount:production:deployer
+<span class="cmd-prompt">$ </span><span class="cmd-cmd">kubectl get rolebindings</span> <span class="cmd-flag">-n</span> production
+<span class="cmd-prompt">$ </span><span class="cmd-cmd">kubectl describe rolebinding</span> deployer-binding <span class="cmd-flag">-n</span> production</div>
+</div>
+</div>
+
+<!-- PAGE 13: SECURITY CONTEXTS -->
+<div class="page" data-page="13">
+<div class="page-stripe"></div>
+<div class="ph"><span class="ph-s">Kubernetes Level 2</span><span class="ph-c">11 — Security Contexts</span></div>
+<div class="gn">11</div>
+<div class="sm">Concept #11</div>
+<h2><span class="n">11.</span>Security Contexts &amp; Pod Security</h2>
+<div class="box def">
+<span class="bl">📖 Definition</span>
+A <strong>securityContext</strong> defines privilege and access control settings for a Pod or container. It lets you run containers as non-root users, make filesystems read-only, drop Linux capabilities, and prevent privilege escalation — hardening your containers against exploits.
+</div>
+<h3>Key Security Context Fields</h3>
+<table>
+<tr><th>Field</th><th>Level</th><th>What It Does</th><th>Best Practice</th></tr>
+<tr><td><code>runAsNonRoot: true</code></td><td>Pod/Container</td><td>K8s refuses to start if image runs as root (UID 0)</td><td>Always set for production</td></tr>
+<tr><td><code>runAsUser: 1000</code></td><td>Pod/Container</td><td>Override the UID the container process runs as</td><td>Use 1000+ (non-root range)</td></tr>
+<tr><td><code>readOnlyRootFilesystem: true</code></td><td>Container</td><td>Root filesystem mounted read-only — blocks malware writes</td><td>Use + volumeMount for writable dirs</td></tr>
+<tr><td><code>allowPrivilegeEscalation: false</code></td><td>Container</td><td>Process cannot gain more privileges than its parent</td><td>Always false for app containers</td></tr>
+<tr><td><code>capabilities.drop: ["ALL"]</code></td><td>Container</td><td>Drop all Linux capabilities; add back only what's needed</td><td>Drop ALL, then add individually</td></tr>
+<tr><td><code>seccompProfile: RuntimeDefault</code></td><td>Pod</td><td>Enables default seccomp filter — blocks dangerous syscalls</td><td>Use RuntimeDefault as baseline</td></tr>
+</table>
+<h3>Hardened Container Security Context</h3>
+<div class="yaml-block">
+<div class="yaml-head"><div class="cmd-dots"><div class="cmd-dot"></div><div class="cmd-dot"></div><div class="cmd-dot"></div></div><div class="yaml-label">Pod spec · Hardened security context</div></div>
+<div class="yaml-body"><span class="y-key">spec:</span>
+  <span class="y-key">securityContext:</span>         <span class="y-cmt"># Pod-level: applies to all containers</span>
+    <span class="y-key">runAsNonRoot:</span> <span class="y-num">true</span>
+    <span class="y-key">runAsUser:</span> <span class="y-num">1000</span>
+    <span class="y-key">runAsGroup:</span> <span class="y-num">1000</span>
+    <span class="y-key">fsGroup:</span> <span class="y-num">1000</span>         <span class="y-cmt"># All volume files owned by GID 1000</span>
+    <span class="y-key">seccompProfile:</span>
+      <span class="y-key">type:</span> <span class="y-str">RuntimeDefault</span>
+  <span class="y-key">containers:</span>
+  <span class="y-key">- name:</span> <span class="y-str">rag-api</span>
+    <span class="y-key">image:</span> <span class="y-str">myregistry/rag-api:v2</span>
+    <span class="y-key">securityContext:</span>       <span class="y-cmt"># Container-level overrides</span>
+      <span class="y-key">readOnlyRootFilesystem:</span> <span class="y-num">true</span>
+      <span class="y-key">allowPrivilegeEscalation:</span> <span class="y-num">false</span>
+      <span class="y-key">capabilities:</span>
+        <span class="y-key">drop:</span> <span class="y-key">[</span><span class="y-str">"ALL"</span><span class="y-key">]</span>
+    <span class="y-key">volumeMounts:</span>
+    <span class="y-key">- name:</span> <span class="y-str">tmp-dir</span>         <span class="y-cmt"># readOnly root FS needs explicit writable /tmp</span>
+      <span class="y-key">mountPath:</span> <span class="y-str">/tmp</span>
+    <span class="y-key">- name:</span> <span class="y-str">cache-dir</span>
+      <span class="y-key">mountPath:</span> <span class="y-str">/app/.cache</span>
+  <span class="y-key">volumes:</span>
+  <span class="y-key">- name:</span> <span class="y-str">tmp-dir</span>
+    <span class="y-key">emptyDir:</span> <span class="y-key">{}</span>
+  <span class="y-key">- name:</span> <span class="y-str">cache-dir</span>
+    <span class="y-key">emptyDir:</span> <span class="y-key">{}</span></div>
+</div>
+<div class="box tip">
+<span class="bl">💡 Pod Security Admission (K8s 1.25+)</span>
+Label your namespace to enforce security standards cluster-wide: <code>pod-security.kubernetes.io/enforce: restricted</code> automatically rejects any Pod that runs as root or lacks seccomp — no per-Pod annotation needed.
+</div>
+</div>
+
+<!-- PAGE 14: HELM -->
+<div class="page" data-page="14">
+<div class="page-stripe"></div>
+<div class="ph"><span class="ph-s">Kubernetes Level 2</span><span class="ph-c">12 — Helm</span></div>
+<div class="gn">12</div>
+<div class="sm">Concept #12</div>
+<h2><span class="n">12.</span>Helm — The Kubernetes Package Manager</h2>
+<div class="box def">
+<span class="bl">📖 Definition</span>
+<strong>Helm</strong> is the package manager for Kubernetes. A <strong>Chart</strong> is a package of templated YAML files configurable via <code>values.yaml</code>. When deployed, a chart becomes a <strong>Release</strong>. Helm makes it trivial to install community software (Qdrant, Redis, PostgreSQL, nginx-ingress) and to package your own apps for repeatable deployment.
+</div>
+<h3>Core Helm Concepts</h3>
+<div class="three">
+<div class="comp-card">
+  <div class="comp-name">Chart</div>
+  <div class="comp-role">The package / blueprint</div>
+  <div class="comp-desc">A directory of YAML templates + values.yaml with defaults + Chart.yaml with metadata. Published to Helm repos (ArtifactHub, private registries).</div>
+</div>
+<div class="comp-card">
+  <div class="comp-name">Values</div>
+  <div class="comp-role">The configuration knobs</div>
+  <div class="comp-desc">YAML parameters (image tag, replica count, resource limits) that override chart defaults. Maintain separate values files per environment: dev, staging, prod.</div>
+</div>
+<div class="comp-card">
+  <div class="comp-name">Release</div>
+  <div class="comp-role">A deployed instance of a chart</div>
+  <div class="comp-desc">When you <code>helm install</code>, Helm creates a named, versioned Release with rollback history. Multiple releases of the same chart can exist in different namespaces.</div>
+</div>
+</div>
+<h3>Essential Helm Commands</h3>
+<div class="cmd-block">
+<div class="cmd-head"><div class="cmd-dots"><div class="cmd-dot"></div><div class="cmd-dot"></div><div class="cmd-dot"></div></div><div class="cmd-label">Terminal · Helm Commands</div></div>
+<div class="cmd-body"><span class="cmd-cmt">── REPOS ────────────────────────────────────────────────────────────────</span>
+<span class="cmd-prompt">$ </span><span class="cmd-cmd">helm repo add</span> qdrant https://qdrant.github.io/qdrant-helm
+<span class="cmd-prompt">$ </span><span class="cmd-cmd">helm repo update</span>                       <span class="cmd-cmt"># Fetch latest chart versions</span>
+<span class="cmd-prompt">$ </span><span class="cmd-cmd">helm search repo</span> qdrant
+
+<span class="cmd-cmt">── INSTALL / UPGRADE ────────────────────────────────────────────────────</span>
+<span class="cmd-prompt">$ </span><span class="cmd-cmd">helm install</span> my-qdrant qdrant/qdrant <span class="cmd-flag">-n</span> production <span class="cmd-flag">-f</span> prod-values.yaml
+<span class="cmd-prompt">$ </span><span class="cmd-cmd">helm upgrade</span> my-qdrant qdrant/qdrant <span class="cmd-flag">-n</span> production <span class="cmd-flag">-f</span> prod-values.yaml
+<span class="cmd-prompt">$ </span><span class="cmd-cmd">helm upgrade</span> <span class="cmd-flag">--install</span> my-qdrant qdrant/qdrant <span class="cmd-cmt"># Install OR upgrade in one cmd</span>
+
+<span class="cmd-cmt">── INSPECT ──────────────────────────────────────────────────────────────</span>
+<span class="cmd-prompt">$ </span><span class="cmd-cmd">helm list</span> <span class="cmd-flag">-n</span> production
+<span class="cmd-prompt">$ </span><span class="cmd-cmd">helm history</span> my-qdrant <span class="cmd-flag">-n</span> production    <span class="cmd-cmt"># All revisions with timestamps</span>
+<span class="cmd-prompt">$ </span><span class="cmd-cmd">helm get values</span> my-qdrant <span class="cmd-flag">-n</span> production <span class="cmd-cmt"># What values are applied now</span>
+<span class="cmd-prompt">$ </span><span class="cmd-cmd">helm template</span> my-qdrant qdrant/qdrant <span class="cmd-flag">-f</span> prod-values.yaml
+<span class="cmd-cmt">           # Render YAML locally without touching the cluster — great for debugging</span>
+
+<span class="cmd-cmt">── ROLLBACK / CLEANUP ───────────────────────────────────────────────────</span>
+<span class="cmd-prompt">$ </span><span class="cmd-cmd">helm rollback</span> my-qdrant 2              <span class="cmd-cmt"># Roll back to revision 2</span>
+<span class="cmd-prompt">$ </span><span class="cmd-cmd">helm uninstall</span> my-qdrant <span class="cmd-flag">-n</span> production <span class="cmd-cmt"># Remove release + all K8s resources</span></div>
+</div>
+<h3>prod-values.yaml — Override Chart Defaults</h3>
+<div class="yaml-block">
+<div class="yaml-head"><div class="cmd-dots"><div class="cmd-dot"></div><div class="cmd-dot"></div><div class="cmd-dot"></div></div><div class="yaml-label">prod-values.yaml</div></div>
+<div class="yaml-body"><span class="y-key">replicaCount:</span> <span class="y-num">1</span>
+<span class="y-key">image:</span>
+  <span class="y-key">tag:</span> <span class="y-str">"v1.9.0"</span>           <span class="y-cmt"># Pin a specific version</span>
+<span class="y-key">resources:</span>
+  <span class="y-key">requests:</span>
+    <span class="y-key">memory:</span> <span class="y-str">"4Gi"</span>
+    <span class="y-key">cpu:</span> <span class="y-str">"500m"</span>
+  <span class="y-key">limits:</span>
+    <span class="y-key">memory:</span> <span class="y-str">"16Gi"</span>
+<span class="y-key">persistence:</span>
+  <span class="y-key">enabled:</span> <span class="y-num">true</span>
+  <span class="y-key">size:</span> <span class="y-str">"100Gi"</span>
+  <span class="y-key">storageClass:</span> <span class="y-str">"gp3"</span>     <span class="y-cmt"># AWS gp3 SSD</span></div>
+</div>
+</div>
+
+<!-- PAGE 15: WRITING YOUR OWN HELM CHART -->
+<div class="page" data-page="15">
+<div class="page-stripe"></div>
+<div class="ph"><span class="ph-s">Kubernetes Level 2</span><span class="ph-c">13 — Writing Your Own Helm Chart</span></div>
+<div class="gn">13</div>
+<div class="sm">Concept #13</div>
+<h2><span class="n">13.</span>Writing Your Own Helm Chart</h2>
+<h3>Chart Directory Structure</h3>
+<div class="yaml-block">
+<div class="yaml-head"><div class="cmd-dots"><div class="cmd-dot"></div><div class="cmd-dot"></div><div class="cmd-dot"></div></div><div class="yaml-label">rag-app/ · Helm chart structure</div></div>
+<div class="yaml-body"><span class="y-top">rag-app/</span>
+<span class="y-key">├── Chart.yaml</span>             <span class="y-cmt"># Chart metadata: name, version, description</span>
+<span class="y-key">├── values.yaml</span>            <span class="y-cmt"># Default values — users override these</span>
+<span class="y-key">├── values-staging.yaml</span>    <span class="y-cmt"># Staging-specific overrides</span>
+<span class="y-key">├── values-prod.yaml</span>       <span class="y-cmt"># Production-specific overrides</span>
+<span class="y-key">├── templates/</span>
+<span class="y-key">│   ├── deployment.yaml</span>    <span class="y-cmt"># Templated Deployment (uses {{ .Values.xxx }})</span>
+<span class="y-key">│   ├── service.yaml</span>
+<span class="y-key">│   ├── ingress.yaml</span>
+<span class="y-key">│   ├── configmap.yaml</span>
+<span class="y-key">│   ├── hpa.yaml</span>
+<span class="y-key">│   └── _helpers.tpl</span>       <span class="y-cmt"># Named template helpers (reusable snippets)</span>
+<span class="y-key">└── charts/</span>                <span class="y-cmt"># Sub-charts / dependencies (qdrant, redis)</span></div>
+</div>
+<h3>Chart.yaml</h3>
+<div class="yaml-block">
+<div class="yaml-head"><div class="cmd-dots"><div class="cmd-dot"></div><div class="cmd-dot"></div><div class="cmd-dot"></div></div><div class="yaml-label">Chart.yaml</div></div>
+<div class="yaml-body"><span class="y-key">apiVersion:</span> <span class="y-str">v2</span>
+<span class="y-key">name:</span> <span class="y-str">rag-app</span>
+<span class="y-key">description:</span> <span class="y-str">RAG application — API, embeddings, and vector store</span>
+<span class="y-key">type:</span> <span class="y-str">application</span>
+<span class="y-key">version:</span> <span class="y-str">1.3.0</span>         <span class="y-cmt"># Chart version — increment on chart changes</span>
+<span class="y-key">appVersion:</span> <span class="y-str">"2.1.0"</span>   <span class="y-cmt"># Your app version — informational</span>
+<span class="y-key">dependencies:</span>
+<span class="y-key">- name:</span> <span class="y-str">qdrant</span>           <span class="y-cmt"># Include Qdrant as a sub-chart</span>
+  <span class="y-key">version:</span> <span class="y-str">"0.8.4"</span>
+  <span class="y-key">repository:</span> <span class="y-str">"https://qdrant.github.io/qdrant-helm"</span></div>
+</div>
+<h3>Templated Deployment — Go Template Syntax</h3>
+<div class="yaml-block">
+<div class="yaml-head"><div class="cmd-dots"><div class="cmd-dot"></div><div class="cmd-dot"></div><div class="cmd-dot"></div></div><div class="yaml-label">templates/deployment.yaml</div></div>
+<div class="yaml-body"><span class="y-api">apiVersion</span>: apps/v1
+<span class="y-api">kind</span>: Deployment
+<span class="y-api">metadata</span>:
+  <span class="y-key">name:</span> <span class="y-key">{{</span> <span class="y-top">include "rag-app.fullname" .</span> <span class="y-key">}}</span>   <span class="y-cmt"># Helper from _helpers.tpl</span>
+  <span class="y-key">namespace:</span> <span class="y-key">{{</span> <span class="y-top">.Release.Namespace</span> <span class="y-key">}}</span>      <span class="y-cmt"># Auto-filled by Helm</span>
+<span class="y-api">spec</span>:
+  <span class="y-key">replicas:</span> <span class="y-key">{{</span> <span class="y-top">.Values.replicaCount</span> <span class="y-key">}}</span>     <span class="y-cmt"># From values.yaml</span>
+  <span class="y-key">template</span>:
+    <span class="y-key">spec:</span>
+      <span class="y-key">containers:</span>
+      <span class="y-key">- name:</span> <span class="y-str">rag-api</span>
+        <span class="y-key">image:</span> <span class="y-key">"{{</span> <span class="y-top">.Values.image.repository</span> <span class="y-key">}}:{{</span> <span class="y-top">.Values.image.tag</span> <span class="y-key">}}"</span>
+        <span class="y-key">resources:</span>
+          <span class="y-key">requests:</span>
+            <span class="y-key">cpu:</span> <span class="y-key">{{</span> <span class="y-top">.Values.resources.requests.cpu</span> <span class="y-key">}}</span>
+            <span class="y-key">memory:</span> <span class="y-key">{{</span> <span class="y-top">.Values.resources.requests.memory</span> <span class="y-key">}}</span>
+        <span class="y-key">{{- if .Values.hpa.enabled }}</span>      <span class="y-cmt"># Conditional blocks</span>
+        <span class="y-cmt"># HPA resource only rendered if hpa.enabled=true</span>
+        <span class="y-key">{{- end }}</span></div>
+</div>
+<div class="cmd-block">
+<div class="cmd-head"><div class="cmd-dots"><div class="cmd-dot"></div><div class="cmd-dot"></div><div class="cmd-dot"></div></div><div class="cmd-label">Terminal · Full stack deploy with Helm</div></div>
+<div class="cmd-body"><span class="cmd-prompt">$ </span><span class="cmd-cmd">helm dependency update</span> ./rag-app    <span class="cmd-cmt"># Pull sub-charts (qdrant, redis)</span>
+<span class="cmd-prompt">$ </span><span class="cmd-cmd">helm upgrade</span> <span class="cmd-flag">--install</span> rag-app ./rag-app \
+    <span class="cmd-flag">--namespace</span> production <span class="cmd-flag">--create-namespace</span> \
+    <span class="cmd-flag">-f</span> values-prod.yaml \
+    <span class="cmd-flag">--set</span> image.tag=v2.3.1 \     <span class="cmd-cmt"># Override from CI/CD pipeline</span>
+    <span class="cmd-flag">--wait</span> \                     <span class="cmd-cmt"># Block until all Deployments ready</span>
+    <span class="cmd-flag">--timeout</span> 10m               <span class="cmd-cmt"># Give model-loading Pods enough time</span></div>
+</div>
+<div class="box tip">
+<span class="bl">💡 helm template for Local Debugging</span>
+Run <code>helm template my-release ./rag-app -f values-prod.yaml</code> to render all templates locally without touching the cluster. Pipe to <code>kubectl apply --dry-run=client -f -</code> for a full validation check.
+</div>
+</div>
+
+<!-- PAGE 16: ADVANCED PROBES -->
+<div class="page" data-page="16">
+<div class="page-stripe"></div>
+<div class="ph"><span class="ph-s">Kubernetes Level 2</span><span class="ph-c">14 — Advanced Probes &amp; Graceful Shutdown</span></div>
+<div class="gn">14</div>
+<div class="sm">Concept #14</div>
+<h2><span class="n">14.</span>Advanced Probes &amp; Graceful Shutdown</h2>
+<h3>Graceful Shutdown for LLM Inference Servers</h3>
+<p>When K8s needs to stop a Pod (scale-down, rolling update, node drain), it sends <strong>SIGTERM</strong>. The container has a grace period to finish in-flight requests before being forcefully killed (SIGKILL). Default: 30 seconds. For LLM inference, a single generation request can take 45–120 seconds — you must increase this.</p>
+<div class="yaml-block">
+<div class="yaml-head"><div class="cmd-dots"><div class="cmd-dot"></div><div class="cmd-dot"></div><div class="cmd-dot"></div></div><div class="yaml-label">Pod spec · Graceful shutdown for LLM servers</div></div>
+<div class="yaml-body"><span class="y-key">spec:</span>
+  <span class="y-key">terminationGracePeriodSeconds:</span> <span class="y-num">120</span> <span class="y-cmt"># 2 min for in-flight completions</span>
+  <span class="y-key">containers:</span>
+  <span class="y-key">- name:</span> <span class="y-str">vllm</span>
+    <span class="y-key">lifecycle:</span>
+      <span class="y-key">preStop:</span>                        <span class="y-cmt"># Runs BEFORE SIGTERM is sent</span>
+        <span class="y-key">exec:</span>
+          <span class="y-key">command:</span> <span class="y-key">[</span><span class="y-str">"/bin/sh"</span><span class="y-key">,</span> <span class="y-str">"-c"</span><span class="y-key">,</span> <span class="y-str">"sleep 5"</span><span class="y-key">]</span>
+          <span class="y-cmt"># 5s delay lets the LB stop sending new requests here</span>
+      <span class="y-key">postStart:</span>                      <span class="y-cmt"># Runs immediately after container starts</span>
+        <span class="y-key">exec:</span>
+          <span class="y-key">command:</span> <span class="y-key">[</span><span class="y-str">"python"</span><span class="y-key">,</span> <span class="y-str">"warmup.py"</span><span class="y-key">]</span></div>
+</div>
+<h3>Startup Probe — For Slow-Starting Models</h3>
+<div class="yaml-block">
+<div class="yaml-head"><div class="cmd-dots"><div class="cmd-dot"></div><div class="cmd-dot"></div><div class="cmd-dot"></div></div><div class="yaml-label">Container spec · Startup probe for LLM server</div></div>
+<div class="yaml-body"><span class="y-key">startupProbe:</span>            <span class="y-cmt"># Disables liveness/readiness until this passes</span>
+  <span class="y-key">httpGet:</span>
+    <span class="y-key">path:</span> <span class="y-str">/v1/models</span>
+    <span class="y-key">port:</span> <span class="y-num">8000</span>
+  <span class="y-key">failureThreshold:</span> <span class="y-num">40</span>   <span class="y-cmt"># 40 × 15s = 10 minutes max startup time</span>
+  <span class="y-key">periodSeconds:</span> <span class="y-num">15</span>
+<span class="y-key">livenessProbe:</span>
+  <span class="y-key">httpGet:</span>
+    <span class="y-key">path:</span> <span class="y-str">/v1/models</span>
+    <span class="y-key">port:</span> <span class="y-num">8000</span>
+  <span class="y-key">periodSeconds:</span> <span class="y-num">30</span>
+  <span class="y-key">failureThreshold:</span> <span class="y-num">3</span>    <span class="y-cmt"># Restart after 3 consecutive failures</span>
+  <span class="y-key">timeoutSeconds:</span> <span class="y-num">5</span>
+<span class="y-key">readinessProbe:</span>
+  <span class="y-key">httpGet:</span>
+    <span class="y-key">path:</span> <span class="y-str">/v1/models</span>
+    <span class="y-key">port:</span> <span class="y-num">8000</span>
+  <span class="y-key">periodSeconds:</span> <span class="y-num">10</span>
+  <span class="y-key">failureThreshold:</span> <span class="y-num">1</span>    <span class="y-cmt"># Remove from LB after just 1 failure</span></div>
+</div>
+<h3>Pod Termination Sequence</h3>
+<div style="display:flex;flex-direction:column;gap:3px;">
+<div class="lc-step"><div class="lc-num">1</div><div class="lc-body"><div class="lc-title">Pod marked Terminating</div><div class="lc-desc">Pod removed from Service endpoints — no new requests routed to it</div></div></div>
+<div class="lc-step"><div class="lc-num">2</div><div class="lc-body"><div class="lc-title">preStop hook runs</div><div class="lc-desc">Your preStop command executes (e.g., sleep 5 to let LB propagate)</div></div></div>
+<div class="lc-step"><div class="lc-num">3</div><div class="lc-body"><div class="lc-title">SIGTERM sent to container</div><div class="lc-desc">Container should start graceful shutdown and finish in-flight requests</div></div></div>
+<div class="lc-step"><div class="lc-num">4</div><div class="lc-body"><div class="lc-title">Grace period counts down</div><div class="lc-desc">terminationGracePeriodSeconds timer runs (set to 120 for LLM servers)</div></div></div>
+<div class="lc-step"><div class="lc-num">5</div><div class="lc-body"><div class="lc-title">SIGKILL if still running</div><div class="lc-desc">If container hasn't exited by end of grace period, K8s force-kills it</div></div></div>
+</div>
+</div>
+
+<!-- PAGE 17: RESOURCE QUOTAS -->
+<div class="page" data-page="17">
+<div class="page-stripe"></div>
+<div class="ph"><span class="ph-s">Kubernetes Level 2</span><span class="ph-c">15 — Resource Quotas &amp; LimitRanges</span></div>
+<div class="gn">15</div>
+<div class="sm">Concept #15</div>
+<h2><span class="n">15.</span>Resource Quotas &amp; LimitRanges</h2>
+<div class="box def">
+<span class="bl">📖 Definitions</span>
+A <strong>ResourceQuota</strong> sets a hard limit on total resources an entire namespace can consume. A <strong>LimitRange</strong> sets default and maximum resource requests/limits for individual containers. Together they prevent any team or namespace from monopolising cluster resources.
+</div>
+<h3>ResourceQuota YAML</h3>
+<div class="yaml-block">
+<div class="yaml-head"><div class="cmd-dots"><div class="cmd-dot"></div><div class="cmd-dot"></div><div class="cmd-dot"></div></div><div class="yaml-label">production-quota.yaml · Namespace budget</div></div>
+<div class="yaml-body"><span class="y-api">apiVersion</span>: v1
+<span class="y-api">kind</span>: ResourceQuota
+<span class="y-api">metadata</span>:
+  <span class="y-key">name:</span> <span class="y-str">production-quota</span>
+  <span class="y-key">namespace:</span> <span class="y-str">production</span>
+<span class="y-api">spec</span>:
+  <span class="y-key">hard:</span>
+    <span class="y-key">requests.cpu:</span> <span class="y-str">"40"</span>       <span class="y-cmt"># Max total CPU requests: 40 cores</span>
+    <span class="y-key">requests.memory:</span> <span class="y-str">80Gi</span>
+    <span class="y-key">limits.cpu:</span> <span class="y-str">"80"</span>
+    <span class="y-key">limits.memory:</span> <span class="y-str">160Gi</span>
+    <span class="y-key">pods:</span> <span class="y-str">"50"</span>              <span class="y-cmt"># Max 50 Pods in namespace</span>
+    <span class="y-key">services.loadbalancers:</span> <span class="y-str">"2"</span>  <span class="y-cmt"># Max 2 cloud LBs</span>
+    <span class="y-key">requests.nvidia.com/gpu:</span> <span class="y-str">"4"</span> <span class="y-cmt"># Max 4 GPUs</span></div>
+</div>
+<h3>LimitRange YAML</h3>
+<div class="yaml-block">
+<div class="yaml-head"><div class="cmd-dots"><div class="cmd-dot"></div><div class="cmd-dot"></div><div class="cmd-dot"></div></div><div class="yaml-label">limitrange.yaml · Per-container defaults &amp; caps</div></div>
+<div class="yaml-body"><span class="y-api">apiVersion</span>: v1
+<span class="y-api">kind</span>: LimitRange
+<span class="y-api">metadata</span>:
+  <span class="y-key">name:</span> <span class="y-str">default-limits</span>
+  <span class="y-key">namespace:</span> <span class="y-str">production</span>
+<span class="y-api">spec</span>:
+  <span class="y-key">limits:</span>
+  <span class="y-key">- type:</span> <span class="y-str">Container</span>
+    <span class="y-key">defaultRequest:</span>        <span class="y-cmt"># Applied if container omits requests</span>
+      <span class="y-key">cpu:</span> <span class="y-str">100m</span>
+      <span class="y-key">memory:</span> <span class="y-str">128Mi</span>
+    <span class="y-key">default:</span>               <span class="y-cmt"># Applied if container omits limits</span>
+      <span class="y-key">cpu:</span> <span class="y-str">500m</span>
+      <span class="y-key">memory:</span> <span class="y-str">512Mi</span>
+    <span class="y-key">max:</span>                   <span class="y-cmt"># Hard cap — no container may exceed these</span>
+      <span class="y-key">cpu:</span> <span class="y-str">8000m</span>
+      <span class="y-key">memory:</span> <span class="y-str">32Gi</span></div>
+</div>
+<table>
+<tr><th>Aspect</th><th>ResourceQuota</th><th>LimitRange</th></tr>
+<tr><td>Scope</td><td>Total for the whole namespace</td><td>Per individual container or Pod</td></tr>
+<tr><td>Purpose</td><td>Prevent namespace from exceeding a budget</td><td>Provide safe defaults; enforce per-container caps</td></tr>
+<tr><td>Effect when exceeded</td><td>New object creation rejected (quota exceeded)</td><td>Container rejected if it exceeds max limits</td></tr>
+</table>
+<div class="box warn">
+<span class="bl">⚠ ResourceQuota + LimitRange Interaction</span>
+If a namespace has a ResourceQuota, all containers must specify resource requests and limits. If a container omits them and there is no LimitRange to supply defaults, K8s refuses to create the Pod. <strong>Always deploy a LimitRange alongside a ResourceQuota.</strong>
+</div>
+</div>
+
+<!-- PAGE 18: AI PATTERNS & COMMON MISTAKES -->
+<div class="page" data-page="18">
+<div class="page-stripe"></div>
+<div class="ph"><span class="ph-s">Kubernetes Level 2</span><span class="ph-c">16 — AI Patterns &amp; Common Mistakes</span></div>
+<div class="gn">16</div>
+<div class="sm">AI Engineer Focus</div>
+<h2><span class="n">16.</span>AI Patterns, Mistakes &amp; Level 2 Summary</h2>
+<h3>Production RAG Stack — Object Map</h3>
+<div style="display:flex;flex-direction:column;gap:3px;margin-bottom:4mm;">
+<div class="arch-box" style="border-left-color:var(--violet);"><span class="ab-t" style="color:var(--violet);">Helm Chart</span><span class="ab-d">Entire stack in one chart. <code>helm upgrade --install rag-app ./rag-app -f values-prod.yaml</code> deploys everything. One command to update the LLM version. One command to roll back.</span></div>
+<div class="arch-box" style="border-left-color:var(--blue);"><span class="ab-t" style="color:var(--blue);">Ingress + cert-manager</span><span class="ab-d">Single NGINX Ingress with auto TLS. Routes <code>/v1/query</code> → RAG API, <code>/v1/ingest</code> → Ingest service. Rate-limited to 100 req/s via annotation.</span></div>
+<div class="arch-box" style="border-left-color:var(--cyan);"><span class="ab-t" style="color:var(--cyan);">vLLM Deployment (GPU)</span><span class="ab-d">Init container downloads Mistral-7B to emptyDir. Main container starts with weights pre-loaded. startupProbe waits 10 min. terminationGracePeriodSeconds: 120.</span></div>
+<div class="arch-box" style="border-left-color:var(--green);"><span class="ab-t" style="color:var(--green);">Qdrant StatefulSet</span><span class="ab-d">volumeClaimTemplate: 100Gi PVC per Pod. NetworkPolicy: only rag-api Pods can reach port 6333. Stable pod name: <code>qdrant-0</code>.</span></div>
+<div class="arch-box" style="border-left-color:var(--amber);"><span class="ab-t" style="color:var(--amber);">Nightly CronJob</span><span class="ab-d">Scans S3 for new docs at 2am, chunks, embeds, upserts to Qdrant. concurrencyPolicy: Forbid. Last 3 job histories kept for debugging.</span></div>
+</div>
+<h3>Common Level 2 Mistakes</h3>
+<div class="box crit" style="margin-bottom:3px;">
+<span class="bl">❌ Using :latest Tag in Production</span>
+You push a broken build, it overwrites latest, K8s pulls it on the next restart. No specific version to roll back to. <strong>Fix:</strong> Always pin: <code>image: myregistry/rag-api:v2.3.1</code>
+</div>
+<div class="box warn" style="margin-bottom:3px;">
+<span class="bl">⚠ Deployment Instead of StatefulSet for Vector DB</span>
+K8s reschedules the Pod to a different node. RWO PVC might not follow. Qdrant comes up empty. <strong>Fix:</strong> Use StatefulSet with volumeClaimTemplates for any stateful service.
+</div>
+<div class="box warn" style="margin-bottom:3px;">
+<span class="bl">⚠ 30s Grace Period for LLM Inference</span>
+vLLM is killed mid-generation on rolling updates. Users get cut-off responses. <strong>Fix:</strong> Set terminationGracePeriodSeconds to 90–180s + preStop sleep 5.
+</div>
+<div class="box warn" style="margin-bottom:3px;">
+<span class="bl">⚠ Init Container Not Idempotent</span>
+Migration init container runs, Pod crashes, K8s restarts Pod, migration runs again and fails. <strong>Fix:</strong> Use Alembic/Flyway that track which migrations have been applied.
+</div>
+<h3>Level 2 Complete — Everything You've Learned</h3>
+<div class="two">
+<div>
+<div class="sr"><div class="si">📄</div><div class="st"><span class="sb">YAML Manifest</span> — Declarative config. 4 required fields. Always use kubectl apply.</div></div>
+<div class="sr"><div class="si">🔢</div><div class="st"><span class="sb">StatefulSet</span> — Stable names + dedicated PVCs. Use for Qdrant, Redis, Postgres.</div></div>
+<div class="sr"><div class="si">🌐</div><div class="st"><span class="sb">DaemonSet</span> — One Pod per node. Logging, monitoring, GPU plugins.</div></div>
+<div class="sr"><div class="si">⚙️</div><div class="st"><span class="sb">Job / CronJob</span> — Run to completion. Indexing, migrations, scheduled tasks.</div></div>
+<div class="sr"><div class="si">🚀</div><div class="st"><span class="sb">Init Containers</span> — Pre-flight: wait for DB, download model, run migrations.</div></div>
+<div class="sr"><div class="si">🔀</div><div class="st"><span class="sb">Ingress</span> — L7 HTTP routing. Path routing + TLS + rate limiting.</div></div>
+<div class="sr"><div class="si">🔒</div><div class="st"><span class="sb">NetworkPolicy</span> — Pod firewalls. Deny-all then selectively allow.</div></div>
+<div class="sr"><div class="si">👤</div><div class="st"><span class="sb">RBAC</span> — Role + RoleBinding + ServiceAccount. Least-privilege access.</div></div>
+<div class="sr"><div class="si">🛡️</div><div class="st"><span class="sb">Security Context</span> — Non-root, read-only FS, drop capabilities.</div></div>
+<div class="sr"><div class="si">📦</div><div class="st"><span class="sb">Helm</span> — Charts, values, releases, rollback. One command to deploy everything.</div></div>
+</div>
+<div>
+<div class="box vio" style="margin-bottom:5px;">
+<span class="bl">What Comes in Level 3</span>
+<ul style="margin:0;padding-left:16px;">
+<li>Custom Resource Definitions (CRDs)</li>
+<li>Kubernetes Operators</li>
+<li>Service Mesh (Istio / Linkerd)</li>
+<li>GitOps with ArgoCD or Flux</li>
+<li>Kustomize — overlay-based config</li>
+<li>KEDA — event-driven autoscaling</li>
+<li>GPU time-slicing &amp; MIG for AI</li>
+<li>Multi-cluster federation patterns</li>
+</ul>
+</div>
+<div class="box tip" style="margin:0;">
+<span class="bl">✅ Your Level 2 Assignment</span>
+Take your Level 1 RAG deployment and: (1) rewrite everything as YAML in a <code>k8s/</code> directory, (2) convert the vector DB to a StatefulSet, (3) add an Ingress, (4) write a nightly CronJob for reindexing, (5) package it all as a Helm chart with separate dev and prod values files.
+</div>
+</div>
+</div>
+<div style="margin-top:5mm;background:var(--off2);border:1.5px solid var(--border2);border-top:3px solid var(--violet);border-radius:2px;padding:8px 13px;text-align:center;">
+<span style="font-family:var(--mono);font-size:8.5px;color:var(--muted);letter-spacing:.14em;text-transform:uppercase;">END OF LEVEL 2 · KUBERNETES FOR AI ENGINEERS · NEXT: LEVEL 3 — OPERATORS, SERVICE MESH &amp; GITOPS</span>
+</div>
+</div>
+</body></html>
