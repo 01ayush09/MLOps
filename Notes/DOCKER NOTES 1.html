@@ -1,0 +1,1027 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Docker for AI Engineers — Field Notes</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ink:#0B1F3A;
+    --body:#33414F;
+    --muted:#6B7A8C;
+    --blue:#1D63ED;
+    --teal:#0F9E96;
+    --amber:#E8923C;
+    --paper:#FFFFFF;
+    --panel:#F4F7FB;
+    --panel-2:#EEF2F8;
+    --line:#DCE3EC;
+    --term-bg:#0B1F3A;
+    --term-text:#E7EEFC;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;background:#FFFFFF;}
+  body{
+    font-family:'IBM Plex Sans', sans-serif;
+    color:var(--body);
+    -webkit-font-smoothing:antialiased;
+  }
+  .doc{
+    display:block;
+    background:#FFFFFF;
+    padding:14px 0 40px;
+  }
+  .page{
+    background:#FFFFFF;
+    width:210mm;
+    height:297mm;
+    max-height:297mm;
+    margin:0 auto 14px;
+    padding:14mm 15mm 12mm;
+    position:relative;
+    display:flex;
+    flex-direction:column;
+    overflow:hidden;
+    box-shadow:0 0 0 1px var(--line), 0 6px 24px rgba(11,31,58,0.06);
+    page-break-after:always;
+    break-after:page;
+  }
+  .page:last-child{
+    page-break-after:auto;
+    break-after:auto;
+    margin-bottom:0;
+  }
+  @media print{
+    .doc{padding:0;}
+    .page{box-shadow:none; width:auto; height:297mm; margin:0;}
+  }
+  @page{ size:A4; margin:0; }
+
+  /* ---------- shared chrome ---------- */
+  .pg-head{
+    display:flex;
+    justify-content:space-between;
+    align-items:baseline;
+    border-bottom:1.5px solid var(--ink);
+    padding-bottom:6px;
+    margin-bottom:14px;
+  }
+  .pg-head .brand{
+    font-family:'Space Grotesk',sans-serif;
+    font-weight:700;
+    font-size:11px;
+    letter-spacing:.12em;
+    text-transform:uppercase;
+    color:var(--ink);
+  }
+  .pg-head .topic{
+    font-family:'IBM Plex Mono',monospace;
+    font-size:10px;
+    letter-spacing:.08em;
+    text-transform:uppercase;
+    color:var(--muted);
+  }
+  .pg-foot{
+    margin-top:auto;
+    padding-top:8px;
+    border-top:1px solid var(--line);
+    display:flex;
+    justify-content:space-between;
+    font-family:'IBM Plex Mono',monospace;
+    font-size:9px;
+    color:var(--muted);
+    letter-spacing:.04em;
+  }
+  .eyebrow{
+    font-family:'IBM Plex Mono',monospace;
+    font-size:10.5px;
+    letter-spacing:.12em;
+    text-transform:uppercase;
+    color:var(--blue);
+    font-weight:600;
+    margin-bottom:4px;
+  }
+  h1.title{
+    font-family:'Space Grotesk',sans-serif;
+    font-size:27px;
+    font-weight:700;
+    color:var(--ink);
+    margin:0 0 6px;
+    letter-spacing:-0.01em;
+  }
+  h2.sub{
+    font-family:'Space Grotesk',sans-serif;
+    font-size:14px;
+    font-weight:500;
+    color:var(--muted);
+    margin:0 0 16px;
+  }
+  h3.section{
+    font-family:'Space Grotesk',sans-serif;
+    font-size:13px;
+    font-weight:700;
+    color:var(--ink);
+    text-transform:uppercase;
+    letter-spacing:.05em;
+    margin:18px 0 8px;
+    display:flex;
+    align-items:center;
+    gap:8px;
+  }
+  h3.section::before{
+    content:"";
+    width:5px;height:5px;border-radius:50%;
+    background:var(--blue);
+    display:inline-block;
+  }
+  p{font-size:11px; line-height:1.6; margin:0 0 8px;}
+  ul.notes{margin:0 0 6px; padding-left:16px;}
+  ul.notes li{font-size:11px; line-height:1.55; margin-bottom:4px;}
+  ul.notes b{color:var(--ink);}
+  .grid2{display:grid; grid-template-columns:1.05fr 1fr; gap:0 22px;}
+  .grid-equal{display:grid; grid-template-columns:1fr 1fr; gap:0 18px;}
+
+  .definition{
+    background:var(--panel);
+    border-left:3px solid var(--blue);
+    padding:10px 12px;
+    border-radius:4px;
+    font-size:11px;
+    line-height:1.55;
+    margin-bottom:10px;
+  }
+  .definition b{color:var(--ink);}
+
+  .callout{
+    background:#FBF4EA;
+    border:1px solid #F0DDB8;
+    border-radius:6px;
+    padding:9px 12px;
+    font-size:10.5px;
+    line-height:1.55;
+    margin-top:10px;
+  }
+  .callout .tag{
+    font-family:'IBM Plex Mono',monospace;
+    font-weight:700;
+    font-size:9.5px;
+    letter-spacing:.06em;
+    text-transform:uppercase;
+    color:var(--amber);
+    display:block;
+    margin-bottom:3px;
+  }
+
+  .diagram-box{
+    background:var(--panel);
+    border:1px solid var(--line);
+    border-radius:8px;
+    padding:10px 8px 6px;
+    margin:8px 0 12px;
+  }
+  .diagram-cap{
+    text-align:center;
+    font-family:'IBM Plex Mono',monospace;
+    font-size:9px;
+    color:var(--muted);
+    letter-spacing:.04em;
+    margin-top:2px;
+  }
+
+  /* ---------- terminal ---------- */
+  .terminal{
+    background:var(--term-bg);
+    border-radius:8px;
+    overflow:hidden;
+    margin:8px 0 10px;
+  }
+  .term-bar{
+    display:flex;
+    align-items:center;
+    gap:6px;
+    padding:7px 10px;
+    background:rgba(255,255,255,0.06);
+  }
+  .dot{width:7px;height:7px;border-radius:50%;display:inline-block;}
+  .dot.red{background:#FF5F57;}
+  .dot.yellow{background:#FEBC2E;}
+  .dot.green{background:#28C840;}
+  .term-title{
+    margin-left:6px;
+    font-family:'IBM Plex Mono',monospace;
+    font-size:9.5px;
+    color:#9FB3D6;
+  }
+  .term-body{
+    padding:10px 14px 12px;
+    font-family:'IBM Plex Mono',monospace;
+    font-size:10.5px;
+    line-height:1.85;
+    color:var(--term-text);
+    white-space:pre-wrap;
+  }
+  .term-body .ln{color:#5B7BB8; margin-right:8px; user-select:none;}
+  .term-body .kw{color:#7FB1FF; font-weight:600;}
+  .term-body .str{color:#9FE3B0;}
+  .term-body .cm{color:#6F8AC2;}
+
+  .notes-list{margin:0; padding-left:16px;}
+  .notes-list li{font-size:10px; line-height:1.6; margin-bottom:7px;}
+  .notes-list b{color:var(--ink); font-family:'IBM Plex Mono',monospace; font-size:10px;}
+
+  /* ---------- tables ---------- */
+  table.cmd-table{
+    width:100%;
+    border-collapse:collapse;
+    margin:6px 0 14px;
+    table-layout:fixed;
+  }
+  table.cmd-table caption{
+    text-align:left;
+    font-family:'Space Grotesk',sans-serif;
+    font-weight:700;
+    font-size:12.5px;
+    color:var(--ink);
+    padding-bottom:6px;
+  }
+  table.cmd-table th{
+    background:var(--ink);
+    color:#fff;
+    text-align:left;
+    font-family:'IBM Plex Mono',monospace;
+    font-size:9px;
+    letter-spacing:.05em;
+    text-transform:uppercase;
+    padding:6px 9px;
+  }
+  table.cmd-table td{
+    padding:6px 9px;
+    border-bottom:1px solid var(--line);
+    font-size:9.6px;
+    line-height:1.45;
+    vertical-align:top;
+  }
+  table.cmd-table tr:nth-child(even) td{background:var(--panel);}
+  table.cmd-table td.cmd{
+    font-family:'IBM Plex Mono',monospace;
+    font-weight:600;
+    color:var(--blue);
+    white-space:normal;
+    overflow-wrap:break-word;
+    word-break:break-word;
+  }
+  table.cmd-table td.cmd span.flag{color:var(--teal);}
+
+  .toc{list-style:none; margin:0; padding:0;}
+  .toc li{
+    display:flex;
+    justify-content:space-between;
+    align-items:baseline;
+    padding:7px 0;
+    border-bottom:1px dashed var(--line);
+    font-size:11.5px;
+  }
+  .toc .num{
+    font-family:'IBM Plex Mono',monospace;
+    color:var(--blue);
+    font-weight:700;
+    margin-right:8px;
+  }
+  .toc .pageno{
+    font-family:'IBM Plex Mono',monospace;
+    color:var(--muted);
+    font-size:10px;
+  }
+  .toc .name{font-family:'Space Grotesk',sans-serif; font-weight:600; color:var(--ink);}
+  .toc .desc{color:var(--muted); font-size:10px; margin-left:8px;}
+
+  .chip{
+    display:inline-block;
+    font-family:'IBM Plex Mono',monospace;
+    font-size:9px;
+    background:var(--panel-2);
+    color:var(--ink);
+    border:1px solid var(--line);
+    border-radius:4px;
+    padding:1px 6px;
+    margin:0 2px;
+  }
+  svg{display:block; width:100%; height:auto;}
+  .small-note{font-size:9.5px; color:var(--muted); margin-top:4px;}
+
+  @media (max-width:760px){
+    .page{width:100%; height:auto; max-height:none; overflow:visible; padding:6mm; }
+    .doc{padding:6px;}
+  }
+</style>
+</head>
+<body>
+<div class="doc">
+
+<!-- =================== PAGE 1 — COVER / INTRO / TOC =================== -->
+<section class="page">
+  <div class="pg-head">
+    <span class="brand">Docker Field Notes</span>
+    <span class="topic">For AI / ML Engineers</span>
+  </div>
+
+  <div class="eyebrow">Beginner-level reference · 10 pages</div>
+  <h1 class="title">Docker for AI Engineers</h1>
+  <h2 class="sub">Images · Containers · Dockerfile · Port Mapping · Volumes</h2>
+
+  <p>Docker packages an application together with its exact runtime, libraries, and system dependencies into a single
+  portable unit, so it behaves identically on a laptop, a training server, and a production cluster. For AI engineers
+  this solves a very specific pain: a model that trains fine locally but breaks in the cloud because of a mismatched
+  CUDA version, a missing system library, or a different Python build. Docker removes that gap by shipping the
+  <b>entire environment</b>, not just the code.</p>
+
+  <ul class="notes">
+    <li><b>Reproducibility</b> — the same image runs identically on every machine; no more "works on my machine".</li>
+    <li><b>Isolation</b> — each project gets its own dependency tree, so a CV pipeline and an LLM service never collide.</li>
+    <li><b>Portability</b> — move a training job or inference API from a laptop to GPU servers or the cloud unchanged.</li>
+    <li><b>Speed</b> — containers start in seconds because they share the host's kernel instead of booting a full OS.</li>
+  </ul>
+
+  <h3 class="section">The Big Picture</h3>
+  <div class="diagram-box">
+    <svg viewBox="0 0 920 250" xmlns="http://www.w3.org/2000/svg">
+      <!-- registry -->
+      <rect x="245" y="8" width="170" height="46" rx="8" fill="#0B1F3A"/>
+      <text x="330" y="27" text-anchor="middle" fill="#fff" font-family="Space Grotesk, sans-serif" font-weight="700" font-size="11">Registry</text>
+      <text x="330" y="42" text-anchor="middle" fill="#9FB3D6" font-family="IBM Plex Mono, monospace" font-size="8.5">Docker Hub / ECR / GCR</text>
+      <!-- push/pull arrow -->
+      <line x1="330" y1="54" x2="330" y2="98" stroke="#1D63ED" stroke-width="2"/>
+      <polygon points="330,98 325,89 335,89" fill="#1D63ED"/>
+      <polygon points="330,54 325,63 335,63" fill="#1D63ED"/>
+      <text x="345" y="80" font-family="IBM Plex Mono, monospace" font-size="8.5" fill="#1D63ED">push / pull</text>
+
+      <!-- Dockerfile -->
+      <rect x="10" y="98" width="150" height="78" rx="8" fill="#F4F7FB" stroke="#DCE3EC"/>
+      <text x="85" y="130" text-anchor="middle" font-family="Space Grotesk, sans-serif" font-weight="700" font-size="12" fill="#0B1F3A">Dockerfile</text>
+      <text x="85" y="148" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="8.3" fill="#6B7A8C">build recipe</text>
+      <text x="85" y="161" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="8.3" fill="#6B7A8C">(text file)</text>
+
+      <line x1="160" y1="137" x2="245" y2="137" stroke="#0B1F3A" stroke-width="2"/>
+      <polygon points="245,137 236,132 236,142" fill="#0B1F3A"/>
+      <text x="165" y="129" font-family="IBM Plex Mono, monospace" font-size="8" fill="#0B1F3A">docker build</text>
+
+      <!-- Image -->
+      <rect x="245" y="98" width="160" height="78" rx="8" fill="#0B1F3A"/>
+      <text x="325" y="130" text-anchor="middle" font-family="Space Grotesk, sans-serif" font-weight="700" font-size="12" fill="#fff">Image</text>
+      <text x="325" y="148" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="8.3" fill="#9FB3D6">read-only,</text>
+      <text x="325" y="161" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="8.3" fill="#9FB3D6">layered template</text>
+
+      <line x1="405" y1="137" x2="495" y2="137" stroke="#0B1F3A" stroke-width="2"/>
+      <polygon points="495,137 486,132 486,142" fill="#0B1F3A"/>
+      <text x="412" y="129" font-family="IBM Plex Mono, monospace" font-size="8" fill="#0B1F3A">docker run</text>
+
+      <!-- Container -->
+      <rect x="495" y="98" width="170" height="78" rx="8" fill="#F4F7FB" stroke="#0F9E96" stroke-width="1.6"/>
+      <text x="580" y="128" text-anchor="middle" font-family="Space Grotesk, sans-serif" font-weight="700" font-size="12" fill="#0B1F3A">Container</text>
+      <text x="580" y="146" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="8.3" fill="#0F9E96">running instance</text>
+      <text x="580" y="159" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="8.3" fill="#0F9E96">+ writable layer</text>
+
+      <!-- ports + volumes pills -->
+      <line x1="525" y1="176" x2="525" y2="200" stroke="#E8923C" stroke-width="2"/>
+      <rect x="475" y="200" width="100" height="30" rx="15" fill="#FBF4EA" stroke="#E8923C"/>
+      <text x="525" y="219" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="8.4" fill="#0B1F3A">-p 8080:5000</text>
+
+      <line x1="635" y1="176" x2="635" y2="200" stroke="#0F9E96" stroke-width="2"/>
+      <rect x="585" y="200" width="100" height="30" rx="15" fill="#EAF7F5" stroke="#0F9E96"/>
+      <text x="635" y="219" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="8.4" fill="#0B1F3A">-v data:/app</text>
+
+
+      <line x1="665" y1="137" x2="760" y2="137" stroke="#0B1F3A" stroke-width="2"/>
+      <polygon points="760,137 751,132 751,142" fill="#0B1F3A"/>
+
+      <!-- App -->
+      <rect x="760" y="98" width="150" height="78" rx="8" fill="#fff" stroke="#1D63ED" stroke-width="1.6" stroke-dasharray="4 3"/>
+      <text x="835" y="130" text-anchor="middle" font-family="Space Grotesk, sans-serif" font-weight="700" font-size="12" fill="#0B1F3A">Your App</text>
+      <text x="835" y="148" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="8.3" fill="#6B7A8C">model API /</text>
+      <text x="835" y="161" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="8.3" fill="#6B7A8C">training job</text>
+    </svg>
+    <div class="diagram-cap">Fig. 1 — The full Docker pipeline: a Dockerfile builds an Image, an Image runs as a Container, exposed via Ports and persisted via Volumes.</div>
+  </div>
+
+  <h3 class="section">What's Inside These Notes</h3>
+  <ul class="toc">
+    <li><span><span class="num">01</span><span class="name">Cover &amp; Big Picture</span><span class="desc">— how the 5 pieces fit together</span></span><span class="pageno">p.01</span></li>
+    <li><span><span class="num">02</span><span class="name">Docker Image</span><span class="desc">— the read-only blueprint</span></span><span class="pageno">p.02</span></li>
+    <li><span><span class="num">03</span><span class="name">Container</span><span class="desc">— a running instance of an image</span></span><span class="pageno">p.03</span></li>
+    <li><span><span class="num">04</span><span class="name">Dockerfile</span><span class="desc">— the recipe that builds an image</span></span><span class="pageno">p.04</span></li>
+    <li><span><span class="num">05</span><span class="name">Port Mapping</span><span class="desc">— exposing a container to the network</span></span><span class="pageno">p.05</span></li>
+    <li><span><span class="num">06</span><span class="name">Volumes</span><span class="desc">— persistent storage outside the container</span></span><span class="pageno">p.06</span></li>
+    <li><span><span class="num">07</span><span class="name">Commands — Image</span><span class="desc">— build, pull, push, tag, inspect</span></span><span class="pageno">p.07</span></li>
+    <li><span><span class="num">08</span><span class="name">Commands — Container</span><span class="desc">— run, exec, logs, stop, remove</span></span><span class="pageno">p.08</span></li>
+    <li><span><span class="num">09</span><span class="name">Commands — Dockerfile &amp; Ports</span><span class="desc">— instructions + publishing flags</span></span><span class="pageno">p.09</span></li>
+    <li><span><span class="num">10</span><span class="name">Commands — Volumes &amp; Cheat Sheet</span><span class="desc">— storage + quick recap</span></span><span class="pageno">p.10</span></li>
+  </ul>
+
+  <div class="pg-foot"><span>Docker for AI Engineers</span><span>01 / 10</span></div>
+</section>
+
+<!-- =================== PAGE 2 — DOCKER IMAGE =================== -->
+<section class="page">
+  <div class="pg-head"><span class="brand">Docker Field Notes</span><span class="topic">01 · Docker Image</span></div>
+
+  <div class="eyebrow">Concept 01</div>
+  <h1 class="title" style="font-size:22px;">Docker Image</h1>
+  <h2 class="sub">The read-only blueprint your containers are built from</h2>
+
+  <div class="definition">
+    <b>Definition.</b> A <b>Docker image</b> is a read-only, immutable template that bundles an application's code,
+    runtime, system libraries, environment variables, and configuration into one package. It is the
+    <i>blueprint</i> — nothing actually runs until the image is started as a <b>container</b> (page 03).
+  </div>
+
+  <div class="grid2">
+    <div>
+      <h3 class="section">Key Characteristics</h3>
+      <ul class="notes">
+        <li><b>Layered</b> — an image is a stack of read-only layers; each layer captures the filesystem changes from one
+        build instruction (page 04 explains this in detail).</li>
+        <li><b>Immutable</b> — once built, an image's layers never change. To change behaviour you build a <i>new</i> image.</li>
+        <li><b>Cached &amp; shared</b> — identical layers are stored once and reused across many images, saving disk space
+        and speeding up builds.</li>
+        <li><b>Addressed by name and ID</b> — referenced as <span class="chip">repository:tag</span> (e.g.
+        <span class="chip">pytorch/pytorch:2.3-cuda12.1</span>) and uniquely by a SHA-256 content digest.</li>
+        <li><b>Portable</b> — pushed to and pulled from a <b>registry</b> (Docker Hub, AWS ECR, GCP Artifact Registry,
+        or a private registry) so any machine can fetch the exact same bytes.</li>
+      </ul>
+    </div>
+    <div>
+      <h3 class="section">Image vs. Registry</h3>
+      <ul class="notes">
+        <li>A <b>local image cache</b> lives on your machine after you build or pull an image.</li>
+        <li><span class="chip">docker push</span> uploads an image to a registry; <span class="chip">docker pull</span>
+        downloads one.</li>
+        <li>A registry is just versioned storage for images — think of it as "GitHub for images".</li>
+        <li>Base images (e.g. <span class="chip">python:3.11-slim</span>, <span class="chip">nvidia/cuda</span>) are
+        themselves images you pull and build on top of.</li>
+      </ul>
+    </div>
+  </div>
+
+  <h3 class="section">How an Image Is Composed</h3>
+  <div class="diagram-box">
+    <svg viewBox="0 0 760 260" xmlns="http://www.w3.org/2000/svg">
+      <rect x="18" y="92" width="150" height="74" rx="8" fill="#0B1F3A"/>
+      <text x="93" y="120" text-anchor="middle" fill="#fff" font-family="Space Grotesk, sans-serif" font-weight="700" font-size="11">Dockerfile</text>
+      <text x="93" y="138" text-anchor="middle" fill="#9FB3D6" font-family="IBM Plex Mono, monospace" font-size="8">instructions</text>
+      <text x="93" y="150" text-anchor="middle" fill="#9FB3D6" font-family="IBM Plex Mono, monospace" font-size="8">build recipe</text>
+
+      <line x1="168" y1="129" x2="222" y2="129" stroke="#1D63ED" stroke-width="2"/>
+      <polygon points="222,129 213,124 213,134" fill="#1D63ED"/>
+      <text x="170" y="118" font-family="IBM Plex Mono, monospace" font-size="8" fill="#1D63ED">docker build</text>
+
+      <!-- layer stack -->
+      <g font-family="IBM Plex Mono, monospace" font-size="9.5">
+        <rect x="230" y="186" width="380" height="42" fill="#0B1F3A" rx="4"/>
+        <text x="420" y="211" text-anchor="middle" fill="#fff">① Base OS — python:3.11-slim</text>
+
+        <rect x="230" y="142" width="380" height="42" fill="#13407A" rx="4"/>
+        <text x="420" y="167" text-anchor="middle" fill="#fff">② Dependencies — pip install -r requirements.txt</text>
+
+        <rect x="230" y="98" width="380" height="42" fill="#1D63ED" rx="4"/>
+        <text x="420" y="123" text-anchor="middle" fill="#fff">③ Application code — COPY . /app</text>
+
+        <rect x="230" y="54" width="380" height="42" fill="#0F9E96" rx="4"/>
+        <text x="420" y="79" text-anchor="middle" fill="#fff">④ Runtime config — CMD ["python","app.py"]</text>
+      </g>
+
+      <!-- bracket -->
+      <path d="M 622 54 L 632 54 L 632 228 L 622 228" fill="none" stroke="#6B7A8C" stroke-width="1.5"/>
+      <text x="642" y="120" font-family="Space Grotesk, sans-serif" font-weight="700" font-size="11.5" fill="#0B1F3A">Image:</text>
+      <text x="642" y="136" font-family="IBM Plex Mono, monospace" font-size="10" fill="#0B1F3A">myapp:1.0</text>
+      <text x="642" y="150" font-family="IBM Plex Mono, monospace" font-size="8" fill="#6B7A8C">(read-only)</text>
+
+      <text x="420" y="245" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="8.3" fill="#6B7A8C">Each instruction adds one immutable, cached layer — together they form the final image.</text>
+    </svg>
+    <div class="diagram-cap">Fig. 2 — A Docker image is simply its layers stacked and tagged together.</div>
+  </div>
+
+  <div class="callout">
+    <span class="tag">Why it matters for AI engineers</span>
+    Pin the exact Python, CUDA, and library versions your model needs into an image once — then that <i>exact</i>
+    environment is reproducible on every teammate's laptop, every training node, and the production server. No more
+    "it trained fine for me but not in the cluster".
+  </div>
+
+  <div class="pg-foot"><span>Docker for AI Engineers</span><span>02 / 10</span></div>
+</section>
+
+<!-- =================== PAGE 3 — CONTAINER =================== -->
+<section class="page">
+  <div class="pg-head"><span class="brand">Docker Field Notes</span><span class="topic">02 · Container</span></div>
+
+  <div class="eyebrow">Concept 02</div>
+  <h1 class="title" style="font-size:22px;">Container</h1>
+  <h2 class="sub">A running, isolated instance of an image</h2>
+
+  <div class="definition">
+    <b>Definition.</b> A <b>container</b> is a running (or stopped) instance of an image. Docker takes the image's
+    read-only layers and adds one thin <b>writable layer</b> on top. That writable layer is where the process can write
+    files, logs, or temp data while it runs — and it disappears when the container is removed.
+  </div>
+
+  <div class="grid2">
+    <div>
+      <h3 class="section">How Isolation Works</h3>
+      <ul class="notes">
+        <li><b>Namespaces</b> — the Linux kernel feature giving each container its own view of processes (PID), network
+        (NET), filesystem mounts (MNT), hostname (UTS), and inter-process communication (IPC).</li>
+        <li><b>Cgroups</b> — control groups limit how much CPU, memory, and I/O a container can consume, so one
+        container can't starve the host or its neighbours.</li>
+        <li><b>Shared kernel</b> — unlike a virtual machine, a container does <i>not</i> boot its own OS kernel; it
+        shares the host's kernel, which is why containers start in seconds and use far less memory than VMs.</li>
+      </ul>
+    </div>
+    <div>
+      <h3 class="section">Lifecycle</h3>
+      <svg viewBox="0 0 340 150" xmlns="http://www.w3.org/2000/svg">
+        <g font-family="IBM Plex Mono, monospace" font-size="9">
+          <rect x="0" y="14" width="78" height="30" rx="15" fill="#F4F7FB" stroke="#DCE3EC"/>
+          <text x="39" y="33" text-anchor="middle" fill="#0B1F3A">created</text>
+          <line x1="78" y1="29" x2="100" y2="29" stroke="#0F9E96" stroke-width="2"/>
+          <polygon points="100,29 92,25 92,33" fill="#0F9E96"/>
+
+          <rect x="100" y="14" width="78" height="30" rx="15" fill="#0F9E96"/>
+          <text x="139" y="33" text-anchor="middle" fill="#fff">running</text>
+          <line x1="139" y1="44" x2="139" y2="64" stroke="#E8923C" stroke-width="2"/>
+          <polygon points="139,64 134,55 144,55" fill="#E8923C"/>
+
+          <rect x="100" y="64" width="78" height="30" rx="15" fill="#FBF4EA" stroke="#E8923C"/>
+          <text x="139" y="83" text-anchor="middle" fill="#0B1F3A">paused</text>
+
+          <line x1="139" y1="14" x2="220" y2="14" stroke="#6B7A8C" stroke-width="0" />
+          <line x1="178" y1="29" x2="220" y2="29" stroke="#1D63ED" stroke-width="2"/>
+          <polygon points="220,29 212,25 212,33" fill="#1D63ED"/>
+          <rect x="220" y="14" width="78" height="30" rx="15" fill="#F4F7FB" stroke="#1D63ED"/>
+          <text x="259" y="33" text-anchor="middle" fill="#0B1F3A">stopped</text>
+
+          <line x1="259" y1="44" x2="259" y2="64" stroke="#6B7A8C" stroke-width="2"/>
+          <polygon points="259,64 254,55 264,55" fill="#6B7A8C"/>
+          <rect x="220" y="64" width="78" height="30" rx="15" fill="#0B1F3A"/>
+          <text x="259" y="83" text-anchor="middle" fill="#fff">removed</text>
+        </g>
+        <text x="0" y="118" font-family="IBM Plex Mono, monospace" font-size="8" fill="#6B7A8C">create → start → (pause) → stop → rm</text>
+        <text x="0" y="132" font-family="IBM Plex Mono, monospace" font-size="8" fill="#6B7A8C">writable layer is deleted only at "removed".</text>
+      </svg>
+    </div>
+  </div>
+
+  <h3 class="section">One Image, Many Containers</h3>
+  <div class="diagram-box">
+    <svg viewBox="0 0 760 200" xmlns="http://www.w3.org/2000/svg">
+      <g font-family="IBM Plex Mono, monospace" font-size="9">
+        <rect x="40" y="20" width="150" height="26" rx="4" fill="#FBF4EA" stroke="#E8923C" stroke-dasharray="3 2"/>
+        <text x="115" y="37" text-anchor="middle" fill="#0B1F3A">Container A · +RW</text>
+
+        <rect x="300" y="20" width="150" height="26" rx="4" fill="#FBF4EA" stroke="#E8923C" stroke-dasharray="3 2"/>
+        <text x="375" y="37" text-anchor="middle" fill="#0B1F3A">Container B · +RW</text>
+
+        <rect x="560" y="20" width="150" height="26" rx="4" fill="#FBF4EA" stroke="#E8923C" stroke-dasharray="3 2"/>
+        <text x="635" y="37" text-anchor="middle" fill="#0B1F3A">Container C · +RW</text>
+
+        <line x1="115" y1="46" x2="115" y2="80" stroke="#6B7A8C" stroke-width="1.5"/>
+        <line x1="375" y1="46" x2="375" y2="80" stroke="#6B7A8C" stroke-width="1.5"/>
+        <line x1="635" y1="46" x2="635" y2="80" stroke="#6B7A8C" stroke-width="1.5"/>
+
+        <rect x="40" y="80" width="670" height="56" rx="6" fill="#0B1F3A"/>
+        <text x="375" y="105" text-anchor="middle" fill="#fff" font-family="Space Grotesk, sans-serif" font-weight="700" font-size="11">Shared Image Layers (read-only)</text>
+        <text x="375" y="122" text-anchor="middle" fill="#9FB3D6" font-size="8.5">e.g. myapp:1.0 — pulled once, mounted into every container</text>
+      </g>
+      <text x="40" y="160" font-family="IBM Plex Mono, monospace" font-size="8.3" fill="#6B7A8C">Each container only stores its own small writable diff — the heavy base layers are never duplicated on disk.</text>
+    </svg>
+    <div class="diagram-cap">Fig. 3 — Multiple isolated containers can run from the same image simultaneously, each with its own writable layer.</div>
+  </div>
+
+  <div class="callout">
+    <span class="tag">Why it matters for AI engineers</span>
+    Run several experiments (different hyperparameters, different library versions) at once from the same base image,
+    each in its own container, without them ever touching each other's files or processes.
+  </div>
+
+  <div class="pg-foot"><span>Docker for AI Engineers</span><span>03 / 10</span></div>
+</section>
+
+<!-- =================== PAGE 4 — DOCKERFILE =================== -->
+<section class="page">
+  <div class="pg-head"><span class="brand">Docker Field Notes</span><span class="topic">03 · Dockerfile</span></div>
+
+  <div class="eyebrow">Concept 03</div>
+  <h1 class="title" style="font-size:22px;">Dockerfile</h1>
+  <h2 class="sub">The text recipe Docker reads to build an image</h2>
+
+  <div class="definition">
+    <b>Definition.</b> A <b>Dockerfile</b> is a plain-text file containing an ordered list of instructions. Running
+    <span class="chip">docker build</span> reads it top to bottom and executes each instruction inside a temporary
+    build container, committing the filesystem changes as a new <b>layer</b> after every step — the result is the
+    final image (page 02).
+  </div>
+
+  <h3 class="section">Annotated Example</h3>
+  <div class="terminal">
+    <div class="term-bar"><span class="dot red"></span><span class="dot yellow"></span><span class="dot green"></span><span class="term-title">Dockerfile</span></div>
+    <div class="term-body">
+<span class="ln">1</span><span class="kw">FROM</span> python:3.11-slim
+<span class="ln">2</span><span class="kw">WORKDIR</span> /app
+<span class="ln">3</span><span class="kw">COPY</span> requirements.txt .
+<span class="ln">4</span><span class="kw">RUN</span> pip install -r requirements.txt
+<span class="ln">5</span><span class="kw">COPY</span> . .
+<span class="ln">6</span><span class="kw">EXPOSE</span> 8000
+<span class="ln">7</span><span class="kw">CMD</span> [<span class="str">"python"</span>, <span class="str">"app.py"</span>]
+    </div>
+  </div>
+
+  <ol class="notes-list">
+    <li><b>FROM</b> — chooses the base image every later instruction builds on (here, a slim Python runtime).</li>
+    <li><b>WORKDIR</b> — sets the working directory for every instruction that follows; creates it if missing.</li>
+    <li><b>COPY requirements.txt .</b> — copies <i>only</i> the dependency list first, on purpose (see caching tip below).</li>
+    <li><b>RUN</b> — executes a command <i>during the build</i> and bakes its result into a new layer.</li>
+    <li><b>COPY . .</b> — copies the rest of the application source into the image, after dependencies are installed.</li>
+    <li><b>EXPOSE</b> — documents which port the app listens on; it does not publish the port (page 05).</li>
+    <li><b>CMD</b> — the default command run when a <i>container</i> starts from this image.</li>
+  </ol>
+
+  <div class="grid2">
+    <div>
+      <h3 class="section">Build Context &amp; .dockerignore</h3>
+      <ul class="notes">
+        <li>The folder you run <span class="chip">docker build</span> from is the <b>build context</b> — Docker sends
+        its files to the daemon so <span class="chip">COPY</span>/<span class="chip">ADD</span> can use them.</li>
+        <li>A <span class="chip">.dockerignore</span> file excludes things like <span class="chip">.git</span>,
+        <span class="chip">__pycache__</span>, datasets, or model checkpoints from being sent — keeping builds fast
+        and images small.</li>
+      </ul>
+    </div>
+    <div>
+      <h3 class="section">Layer Caching Tip</h3>
+      <ul class="notes">
+        <li>Docker reuses a cached layer if the instruction and its inputs are unchanged.</li>
+        <li>Order instructions from <b>least</b> to <b>most</b> frequently changing: copy
+        <span class="chip">requirements.txt</span> and install dependencies <i>before</i> copying application code.</li>
+        <li>Result: editing your Python code no longer triggers a slow re-install of every ML library.</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="callout">
+    <span class="tag">Why it matters for AI engineers</span>
+    A Dockerfile makes your training/serving environment <i>version-controllable</i> — review it in a pull request
+    just like code, so "what dependencies does this model need" is never tribal knowledge.
+  </div>
+
+  <div class="pg-foot"><span>Docker for AI Engineers</span><span>04 / 10</span></div>
+</section>
+
+<!-- =================== PAGE 5 — PORT MAPPING =================== -->
+<section class="page">
+  <div class="pg-head"><span class="brand">Docker Field Notes</span><span class="topic">04 · Port Mapping</span></div>
+
+  <div class="eyebrow">Concept 04</div>
+  <h1 class="title" style="font-size:22px;">Port Mapping</h1>
+  <h2 class="sub">Letting traffic from outside reach a process inside a container</h2>
+
+  <div class="definition">
+    <b>Definition.</b> By default a container runs in its own isolated network namespace — nothing outside it can
+    reach a port the app listens on. <b>Port mapping</b> (a.k.a. "publishing a port") creates a forwarding rule from
+    a port on the host machine to a port inside the container, using the
+    <span class="chip">-p host_port:container_port</span> flag on <span class="chip">docker run</span>.
+  </div>
+
+  <div class="diagram-box">
+    <svg viewBox="0 0 760 220" xmlns="http://www.w3.org/2000/svg">
+      <g font-family="IBM Plex Mono, monospace" font-size="9.5">
+        <rect x="10" y="78" width="110" height="56" rx="8" fill="#F4F7FB" stroke="#DCE3EC"/>
+        <text x="65" y="108" text-anchor="middle" fill="#0B1F3A">Browser /</text>
+        <text x="65" y="121" text-anchor="middle" fill="#0B1F3A">curl client</text>
+
+        <line x1="120" y1="106" x2="170" y2="106" stroke="#1D63ED" stroke-width="2"/>
+        <polygon points="170,106 161,101 161,111" fill="#1D63ED"/>
+        <text x="122" y="96" fill="#1D63ED" font-size="8">request</text>
+
+        <!-- host machine -->
+        <rect x="170" y="40" width="560" height="160" rx="10" fill="#fff" stroke="#0B1F3A" stroke-width="1.6"/>
+        <text x="186" y="58" fill="#0B1F3A" font-family="Space Grotesk, sans-serif" font-weight="700" font-size="10">Host Machine</text>
+
+        <rect x="190" y="78" width="120" height="56" rx="6" fill="#0B1F3A"/>
+        <text x="250" y="102" text-anchor="middle" fill="#fff">Port 8080</text>
+        <text x="250" y="118" text-anchor="middle" fill="#9FB3D6" font-size="8">(host port)</text>
+
+        <line x1="310" y1="106" x2="370" y2="106" stroke="#E8923C" stroke-width="2" stroke-dasharray="5 3"/>
+        <polygon points="370,106 361,101 361,111" fill="#E8923C"/>
+        <text x="312" y="96" fill="#E8923C" font-size="8">-p 8080:5000</text>
+
+        <!-- container -->
+        <rect x="370" y="60" width="330" height="120" rx="8" fill="#EAF7F5" stroke="#0F9E96" stroke-width="1.6"/>
+        <text x="386" y="78" fill="#0B1F3A" font-family="Space Grotesk, sans-serif" font-weight="700" font-size="10">Container</text>
+
+        <rect x="390" y="92" width="120" height="56" rx="6" fill="#0F9E96"/>
+        <text x="450" y="116" text-anchor="middle" fill="#fff">Port 5000</text>
+        <text x="450" y="132" text-anchor="middle" fill="#E7F7F4" font-size="8">(container port)</text>
+
+        <line x1="510" y1="120" x2="560" y2="120" stroke="#0B1F3A" stroke-width="2"/>
+        <polygon points="560,120 551,115 551,125" fill="#0B1F3A"/>
+
+        <rect x="560" y="92" width="120" height="56" rx="6" fill="#fff" stroke="#1D63ED" stroke-dasharray="4 3"/>
+        <text x="620" y="116" text-anchor="middle" fill="#0B1F3A" font-size="9">App process</text>
+        <text x="620" y="132" text-anchor="middle" fill="#1D63ED" font-size="8">listens on :5000</text>
+      </g>
+    </svg>
+    <div class="diagram-cap">Fig. 4 — <span class="chip">-p 8080:5000</span> forwards requests hitting the host's port 8080 to port 5000 inside the container.</div>
+  </div>
+
+  <div class="grid2">
+    <div>
+      <h3 class="section">Rules to Remember</h3>
+      <ul class="notes">
+        <li><span class="chip">EXPOSE</span> in a Dockerfile is only <b>documentation</b> — it does not publish a
+        port by itself.</li>
+        <li><span class="chip">-p host:container</span> is what actually opens the door from outside.</li>
+        <li><span class="chip">-P</span> (capital) publishes every <span class="chip">EXPOSE</span>d port to a random
+        free host port.</li>
+        <li>You can map several ports in one command, repeating <span class="chip">-p</span> for each pair.</li>
+      </ul>
+    </div>
+    <div>
+      <h3 class="section">Good Practice</h3>
+      <ul class="notes">
+        <li>Bind to localhost only when you don't want the service reachable from other machines:
+        <span class="chip">-p 127.0.0.1:8080:5000</span>.</li>
+        <li>Host and container ports don't need to match — only the mapping matters.</li>
+        <li>Use <span class="chip">docker port &lt;container&gt;</span> to check what's actually published.</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="callout">
+    <span class="tag">Why it matters for AI engineers</span>
+    When you containerize a FastAPI/Flask model-serving endpoint, port mapping is what lets a teammate, a load
+    balancer, or your own browser actually call <span class="chip">/predict</span> on it.
+  </div>
+
+  <div class="pg-foot"><span>Docker for AI Engineers</span><span>05 / 10</span></div>
+</section>
+
+<!-- =================== PAGE 6 — VOLUMES =================== -->
+<section class="page">
+  <div class="pg-head"><span class="brand">Docker Field Notes</span><span class="topic">05 · Volumes</span></div>
+
+  <div class="eyebrow">Concept 05</div>
+  <h1 class="title" style="font-size:22px;">Volumes</h1>
+  <h2 class="sub">Persistent storage that survives a container's life</h2>
+
+  <div class="definition">
+    <b>Definition.</b> A container's writable layer is <b>ephemeral</b> — it is deleted the moment the container is
+    removed. A <b>volume</b> is storage managed by Docker that lives <i>outside</i> any single container's lifecycle,
+    so data (datasets, model checkpoints, database files) survives container restarts, removals, and upgrades, and
+    can even be shared between containers.
+  </div>
+
+  <div class="diagram-box">
+    <svg viewBox="0 0 760 230" xmlns="http://www.w3.org/2000/svg">
+      <g font-family="IBM Plex Mono, monospace" font-size="9">
+        <!-- bind mount -->
+        <text x="20" y="22" font-family="Space Grotesk, sans-serif" font-weight="700" font-size="11" fill="#0B1F3A">Bind Mount</text>
+        <rect x="20" y="34" width="160" height="56" rx="6" fill="#F4F7FB" stroke="#DCE3EC"/>
+        <text x="100" y="58" text-anchor="middle" fill="#0B1F3A">Host folder</text>
+        <text x="100" y="72" text-anchor="middle" fill="#6B7A8C" font-size="8">~/data/dataset</text>
+
+        <line x1="180" y1="62" x2="230" y2="62" stroke="#1D63ED" stroke-width="2"/>
+        <polygon points="230,62 221,57 221,67" fill="#1D63ED"/>
+        <line x1="230" y1="68" x2="180" y2="68" stroke="#1D63ED" stroke-width="2"/>
+        <polygon points="180,68 189,63 189,73" fill="#1D63ED"/>
+
+        <rect x="230" y="34" width="170" height="56" rx="6" fill="#EAF7F5" stroke="#0F9E96"/>
+        <text x="315" y="58" text-anchor="middle" fill="#0B1F3A">Container path</text>
+        <text x="315" y="72" text-anchor="middle" fill="#0F9E96" font-size="8">/app/data</text>
+        <text x="20" y="104" fill="#6B7A8C" font-size="8">-v ~/data/dataset:/app/data &nbsp; (you choose the exact host path)</text>
+
+        <!-- named volume -->
+        <text x="420" y="22" font-family="Space Grotesk, sans-serif" font-weight="700" font-size="11" fill="#0B1F3A">Named Volume</text>
+        <rect x="420" y="34" width="160" height="56" rx="6" fill="#F4F7FB" stroke="#DCE3EC"/>
+        <text x="500" y="58" text-anchor="middle" fill="#0B1F3A">Docker-managed</text>
+        <text x="500" y="72" text-anchor="middle" fill="#6B7A8C" font-size="8">volume: model-ckpts</text>
+
+        <line x1="580" y1="62" x2="630" y2="62" stroke="#1D63ED" stroke-width="2"/>
+        <polygon points="630,62 621,57 621,67" fill="#1D63ED"/>
+        <line x1="630" y1="68" x2="580" y2="68" stroke="#1D63ED" stroke-width="2"/>
+        <polygon points="580,68 589,63 589,73" fill="#1D63ED"/>
+
+        <rect x="630" y="34" width="110" height="56" rx="6" fill="#EAF7F5" stroke="#0F9E96"/>
+        <text x="685" y="58" text-anchor="middle" fill="#0B1F3A" font-size="8.5">Container</text>
+        <text x="685" y="72" text-anchor="middle" fill="#0F9E96" font-size="8">/app/ckpts</text>
+        <text x="420" y="104" fill="#6B7A8C" font-size="8">-v model-ckpts:/app/ckpts (Docker picks &amp; manages the storage location)</text>
+
+        <!-- persistence comparison -->
+        <rect x="20" y="130" width="330" height="60" rx="6" fill="#FBF4EA" stroke="#E8923C"/>
+        <text x="35" y="150" fill="#0B1F3A" font-weight="700" font-size="9">Writable layer (no volume)</text>
+        <text x="35" y="166" fill="#0B1F3A" font-size="8.5">✕ deleted on <tspan fill="#E8923C">docker rm</tspan></text>
+        <text x="35" y="180" fill="#6B7A8C" font-size="8">good for temp/scratch files only</text>
+
+        <rect x="410" y="130" width="330" height="60" rx="6" fill="#EAF7F5" stroke="#0F9E96"/>
+        <text x="425" y="150" fill="#0B1F3A" font-weight="700" font-size="9">Volume (bind or named)</text>
+        <text x="425" y="166" fill="#0B1F3A" font-size="8.5">✓ survives <tspan fill="#0F9E96">docker rm</tspan></text>
+        <text x="425" y="180" fill="#6B7A8C" font-size="8">use for datasets, checkpoints, DB data</text>
+      </g>
+    </svg>
+    <div class="diagram-cap">Fig. 5 — Bind mounts point at a host path you choose; named volumes are storage Docker manages for you. Both outlive the container.</div>
+  </div>
+
+  <div class="grid2">
+    <div>
+      <h3 class="section">Types of Mounts</h3>
+      <ul class="notes">
+        <li><b>Named volume</b> — created and tracked by Docker (<span class="chip">docker volume create</span>),
+        stored under Docker's own directory; best for app/database data you don't need to browse directly.</li>
+        <li><b>Bind mount</b> — maps a specific folder/file from the host straight into the container; best for
+        mounting source code or datasets you're actively editing on the host.</li>
+        <li><b>tmpfs mount</b> — stored only in host memory, never written to disk; useful for sensitive, very
+        short-lived data.</li>
+      </ul>
+    </div>
+    <div>
+      <h3 class="section">Good Practice</h3>
+      <ul class="notes">
+        <li>Never bake large datasets into the image itself — mount them as a volume instead, so the image stays
+        small and fast to build/pull.</li>
+        <li>Mount a volume for model checkpoints so a crashed/restarted training container resumes without losing
+        progress.</li>
+        <li>Multiple containers can mount the <i>same</i> named volume to share data safely.</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="callout">
+    <span class="tag">Why it matters for AI engineers</span>
+    Mount your dataset directory and a checkpoints folder as volumes — your training container can be deleted and
+    recreated freely while the dataset and progress stay safely on disk.
+  </div>
+
+  <div class="pg-foot"><span>Docker for AI Engineers</span><span>06 / 10</span></div>
+</section>
+
+<!-- =================== PAGE 7 — COMMANDS: IMAGE =================== -->
+<section class="page">
+  <div class="pg-head"><span class="brand">Docker Field Notes</span><span class="topic">Command Reference · Image</span></div>
+
+  <div class="eyebrow">Command Reference 01</div>
+  <h1 class="title" style="font-size:22px;">Docker Image — Commands</h1>
+  <h2 class="sub">Every command you'll use to build, inspect, and move images</h2>
+
+  <table class="cmd-table">
+    <caption>Image lifecycle &amp; registry commands</caption>
+    <thead><tr><th style="width:30%">Command</th><th style="width:32%">Example</th><th>What it does</th></tr></thead>
+    <tbody>
+      <tr><td class="cmd">docker build</td><td class="cmd">docker build -t myapp:1.0 .</td><td>Builds an image from the Dockerfile in the current folder (the <b>.</b> is the build context) and tags it <b>myapp:1.0</b>.</td></tr>
+      <tr><td class="cmd">docker images</td><td class="cmd">docker images</td><td>Lists every image stored in your local image cache, with repository, tag, ID, and size.</td></tr>
+      <tr><td class="cmd">docker pull</td><td class="cmd">docker pull python:3.11-slim</td><td>Downloads an image (and any missing layers) from a registry to your local cache.</td></tr>
+      <tr><td class="cmd">docker push</td><td class="cmd">docker push myrepo/myapp:1.0</td><td>Uploads a local image to a remote registry, after you've logged in and tagged it correctly.</td></tr>
+      <tr><td class="cmd">docker tag</td><td class="cmd">docker tag myapp:1.0 myapp:latest</td><td>Creates an additional name/tag pointing at an existing image, without duplicating its layers.</td></tr>
+      <tr><td class="cmd">docker rmi</td><td class="cmd">docker rmi myapp:1.0</td><td>Deletes a local image. Fails if a running container still depends on it.</td></tr>
+      <tr><td class="cmd">docker inspect</td><td class="cmd">docker inspect myapp:1.0</td><td>Prints detailed JSON metadata about an image — layers, environment variables, entrypoint, exposed ports.</td></tr>
+      <tr><td class="cmd">docker history</td><td class="cmd">docker history myapp:1.0</td><td>Shows every layer of an image in build order, with the instruction and size that produced it.</td></tr>
+      <tr><td class="cmd">docker save</td><td class="cmd">docker save -o myapp.tar myapp:1.0</td><td>Exports an image to a single <b>.tar</b> archive file, for transferring without a registry.</td></tr>
+      <tr><td class="cmd">docker load</td><td class="cmd">docker load -i myapp.tar</td><td>Imports an image previously exported with <b>docker save</b> back into the local cache.</td></tr>
+      <tr><td class="cmd">docker image prune</td><td class="cmd">docker image prune -a</td><td>Removes unused/dangling images to free up disk space.</td></tr>
+    </tbody>
+  </table>
+
+  <div class="callout">
+    <span class="tag">Tip</span>
+    <span class="chip">docker images</span> and <span class="chip">docker image ls</span> are interchangeable — most
+    Docker commands accept either the short legacy form or the newer <span class="chip">docker &lt;object&gt; &lt;action&gt;</span> form.
+  </div>
+
+  <div class="pg-foot"><span>Docker for AI Engineers</span><span>07 / 10</span></div>
+</section>
+
+<!-- =================== PAGE 8 — COMMANDS: CONTAINER =================== -->
+<section class="page">
+  <div class="pg-head"><span class="brand">Docker Field Notes</span><span class="topic">Command Reference · Container</span></div>
+
+  <div class="eyebrow">Command Reference 02</div>
+  <h1 class="title" style="font-size:22px;">Container — Commands</h1>
+  <h2 class="sub">Running, inspecting, and managing containers</h2>
+
+  <table class="cmd-table">
+    <caption>Container lifecycle &amp; debugging commands</caption>
+    <thead><tr><th style="width:30%">Command</th><th style="width:34%">Example</th><th>What it does</th></tr></thead>
+    <tbody>
+      <tr><td class="cmd">docker run</td><td class="cmd">docker run -d -p 8080:5000 myapp:1.0</td><td>Creates <i>and</i> starts a new container from an image. <span class="flag">-d</span> runs it in the background (detached).</td></tr>
+      <tr><td class="cmd">docker ps</td><td class="cmd">docker ps -a</td><td>Lists containers — running only by default; <span class="flag">-a</span> shows stopped ones too.</td></tr>
+      <tr><td class="cmd">docker start</td><td class="cmd">docker start my_container</td><td>Starts an existing, stopped container without recreating it.</td></tr>
+      <tr><td class="cmd">docker stop</td><td class="cmd">docker stop my_container</td><td>Gracefully stops a running container by sending it a termination signal.</td></tr>
+      <tr><td class="cmd">docker restart</td><td class="cmd">docker restart my_container</td><td>Stops then starts a container again — useful after changing environment variables or to clear a stuck process.</td></tr>
+      <tr><td class="cmd">docker rm</td><td class="cmd">docker rm my_container</td><td>Deletes a stopped container and its writable layer. Add <span class="flag">-f</span> to force-remove a running one.</td></tr>
+      <tr><td class="cmd">docker exec</td><td class="cmd">docker exec -it my_container bash</td><td>Runs a new command inside an <i>already running</i> container — most often used to open an interactive shell.</td></tr>
+      <tr><td class="cmd">docker logs</td><td class="cmd">docker logs -f my_container</td><td>Shows a container's stdout/stderr output; <span class="flag">-f</span> follows the log stream live.</td></tr>
+      <tr><td class="cmd">docker attach</td><td class="cmd">docker attach my_container</td><td>Connects your terminal directly to a running container's main process input/output.</td></tr>
+      <tr><td class="cmd">docker cp</td><td class="cmd">docker cp my_container:/app/out.csv .</td><td>Copies files or folders between the host and a container in either direction.</td></tr>
+      <tr><td class="cmd">docker stats</td><td class="cmd">docker stats</td><td>Streams live CPU, memory, and network usage for running containers.</td></tr>
+    </tbody>
+  </table>
+
+  <div class="callout">
+    <span class="tag">Tip</span>
+    <span class="chip">-it</span> on <span class="chip">docker run</span>/<span class="chip">exec</span> combines
+    <span class="chip">-i</span> (keep input open) and <span class="chip">-t</span> (allocate a terminal) — almost
+    always what you want for an interactive shell session.
+  </div>
+
+  <div class="pg-foot"><span>Docker for AI Engineers</span><span>08 / 10</span></div>
+</section>
+
+<!-- =================== PAGE 9 — COMMANDS: DOCKERFILE + PORTS =================== -->
+<section class="page">
+  <div class="pg-head"><span class="brand">Docker Field Notes</span><span class="topic">Command Reference · Dockerfile &amp; Ports</span></div>
+
+  <div class="eyebrow">Command Reference 03</div>
+  <h1 class="title" style="font-size:22px;">Dockerfile Instructions &amp; Port Mapping — Commands</h1>
+  <h2 class="sub">What goes inside the recipe, and how to expose what it builds</h2>
+
+  <table class="cmd-table">
+    <caption>Core Dockerfile instructions</caption>
+    <thead><tr><th style="width:22%">Instruction</th><th style="width:34%">Example</th><th>What it does</th></tr></thead>
+    <tbody>
+      <tr><td class="cmd">FROM</td><td class="cmd">FROM python:3.11-slim</td><td>Sets the base image every other instruction builds on top of. Must be the first real instruction.</td></tr>
+      <tr><td class="cmd">WORKDIR</td><td class="cmd">WORKDIR /app</td><td>Sets (and creates, if needed) the working directory for all following instructions.</td></tr>
+      <tr><td class="cmd">COPY</td><td class="cmd">COPY . .</td><td>Copies files/folders from the build context on the host into the image.</td></tr>
+      <tr><td class="cmd">ADD</td><td class="cmd">ADD app.tar.gz /app</td><td>Like COPY, but can also fetch a URL and auto-extract local archives — use COPY unless you need that.</td></tr>
+      <tr><td class="cmd">RUN</td><td class="cmd">RUN pip install -r requirements.txt</td><td>Executes a shell command at <i>build time</i> and commits the result as a new layer.</td></tr>
+      <tr><td class="cmd">ENV</td><td class="cmd">ENV MODEL_PATH=/models/v1</td><td>Sets an environment variable available at build time and inside every container started from the image.</td></tr>
+      <tr><td class="cmd">ARG</td><td class="cmd">ARG PYTHON_VERSION=3.11</td><td>Defines a build-time-only variable that can be overridden with <span class="flag">--build-arg</span>.</td></tr>
+      <tr><td class="cmd">EXPOSE</td><td class="cmd">EXPOSE 8000</td><td>Documents which port the container listens on. Informational only — does not publish the port.</td></tr>
+      <tr><td class="cmd">CMD</td><td class="cmd">CMD ["python","app.py"]</td><td>Default command run when a container starts; can be overridden at <span class="chip">docker run</span>.</td></tr>
+      <tr><td class="cmd">ENTRYPOINT</td><td class="cmd">ENTRYPOINT ["python"]</td><td>Fixed command that always runs; CMD's value (if any) is passed to it as arguments.</td></tr>
+    </tbody>
+  </table>
+
+  <table class="cmd-table">
+    <caption>Port mapping commands</caption>
+    <thead><tr><th style="width:30%">Command</th><th style="width:32%">Example</th><th>What it does</th></tr></thead>
+    <tbody>
+      <tr><td class="cmd">-p (publish)</td><td class="cmd">docker run -p 8080:5000 myapp</td><td>Maps host port 8080 to container port 5000, so outside traffic can reach the app inside.</td></tr>
+      <tr><td class="cmd">-p (localhost only)</td><td class="cmd">docker run -p 127.0.0.1:8080:5000 myapp</td><td>Same as above but only reachable from the host machine itself, not the wider network.</td></tr>
+      <tr><td class="cmd">-P (publish all)</td><td class="cmd">docker run -P myapp</td><td>Publishes every <span class="chip">EXPOSE</span>d port to a random free host port.</td></tr>
+      <tr><td class="cmd">docker port</td><td class="cmd">docker port my_container</td><td>Shows the actual host↔container port mappings for a running container.</td></tr>
+    </tbody>
+  </table>
+
+  <div class="pg-foot"><span>Docker for AI Engineers</span><span>09 / 10</span></div>
+</section>
+
+<!-- =================== PAGE 10 — COMMANDS: VOLUMES + CHEAT SHEET =================== -->
+<section class="page">
+  <div class="pg-head"><span class="brand">Docker Field Notes</span><span class="topic">Command Reference · Volumes</span></div>
+
+  <div class="eyebrow">Command Reference 04</div>
+  <h1 class="title" style="font-size:22px;">Volumes — Commands &amp; Quick Cheat Sheet</h1>
+  <h2 class="sub">Persisting data, plus the commands you'll reach for daily</h2>
+
+  <table class="cmd-table">
+    <caption>Volume management commands</caption>
+    <thead><tr><th style="width:30%">Command</th><th style="width:34%">Example</th><th>What it does</th></tr></thead>
+    <tbody>
+      <tr><td class="cmd">docker volume create</td><td class="cmd">docker volume create model-ckpts</td><td>Creates a named volume that Docker stores and manages for you.</td></tr>
+      <tr><td class="cmd">docker volume ls</td><td class="cmd">docker volume ls</td><td>Lists all volumes that currently exist on the machine.</td></tr>
+      <tr><td class="cmd">docker volume inspect</td><td class="cmd">docker volume inspect model-ckpts</td><td>Shows a volume's details, including its real path on the host filesystem.</td></tr>
+      <tr><td class="cmd">docker volume rm</td><td class="cmd">docker volume rm model-ckpts</td><td>Deletes a volume permanently — make sure nothing needs the data first.</td></tr>
+      <tr><td class="cmd">docker volume prune</td><td class="cmd">docker volume prune</td><td>Removes every volume not currently used by any container, to reclaim disk space.</td></tr>
+      <tr><td class="cmd">-v (named volume)</td><td class="cmd">docker run -v model-ckpts:/app/ckpts myapp</td><td>Mounts the named volume <b>model-ckpts</b> at <b>/app/ckpts</b> inside the container.</td></tr>
+      <tr><td class="cmd">-v (bind mount)</td><td class="cmd">docker run -v ~/data:/app/data myapp</td><td>Mounts a specific host folder directly into the container at the given path.</td></tr>
+      <tr><td class="cmd">--mount</td><td class="cmd">docker run --mount type=bind,<wbr>source=~/data,<wbr>target=/app/data myapp</td><td>The more explicit, recommended syntax for the same bind-mount behaviour as <span class="flag">-v</span>.</td></tr>
+      <tr><td class="cmd">--tmpfs</td><td class="cmd">docker run --tmpfs /app/tmp myapp</td><td>Mounts an in-memory, non-persistent filesystem at the given container path.</td></tr>
+    </tbody>
+  </table>
+
+  <table class="cmd-table">
+    <caption>Quick cheat sheet — the 6 commands you'll use most</caption>
+    <thead><tr><th style="width:34%">Command</th><th>What it's for</th></tr></thead>
+    <tbody>
+      <tr><td class="cmd">docker build -t name:tag .</td><td>Build an image from your Dockerfile.</td></tr>
+      <tr><td class="cmd">docker run -d -p 8080:5000 -v data:/app/data name:tag</td><td>Start a container, publish a port, and attach a volume — all at once.</td></tr>
+      <tr><td class="cmd">docker ps -a</td><td>See what's running and what's stopped.</td></tr>
+      <tr><td class="cmd">docker logs -f &lt;container&gt;</td><td>Watch a container's output live while debugging.</td></tr>
+      <tr><td class="cmd">docker exec -it &lt;container&gt; bash</td><td>Hop inside a running container to poke around.</td></tr>
+      <tr><td class="cmd">docker rm -f &lt;container&gt; &amp;&amp; docker rmi &lt;image&gt;</td><td>Clean up a container and its image when you're done.</td></tr>
+    </tbody>
+  </table>
+
+  <div class="callout">
+    <span class="tag">Putting it all together</span>
+    A typical AI-engineer workflow: write a <b>Dockerfile</b> → <span class="chip">docker build</span> it into an
+    <b>image</b> → <span class="chip">docker run</span> it as a <b>container</b>, publishing a <b>port</b> for your
+    model API and mounting a <b>volume</b> for the dataset and checkpoints. That one command line is the whole
+    pipeline from Figure 1 on page 01, in practice.
+  </div>
+
+  <div class="pg-foot"><span>Docker for AI Engineers</span><span>10 / 10</span></div>
+</section>
+
+</div>
+</body>
+</html>
