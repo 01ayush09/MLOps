@@ -1,0 +1,1465 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Kubernetes Level 1 — AI Engineer Notes</title>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:ital,wght@0,300;0,400;0,600;0,700;0,800;0,900;1,400;1,700&family=Zilla+Slab:ital,wght@0,400;0,500;0,600;0,700;1,400;1,600&family=Roboto+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --white:#ffffff; --off:#f7f9fc; --off2:#eef2f8; --surface:#e4ecf7;
+  --border:#cdd8ec; --border2:#b0c2de;
+  --ink:#09131f; --ink2:#1a2a3f; --muted:#5a6e88; --ghost:#9aaabb;
+  --blue:#1253a4; --blue-lt:#eaf1fb; --blue-md:#b8cef0;
+  --cyan:#0695a4; --cyan-lt:#e7f9fb; --cyan-md:#9de5ec;
+  --green:#0a7245; --green-lt:#e8f7f0; --green-md:#8ed8b4;
+  --amber:#a06000; --amber-lt:#fdf7e8; --amber-md:#f0d080;
+  --red:#a01828; --red-lt:#fdf0f2; --red-md:#f0b0bc;
+  --violet:#5a18a8; --violet-lt:#f3eefa; --violet-md:#ceaaec;
+  --navy:#071830; --teal:#065868;
+  --mono:'Roboto Mono',monospace;
+  --display:'Zilla Slab',serif;
+  --body:'Nunito',sans-serif;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:var(--body);background:#c8d4e4;color:var(--ink);font-size:13.5px;line-height:1.7;}
+
+/* PAGE */
+.page{
+  width:210mm;min-height:297mm;margin:0 auto 3px;
+  padding:13mm 14mm 16mm;background:var(--white);
+  position:relative;page-break-after:always;break-after:page;overflow:hidden;
+}
+/* Subtle dot-grid texture */
+.page::before{
+  content:'';position:absolute;inset:0;
+  background-image:radial-gradient(circle,var(--border) 1px,transparent 1px);
+  background-size:8mm 8mm;background-position:4mm 4mm;
+  opacity:.25;pointer-events:none;z-index:0;
+}
+.page>*{position:relative;z-index:1;}
+/* Blue left accent stripe */
+.page-stripe{position:absolute;top:0;left:0;bottom:0;width:4px;background:linear-gradient(180deg,var(--blue) 0%,var(--cyan) 100%);z-index:10;}
+/* Page number */
+.page::after{content:attr(data-page);position:absolute;bottom:9mm;right:14mm;font-family:var(--mono);font-size:9px;color:var(--ghost);letter-spacing:.06em;z-index:2;}
+
+@media screen{body{padding:22px 0;} .page{box-shadow:0 4px 32px rgba(9,19,31,.14),0 0 0 1px rgba(9,19,31,.06);margin-bottom:18px;}}
+@media print{body{background:white;padding:0;} .page{box-shadow:none;margin:0;}}
+
+/* PAGE HEADER */
+.ph{display:flex;align-items:center;justify-content:space-between;margin-bottom:7mm;padding-bottom:2.5mm;border-bottom:2px solid var(--navy);}
+.ph-s{font-family:var(--mono);font-size:9px;color:var(--blue);letter-spacing:.16em;text-transform:uppercase;font-weight:600;}
+.ph-c{font-family:var(--mono);font-size:9px;color:var(--muted);}
+
+/* COVER */
+.cover-band{
+  position:absolute;top:0;left:0;right:0;height:78mm;
+  background:linear-gradient(135deg,var(--navy) 0%,#0d2650 60%,#0a3c6e 100%);
+  overflow:hidden;
+}
+.cover-band::before{
+  content:'';position:absolute;inset:0;
+  background-image:linear-gradient(rgba(255,255,255,.04) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.04) 1px,transparent 1px);
+  background-size:10mm 10mm;
+}
+.cover-band::after{
+  content:'K8s';position:absolute;right:-5mm;bottom:-8mm;
+  font-family:var(--display);font-size:140px;font-weight:700;
+  color:rgba(255,255,255,.04);line-height:1;letter-spacing:-.04em;
+}
+.cover-band-inner{
+  position:absolute;top:0;left:0;right:0;bottom:0;
+  padding:14mm 14mm 10mm;display:flex;flex-direction:column;justify-content:center;
+}
+.cover-eyebrow{font-family:var(--mono);font-size:9px;letter-spacing:.2em;text-transform:uppercase;color:rgba(255,255,255,.5);margin-bottom:8px;}
+.cover h1{font-family:var(--display);font-size:52px;font-weight:700;line-height:.98;color:white;letter-spacing:-.02em;margin-bottom:6px;}
+.cover h1 em{color:#7ab8f5;font-style:italic;}
+.cover-sub{font-family:var(--body);font-size:13.5px;font-weight:300;color:rgba(255,255,255,.65);max-width:380px;line-height:1.6;}
+.cover-body{margin-top:82mm;padding:0;}
+.cover-intro{font-family:var(--body);font-size:13.5px;color:var(--muted);line-height:1.72;max-width:430px;margin-bottom:8mm;border-left:3px solid var(--blue-md);padding-left:12px;}
+.cover-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:5px;margin-bottom:8mm;}
+.cover-chip{background:var(--off);border:1px solid var(--border);border-top:2px solid var(--blue);border-radius:2px;padding:7px 9px;font-family:var(--mono);font-size:9px;color:var(--navy);line-height:1.45;}
+.cover-chip .cn{color:var(--blue);font-size:8px;display:block;margin-bottom:1px;font-weight:600;}
+.cover-meta{display:flex;gap:8px;flex-wrap:wrap;border-top:1px solid var(--border);padding-top:5mm;margin-top:auto;}
+.cover-pill{font-family:var(--mono);font-size:9px;background:var(--navy);color:white;padding:3px 10px;border-radius:1px;letter-spacing:.06em;}
+
+/* TOC */
+.toc-h{font-family:var(--display);font-size:38px;font-weight:700;color:var(--navy);margin-bottom:7mm;letter-spacing:-.02em;}
+.toc-sec{font-family:var(--mono);font-size:8.5px;letter-spacing:.18em;text-transform:uppercase;color:var(--blue);margin:5.5mm 0 1.5mm;display:flex;align-items:center;gap:8px;}
+.toc-sec::after{content:'';flex:1;height:1px;background:var(--border);}
+.toc-item{display:flex;align-items:baseline;gap:5px;padding:3.5px 0;border-bottom:1px dotted var(--border);}
+.toc-n{font-family:var(--mono);font-size:9px;color:var(--blue);min-width:24px;font-weight:700;}
+.toc-l{font-family:var(--display);font-size:13px;font-weight:600;flex:1;color:var(--ink);}
+.toc-sub{font-family:var(--mono);font-size:8px;color:var(--muted);}
+.toc-p{font-family:var(--mono);font-size:9px;color:var(--ghost);min-width:16px;text-align:right;}
+
+/* HEADINGS */
+h2{font-family:var(--display);font-size:28px;font-weight:700;color:var(--navy);line-height:1.1;margin-bottom:4mm;letter-spacing:-.02em;}
+h2 .n{color:var(--blue);font-weight:400;font-style:italic;margin-right:3px;font-size:24px;}
+h3{font-family:var(--mono);font-size:9px;font-weight:700;letter-spacing:.18em;text-transform:uppercase;color:var(--navy);margin:4.5mm 0 2mm;display:flex;align-items:center;gap:8px;}
+h3::after{content:'';flex:1;height:1px;background:var(--border);}
+h4{font-family:var(--display);font-size:14px;font-weight:600;color:var(--blue);margin:2.5mm 0 1mm;}
+p{margin-bottom:2.5mm;font-size:13.5px;color:var(--ink2);line-height:1.7;}
+
+/* BOXES */
+.box{border-radius:3px;padding:8px 12px;margin:3mm 0;font-size:12.5px;border:1px solid;border-left:3.5px solid;line-height:1.65;}
+.bl{font-family:var(--mono);font-size:8.5px;letter-spacing:.12em;text-transform:uppercase;margin-bottom:3px;font-weight:700;display:block;}
+.def{background:var(--blue-lt);border-color:var(--blue-md);border-left-color:var(--blue);} .def .bl{color:var(--blue);}
+.tip{background:var(--green-lt);border-color:var(--green-md);border-left-color:var(--green);} .tip .bl{color:var(--green);}
+.warn{background:var(--amber-lt);border-color:var(--amber-md);border-left-color:var(--amber);} .warn .bl{color:var(--amber);}
+.note{background:var(--off2);border-color:var(--border2);border-left-color:var(--muted);} .note .bl{color:var(--muted);}
+.key{background:var(--cyan-lt);border-color:var(--cyan-md);border-left-color:var(--cyan);} .key .bl{color:var(--cyan);}
+.vio{background:var(--violet-lt);border-color:var(--violet-md);border-left-color:var(--violet);} .vio .bl{color:var(--violet);}
+.crit{background:var(--red-lt);border-color:var(--red-md);border-left-color:var(--red);} .crit .bl{color:var(--red);}
+
+/* COMMANDS */
+.cmd-block{background:#0d1520;border-radius:4px;margin:3mm 0;overflow:hidden;border:1px solid #1e2f48;}
+.cmd-head{background:#121d30;border-bottom:1px solid #1e2f48;padding:5px 12px;display:flex;align-items:center;justify-content:space-between;}
+.cmd-label{font-family:var(--mono);font-size:9px;color:#7ab8f5;letter-spacing:.08em;}
+.cmd-dots{display:flex;gap:5px;}
+.cmd-dot{width:8px;height:8px;border-radius:50%;}
+.cmd-dot:nth-child(1){background:#ff5f57;} .cmd-dot:nth-child(2){background:#febc2e;} .cmd-dot:nth-child(3){background:#28c840;}
+.cmd-body{padding:9px 13px;font-family:var(--mono);font-size:11px;line-height:1.85;color:#cdd9ed;white-space:pre;}
+.cmd-prompt{color:#5a9fd4;} .cmd-cmd{color:#7ab8f5;font-weight:600;} .cmd-flag{color:#f0c860;} .cmd-out{color:#8aab7a;} .cmd-cmt{color:#3a5068;font-style:italic;}
+
+/* DIAGRAMS */
+.diag{background:var(--off);border:1px solid var(--border);border-top:2.5px solid var(--blue);border-radius:3px;padding:6mm;margin:3mm 0;}
+.diag-t{font-family:var(--mono);font-size:8.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--navy);text-align:center;margin-bottom:4mm;font-weight:700;}
+
+/* Flow nodes */
+.flow{display:flex;align-items:center;justify-content:center;flex-wrap:wrap;}
+.fb{background:var(--white);border:1.5px solid var(--border2);border-radius:3px;padding:6px 8px;text-align:center;font-family:var(--mono);font-size:9px;line-height:1.4;min-width:62px;color:var(--ink2);}
+.fb.blue{border-color:var(--blue);background:var(--blue-lt);color:var(--blue);font-weight:600;}
+.fb.navy{border-color:var(--navy);background:var(--off2);color:var(--navy);font-weight:600;}
+.fb.cyan{border-color:var(--cyan);background:var(--cyan-lt);color:var(--cyan);font-weight:600;}
+.fb.green{border-color:var(--green);background:var(--green-lt);color:var(--green);font-weight:600;}
+.fb.amber{border-color:var(--amber);background:var(--amber-lt);color:var(--amber);font-weight:600;}
+.fb.violet{border-color:var(--violet);background:var(--violet-lt);color:var(--violet);font-weight:600;}
+.fb.red{border-color:var(--red);background:var(--red-lt);color:var(--red);font-weight:600;}
+.fb.dark{border-color:var(--navy);background:var(--navy);color:white;font-weight:600;}
+.fa{font-size:13px;color:var(--border2);padding:0 4px;}
+
+/* TABLE */
+table{width:100%;border-collapse:collapse;font-size:12px;margin:2.5mm 0;}
+th{background:var(--navy);color:white;font-family:var(--mono);font-size:8.5px;letter-spacing:.1em;text-transform:uppercase;padding:6px 9px;text-align:left;}
+td{padding:5px 9px;border-bottom:1px solid var(--border);vertical-align:top;color:var(--ink2);}
+tr:nth-child(even) td{background:var(--off);}
+
+/* TAGS */
+.tag{display:inline-block;font-family:var(--mono);font-size:8.5px;letter-spacing:.05em;padding:2px 6px;border-radius:2px;text-transform:uppercase;border:1px solid;margin:1px;}
+.tb{color:var(--blue);border-color:var(--blue);background:var(--blue-lt);}
+.tc{color:var(--cyan);border-color:var(--cyan);background:var(--cyan-lt);}
+.tg{color:var(--green);border-color:var(--green);background:var(--green-lt);}
+.ta{color:var(--amber);border-color:var(--amber);background:var(--amber-lt);}
+.tv{color:var(--violet);border-color:var(--violet);background:var(--violet-lt);}
+.tn{color:white;border-color:var(--navy);background:var(--navy);}
+
+/* LAYOUT */
+.two{display:grid;grid-template-columns:1fr 1fr;gap:5mm;}
+.three{display:grid;grid-template-columns:1fr 1fr 1fr;gap:4mm;}
+.hr{border:none;border-top:1px solid var(--border);margin:4mm 0;}
+ul,ol{padding-left:17px;margin:1.5mm 0 2.5mm;}
+li{margin-bottom:2px;font-size:13px;}
+strong{color:var(--navy);}
+
+/* Section marker */
+.sm{display:inline-flex;align-items:center;gap:5px;font-family:var(--mono);font-size:8.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--blue);border:1px solid var(--blue);padding:3px 9px;border-radius:2px;margin-bottom:3mm;}
+
+/* Ghost number */
+.gn{position:absolute;top:10mm;right:12mm;font-family:var(--display);font-size:88px;font-weight:700;color:rgba(7,24,48,.04);line-height:1;pointer-events:none;letter-spacing:-.04em;z-index:0;}
+
+/* Architecture box */
+.arch-box{background:var(--white);border:1px solid var(--border);border-left:4px solid;border-radius:3px;padding:6px 10px;margin:2px 0;display:flex;align-items:flex-start;gap:9px;}
+.ab-t{font-family:var(--mono);font-size:9px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;min-width:90px;margin-top:1px;}
+.ab-d{font-size:12px;color:var(--muted);line-height:1.5;flex:1;}
+
+/* Analogy card */
+.analogy{background:var(--amber-lt);border:1px solid var(--amber-md);border-left:3px solid var(--amber);border-radius:2px;padding:8px 12px;margin:3mm 0;font-style:italic;font-size:13px;line-height:1.7;color:var(--ink2);}
+
+/* Summary row */
+.sr{display:flex;gap:7px;align-items:flex-start;margin-bottom:3px;}
+.si{font-size:13px;min-width:18px;margin-top:1px;}
+.st{font-size:13px;line-height:1.55;}
+.sb{font-weight:700;color:var(--navy);font-family:var(--display);font-size:13px;}
+
+/* k8s component card */
+.comp-card{background:var(--off);border:1px solid var(--border);border-top:2px solid var(--blue);border-radius:3px;padding:8px 10px;}
+.comp-name{font-family:var(--display);font-size:13px;font-weight:700;color:var(--navy);margin-bottom:2px;}
+.comp-role{font-family:var(--mono);font-size:8.5px;color:var(--blue);margin-bottom:3px;}
+.comp-desc{font-size:12px;color:var(--muted);line-height:1.5;}
+
+/* lifecycle step */
+.lc-step{display:flex;gap:10px;margin:2mm 0;align-items:flex-start;}
+.lc-num{min-width:22px;height:22px;background:var(--blue);color:white;border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:var(--mono);font-size:9px;font-weight:600;flex-shrink:0;margin-top:1px;}
+.lc-body{flex:1;}
+.lc-title{font-family:var(--display);font-size:13px;font-weight:600;color:var(--navy);}
+.lc-desc{font-size:12.5px;color:var(--muted);line-height:1.55;}
+</style>
+</head>
+<body>
+
+<!-- ═══════ PAGE 1 — COVER ═══════ -->
+<div class="page" data-page="1">
+<div class="page-stripe"></div>
+<div class="cover-band">
+  <div class="cover-band-inner">
+    <div class="cover-eyebrow">AI Engineer Notes · Level 1 · Container Orchestration Series</div>
+    <h1 class="cover">Kubernetes<br><em>From Zero</em><br>to Running</h1>
+    <p class="cover-sub">A complete beginner's guide to Kubernetes for AI engineers — what it is, why it exists, how it works, and the commands you'll use every day.</p>
+  </div>
+</div>
+<div class="cover-body">
+  <p class="cover-intro">
+    As an AI engineer, your models and RAG pipelines don't live on your laptop forever. Kubernetes is the universal platform for running containerised AI applications reliably at scale. This is where your journey begins.
+  </p>
+  <div class="cover-grid">
+    <div class="cover-chip"><span class="cn">§ 01</span>What Is Kubernetes?</div>
+    <div class="cover-chip"><span class="cn">§ 02</span>Core Architecture</div>
+    <div class="cover-chip"><span class="cn">§ 03</span>Pods — The Smallest Unit</div>
+    <div class="cover-chip"><span class="cn">§ 04</span>Nodes &amp; Clusters</div>
+    <div class="cover-chip"><span class="cn">§ 05</span>Deployments</div>
+    <div class="cover-chip"><span class="cn">§ 06</span>Services &amp; Networking</div>
+    <div class="cover-chip"><span class="cn">§ 07</span>ConfigMaps &amp; Secrets</div>
+    <div class="cover-chip"><span class="cn">§ 08</span>Namespaces</div>
+    <div class="cover-chip"><span class="cn">§ 09</span>Kubectl Commands</div>
+    <div class="cover-chip"><span class="cn">§ 10</span>Scaling &amp; Health</div>
+    <div class="cover-chip"><span class="cn">§ 11</span>Storage Basics</div>
+    <div class="cover-chip"><span class="cn">§ 12</span>K8s for AI Engineers</div>
+  </div>
+  <div class="cover-meta">
+    <div class="cover-pill">Level 1</div>
+    <div class="cover-pill">20 Pages</div>
+    <div class="cover-pill">Theory + Commands</div>
+    <div class="cover-pill">AI Engineer Focus</div>
+    <div class="cover-pill">White Background</div>
+  </div>
+</div>
+</div>
+
+<!-- ═══════ PAGE 2 — TOC ═══════ -->
+<div class="page" data-page="2">
+<div class="page-stripe"></div>
+<div class="ph"><span class="ph-s">Kubernetes Level 1</span><span class="ph-c">Table of Contents</span></div>
+<div class="toc-h">Contents</div>
+
+<div class="toc-sec">The Foundation</div>
+<div class="toc-item"><span class="toc-n">01</span><span class="toc-l">What Is Kubernetes & Why Does It Exist?</span><span class="toc-sub">The problem it solves</span><span class="toc-p">3</span></div>
+<div class="toc-item"><span class="toc-n">02</span><span class="toc-l">Containers First — Docker in 5 Minutes</span><span class="toc-sub">What K8s manages</span><span class="toc-p">4</span></div>
+<div class="toc-item"><span class="toc-n">03</span><span class="toc-l">Kubernetes Architecture</span><span class="toc-sub">Control Plane &amp; Worker Nodes</span><span class="toc-p">5</span></div>
+
+<div class="toc-sec">Core Objects</div>
+<div class="toc-item"><span class="toc-n">04</span><span class="toc-l">Pods — The Atomic Unit</span><span class="toc-sub">What runs in K8s</span><span class="toc-p">6</span></div>
+<div class="toc-item"><span class="toc-n">05</span><span class="toc-l">Nodes &amp; Clusters</span><span class="toc-sub">Where Pods run</span><span class="toc-p">7</span></div>
+<div class="toc-item"><span class="toc-n">06</span><span class="toc-l">Deployments — Managing Pods at Scale</span><span class="toc-sub">Desired state &amp; self-healing</span><span class="toc-p">8</span></div>
+<div class="toc-item"><span class="toc-n">07</span><span class="toc-l">ReplicaSets</span><span class="toc-sub">How Deployments maintain count</span><span class="toc-p">9</span></div>
+<div class="toc-item"><span class="toc-n">08</span><span class="toc-l">Services — Networking &amp; Discovery</span><span class="toc-sub">How Pods talk to each other</span><span class="toc-p">10</span></div>
+
+<div class="toc-sec">Configuration & Storage</div>
+<div class="toc-item"><span class="toc-n">09</span><span class="toc-l">ConfigMaps &amp; Secrets</span><span class="toc-sub">Injecting config without rebuilding images</span><span class="toc-p">11</span></div>
+<div class="toc-item"><span class="toc-n">10</span><span class="toc-l">Namespaces</span><span class="toc-sub">Logical isolation &amp; multi-tenancy</span><span class="toc-p">12</span></div>
+<div class="toc-item"><span class="toc-n">11</span><span class="toc-l">Volumes &amp; Persistent Storage</span><span class="toc-sub">Keeping data beyond Pod lifetime</span><span class="toc-p">13</span></div>
+
+<div class="toc-sec">Operations</div>
+<div class="toc-item"><span class="toc-n">12</span><span class="toc-l">kubectl — The Command Reference</span><span class="toc-sub">Every essential command explained</span><span class="toc-p">14</span></div>
+<div class="toc-item"><span class="toc-n">13</span><span class="toc-l">Scaling &amp; Rolling Updates</span><span class="toc-sub">Zero-downtime deployments</span><span class="toc-p">15</span></div>
+<div class="toc-item"><span class="toc-n">14</span><span class="toc-l">Health Checks — Probes</span><span class="toc-sub">Liveness, readiness &amp; startup</span><span class="toc-p">16</span></div>
+<div class="toc-item"><span class="toc-n">15</span><span class="toc-l">Resource Requests &amp; Limits</span><span class="toc-sub">CPU, memory &amp; GPU allocation</span><span class="toc-p">17</span></div>
+
+<div class="toc-sec">AI Engineer Focus</div>
+<div class="toc-item"><span class="toc-n">16</span><span class="toc-l">Kubernetes for AI Engineers</span><span class="toc-sub">Deploying RAG apps, models &amp; GPUs</span><span class="toc-p">18</span></div>
+<div class="toc-item"><span class="toc-n">17</span><span class="toc-l">Common Mistakes at Level 1</span><span class="toc-p">19</span></div>
+<div class="toc-item"><span class="toc-n">18</span><span class="toc-l">Level 1 Complete Summary</span><span class="toc-p">20</span></div>
+</div>
+
+<!-- ═══════ PAGE 3 — WHAT IS KUBERNETES ═══════ -->
+<div class="page" data-page="3">
+<div class="page-stripe"></div>
+<div class="ph"><span class="ph-s">Kubernetes Level 1</span><span class="ph-c">01 — What Is Kubernetes?</span></div>
+<div class="gn">01</div>
+<div class="sm">Concept #1</div>
+<h2><span class="n">01.</span>What Is Kubernetes & Why Does It Exist?</h2>
+
+<div class="box def">
+<span class="bl">📖 Definition</span>
+<strong>Kubernetes</strong> (often written as <strong>K8s</strong> — the 8 represents the 8 letters between K and s) is an open-source <strong>container orchestration platform</strong> that automates the deployment, scaling, management, and healing of containerised applications. It was originally developed by Google and released in 2014, inspired by Google's internal cluster manager called Borg.
+</div>
+
+<h3>The Problem Kubernetes Solves</h3>
+<p>Imagine you've built a RAG application. It runs perfectly on your laptop in a Docker container. Now imagine 50,000 users are hitting it simultaneously. You need:</p>
+<ul>
+<li>Many copies of the application running at once (multiple <em>instances</em> or <em>replicas</em>)</li>
+<li>A way to automatically start a new instance when one crashes</li>
+<li>A way to route traffic across all instances evenly</li>
+<li>A way to update the application without downtime</li>
+<li>A way to scale up (more instances) when traffic is high, and scale down at night</li>
+<li>A way to allocate GPU resources to the model-serving component specifically</li>
+</ul>
+<p>Managing all of this manually across dozens of servers is impossible. Kubernetes does all of it automatically.</p>
+
+<div class="analogy">
+Think of Kubernetes as the <strong>air traffic control system</strong> of your application. Just as air traffic control knows exactly which runway each plane uses, which planes are airborne, when to redirect traffic during delays, and how to handle emergencies — Kubernetes knows exactly which server runs which application, when to restart a crashed container, how to route incoming requests, and how to handle failures without human intervention.
+</div>
+
+<h3>The Three Core Promises of Kubernetes</h3>
+<div class="three">
+<div class="box def" style="margin:0;font-size:12px;">
+<span class="bl">Self-Healing</span>
+If a container crashes, K8s automatically restarts it. If a server dies, K8s moves all its containers to other servers. Applications stay up without human intervention.
+</div>
+<div class="box tip" style="margin:0;font-size:12px;">
+<span class="bl">Scaling</span>
+K8s can automatically add more copies of your app when traffic increases and remove them when traffic drops — saving money and maintaining performance.
+</div>
+<div class="box key" style="margin:0;font-size:12px;">
+<span class="bl">Declarative Management</span>
+You tell K8s <em>what</em> you want (e.g., "run 5 copies of my RAG app"), not <em>how</em> to do it. K8s figures out how and keeps the system in that desired state forever.
+</div>
+</div>
+
+<h3>Why AI Engineers Specifically Need Kubernetes</h3>
+<table>
+<tr><th>AI Engineering Challenge</th><th>How Kubernetes Helps</th></tr>
+<tr><td>Model inference server needs 3 GPU replicas</td><td>Specify GPU resources per Pod; K8s schedules on GPU-equipped nodes</td></tr>
+<tr><td>RAG pipeline has 5 microservices</td><td>Manage each as a Deployment; they discover each other via Services</td></tr>
+<tr><td>Need to update the LLM version without downtime</td><td>Rolling update strategy — K8s replaces Pods one at a time</td></tr>
+<tr><td>API keys and model credentials must not be in code</td><td>Secrets injected securely into Pods at runtime</td></tr>
+<tr><td>Traffic spikes during business hours</td><td>Horizontal Pod Autoscaler scales replicas automatically</td></tr>
+</table>
+</div>
+
+<!-- ═══════ PAGE 4 — CONTAINERS ═══════ -->
+<div class="page" data-page="4">
+<div class="page-stripe"></div>
+<div class="ph"><span class="ph-s">Kubernetes Level 1</span><span class="ph-c">02 — Containers First</span></div>
+<div class="gn">02</div>
+<div class="sm">Concept #2</div>
+<h2><span class="n">02.</span>Containers First — Docker in 5 Minutes</h2>
+
+<div class="box def">
+<span class="bl">📖 What Is a Container?</span>
+A <strong>container</strong> is a lightweight, standalone, executable software package that includes everything needed to run an application: the code, runtime, system tools, libraries, and settings. It runs identically on any machine that has a container runtime (like Docker) installed — eliminating the classic "it works on my machine" problem.
+</div>
+
+<h3>Container vs Virtual Machine</h3>
+<div class="diag">
+<div class="diag-t">Container vs Virtual Machine — Architecture Comparison</div>
+<div class="two" style="gap:6mm;">
+  <div>
+    <div style="background:var(--navy);color:white;font-family:var(--mono);font-size:9px;font-weight:700;padding:5px 10px;text-align:center;border-radius:2px;margin-bottom:4px;">VIRTUAL MACHINE</div>
+    <div style="background:var(--ivory);border:1px solid var(--border2);border-radius:2px;padding:8px;display:flex;flex-direction:column;gap:3px;font-family:var(--mono);font-size:9px;text-align:center;">
+      <div style="background:var(--blue-lt);border:1px solid var(--blue-md);padding:4px;">App A</div>
+      <div style="background:var(--blue-lt);border:1px solid var(--blue-md);padding:4px;">Guest OS (2GB)</div>
+      <div style="background:var(--blue-lt);border:1px solid var(--blue-md);padding:4px;">App B</div>
+      <div style="background:var(--blue-lt);border:1px solid var(--blue-md);padding:4px;">Guest OS (2GB)</div>
+      <div style="background:var(--off2);border:1px solid var(--border2);padding:4px;font-weight:700;">Hypervisor</div>
+      <div style="background:var(--off2);border:1px solid var(--border2);padding:4px;font-weight:700;">Host OS</div>
+      <div style="background:var(--surface);border:1px solid var(--border2);padding:4px;font-weight:700;">Physical Hardware</div>
+    </div>
+    <p style="font-family:var(--mono);font-size:9px;color:var(--muted);margin-top:4px;text-align:center;">Each VM = full OS copy (GBs, minutes to start)</p>
+  </div>
+  <div>
+    <div style="background:var(--green);color:white;font-family:var(--mono);font-size:9px;font-weight:700;padding:5px 10px;text-align:center;border-radius:2px;margin-bottom:4px;">CONTAINERS</div>
+    <div style="background:var(--ivory);border:1px solid var(--border2);border-radius:2px;padding:8px;display:flex;flex-direction:column;gap:3px;font-family:var(--mono);font-size:9px;text-align:center;">
+      <div style="background:var(--green-lt);border:1px solid var(--green-md);padding:4px;">Container A (App A)</div>
+      <div style="background:var(--green-lt);border:1px solid var(--green-md);padding:4px;">Container B (App B)</div>
+      <div style="background:var(--green-lt);border:1px solid var(--green-md);padding:4px;">Container C (App C)</div>
+      <div style="background:var(--off2);border:1px solid var(--border2);padding:4px;font-weight:700;">Container Runtime (Docker)</div>
+      <div style="background:var(--off2);border:1px solid var(--border2);padding:4px;font-weight:700;">Host OS (shared kernel)</div>
+      <div style="background:var(--surface);border:1px solid var(--border2);padding:4px;font-weight:700;">Physical Hardware</div>
+    </div>
+    <p style="font-family:var(--mono);font-size:9px;color:var(--muted);margin-top:4px;text-align:center;">Containers share OS kernel (MBs, seconds to start)</p>
+  </div>
+</div>
+</div>
+
+<h3>The Docker Workflow (What K8s Manages)</h3>
+<p>Before Kubernetes, the Docker workflow is simple: write a Dockerfile, build an image, run a container. Kubernetes takes over from the "run" step — it decides <em>where</em> to run it, <em>how many</em> to run, and <em>what to do</em> when it fails.</p>
+
+<div class="diag">
+<div class="diag-t">Container Lifecycle — From Code to Running in K8s</div>
+<div class="flow" style="gap:0;flex-wrap:wrap;">
+  <div class="fb blue" style="font-size:9px;min-width:80px;">Write<br>Dockerfile</div><div class="fa">→</div>
+  <div class="fb navy" style="font-size:9px;min-width:80px;">docker build<br>→ Image</div><div class="fa">→</div>
+  <div class="fb cyan" style="font-size:9px;min-width:90px;">docker push<br>→ Registry</div><div class="fa">→</div>
+  <div class="fb green" style="font-size:9px;min-width:90px;">K8s Pulls<br>Image</div><div class="fa">→</div>
+  <div class="fb amber" style="font-size:9px;min-width:80px;">K8s Runs<br>as Pod</div><div class="fa">→</div>
+  <div class="fb dark" style="font-size:9px;min-width:80px;">K8s Manages<br>Forever</div>
+</div>
+</div>
+
+<h3>Key Docker Commands You Must Know</h3>
+<div class="cmd-block">
+<div class="cmd-head"><div class="cmd-dots"><div class="cmd-dot"></div><div class="cmd-dot"></div><div class="cmd-dot"></div></div><div class="cmd-label">Terminal · Docker Commands</div></div>
+<div class="cmd-body"><span class="cmd-prompt">$ </span><span class="cmd-cmd">docker build</span> <span class="cmd-flag">-t</span> my-rag-app:v1 .        <span class="cmd-cmt"># Build image from Dockerfile in current dir</span>
+<span class="cmd-prompt">$ </span><span class="cmd-cmd">docker run</span> <span class="cmd-flag">-p</span> 8080:8080 my-rag-app:v1   <span class="cmd-cmt"># Run container, expose port 8080</span>
+<span class="cmd-prompt">$ </span><span class="cmd-cmd">docker push</span> myregistry/my-rag-app:v1      <span class="cmd-cmt"># Push image to registry (DockerHub/ECR/GCR)</span>
+<span class="cmd-prompt">$ </span><span class="cmd-cmd">docker ps</span>                                 <span class="cmd-cmt"># List running containers</span>
+<span class="cmd-prompt">$ </span><span class="cmd-cmd">docker images</span>                             <span class="cmd-cmt"># List built images</span></div>
+</div>
+
+<div class="box tip">
+<span class="bl">💡 The Image Registry is the Bridge Between Docker and K8s</span>
+Your image must be in a registry (Docker Hub, AWS ECR, Google GCR, GitHub Container Registry) before Kubernetes can use it. K8s pulls the image from the registry and runs it on the appropriate node. This is why <code>docker push</code> is a required step before any K8s deployment.
+</div>
+</div>
+
+<!-- ═══════ PAGE 5 — ARCHITECTURE ═══════ -->
+<div class="page" data-page="5">
+<div class="page-stripe"></div>
+<div class="ph"><span class="ph-s">Kubernetes Level 1</span><span class="ph-c">03 — Kubernetes Architecture</span></div>
+<div class="gn">03</div>
+<div class="sm">Concept #3</div>
+<h2><span class="n">03.</span>Kubernetes Architecture</h2>
+
+<div class="box def">
+<span class="bl">📖 Definition</span>
+A Kubernetes cluster consists of two types of machines: the <strong>Control Plane</strong> (the brain — makes decisions about the cluster) and <strong>Worker Nodes</strong> (the muscle — actually run your application containers). The Control Plane manages the desired state; the Worker Nodes execute it.
+</div>
+
+<h3>The Full Cluster Architecture</h3>
+<div class="diag">
+<div class="diag-t">Kubernetes Cluster — Control Plane + Worker Nodes</div>
+
+<div style="margin-bottom:5mm;">
+<div style="background:var(--navy);color:white;font-family:var(--mono);font-size:9px;font-weight:700;padding:4px 10px;text-align:center;border-radius:2px;margin-bottom:4px;">CONTROL PLANE (The Brain)</div>
+<div style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:4px;">
+  <div class="arch-box" style="border-left-color:var(--blue);flex-direction:column;gap:2px;">
+    <span class="ab-t" style="color:var(--blue);min-width:auto;">API Server</span>
+    <span class="ab-d">Front door to K8s. All commands go through here. kubectl talks to this.</span>
+  </div>
+  <div class="arch-box" style="border-left-color:var(--cyan);flex-direction:column;gap:2px;">
+    <span class="ab-t" style="color:var(--cyan);min-width:auto;">etcd</span>
+    <span class="ab-d">The cluster database. Stores entire cluster state. Single source of truth.</span>
+  </div>
+  <div class="arch-box" style="border-left-color:var(--green);flex-direction:column;gap:2px;">
+    <span class="ab-t" style="color:var(--green);min-width:auto;">Scheduler</span>
+    <span class="ab-d">Decides which Node a new Pod runs on based on available resources.</span>
+  </div>
+  <div class="arch-box" style="border-left-color:var(--amber);flex-direction:column;gap:2px;">
+    <span class="ab-t" style="color:var(--amber);min-width:auto;">Controller Manager</span>
+    <span class="ab-d">Watches state. Ensures desired matches actual. Restarts failed Pods.</span>
+  </div>
+</div>
+</div>
+
+<div style="text-align:center;font-family:var(--mono);font-size:11px;color:var(--muted);margin-bottom:4mm;">↕ Control Plane communicates with Worker Nodes via kubelet</div>
+
+<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:5mm;">
+  <div>
+    <div style="background:var(--forest);background:var(--teal);color:white;font-family:var(--mono);font-size:9px;font-weight:700;padding:4px;text-align:center;border-radius:2px;margin-bottom:4px;">WORKER NODE 1</div>
+    <div style="background:var(--cyan-lt);border:1px solid var(--cyan-md);border-radius:2px;padding:6px;font-size:11px;">
+      <div style="font-family:var(--mono);font-size:8.5px;color:var(--cyan);margin-bottom:3px;font-weight:700;">KUBELET</div>
+      <div style="display:flex;gap:3px;">
+        <div style="background:var(--blue-lt);border:1px solid var(--blue-md);border-radius:1px;padding:3px 5px;font-family:var(--mono);font-size:8.5px;color:var(--blue);flex:1;text-align:center;">Pod A</div>
+        <div style="background:var(--blue-lt);border:1px solid var(--blue-md);border-radius:1px;padding:3px 5px;font-family:var(--mono);font-size:8.5px;color:var(--blue);flex:1;text-align:center;">Pod B</div>
+      </div>
+    </div>
+  </div>
+  <div>
+    <div style="background:var(--teal);color:white;font-family:var(--mono);font-size:9px;font-weight:700;padding:4px;text-align:center;border-radius:2px;margin-bottom:4px;">WORKER NODE 2</div>
+    <div style="background:var(--cyan-lt);border:1px solid var(--cyan-md);border-radius:2px;padding:6px;font-size:11px;">
+      <div style="font-family:var(--mono);font-size:8.5px;color:var(--cyan);margin-bottom:3px;font-weight:700;">KUBELET</div>
+      <div style="display:flex;gap:3px;">
+        <div style="background:var(--blue-lt);border:1px solid var(--blue-md);border-radius:1px;padding:3px 5px;font-family:var(--mono);font-size:8.5px;color:var(--blue);flex:1;text-align:center;">Pod C</div>
+        <div style="background:var(--blue-lt);border:1px solid var(--blue-md);border-radius:1px;padding:3px 5px;font-family:var(--mono);font-size:8.5px;color:var(--blue);flex:1;text-align:center;">Pod D</div>
+      </div>
+    </div>
+  </div>
+  <div>
+    <div style="background:var(--teal);color:white;font-family:var(--mono);font-size:9px;font-weight:700;padding:4px;text-align:center;border-radius:2px;margin-bottom:4px;">WORKER NODE 3</div>
+    <div style="background:var(--cyan-lt);border:1px solid var(--cyan-md);border-radius:2px;padding:6px;font-size:11px;">
+      <div style="font-family:var(--mono);font-size:8.5px;color:var(--cyan);margin-bottom:3px;font-weight:700;">KUBELET</div>
+      <div style="display:flex;gap:3px;">
+        <div style="background:var(--blue-lt);border:1px solid var(--blue-md);border-radius:1px;padding:3px 5px;font-family:var(--mono);font-size:8.5px;color:var(--blue);flex:1;text-align:center;">Pod E</div>
+      </div>
+    </div>
+  </div>
+</div>
+</div>
+
+<h3>What Each Component Does</h3>
+<table>
+<tr><th>Component</th><th>Location</th><th>Responsibility</th><th>Analogy</th></tr>
+<tr><td><strong>API Server</strong></td><td>Control Plane</td><td>Receives all kubectl commands, validates and processes them</td><td>Front desk receptionist</td></tr>
+<tr><td><strong>etcd</strong></td><td>Control Plane</td><td>Stores entire cluster state (all Pods, Deployments, config)</td><td>The office filing cabinet</td></tr>
+<tr><td><strong>Scheduler</strong></td><td>Control Plane</td><td>Assigns Pods to the most suitable Worker Node</td><td>Office manager assigning desks</td></tr>
+<tr><td><strong>Controller Manager</strong></td><td>Control Plane</td><td>Watches cluster; fixes anything that drifts from desired state</td><td>Quality control supervisor</td></tr>
+<tr><td><strong>kubelet</strong></td><td>Worker Node</td><td>Agent on each node; receives Pod specs and runs containers</td><td>The desk worker who does the actual work</td></tr>
+<tr><td><strong>kube-proxy</strong></td><td>Worker Node</td><td>Manages network rules so Pods can communicate</td><td>Internal telephone operator</td></tr>
+</table>
+</div>
+
+<!-- ═══════ PAGE 6 — PODS ═══════ -->
+<div class="page" data-page="6">
+<div class="page-stripe"></div>
+<div class="ph"><span class="ph-s">Kubernetes Level 1</span><span class="ph-c">04 — Pods</span></div>
+<div class="gn">04</div>
+<div class="sm">Concept #4</div>
+<h2><span class="n">04.</span>Pods — The Atomic Unit of Kubernetes</h2>
+
+<div class="box def">
+<span class="bl">📖 Definition</span>
+A <strong>Pod</strong> is the smallest deployable unit in Kubernetes. It represents a single instance of a running process in your cluster. A Pod encapsulates one or more containers (usually one), their shared storage, shared network (they share an IP address), and specifications for how to run them.
+</div>
+
+<h3>Why Pods and Not Just Containers?</h3>
+<p>You might wonder: if Kubernetes manages containers, why introduce a "Pod" concept? The reason is that some applications naturally need multiple tightly-coupled containers to run together. For example, a web server container might need a logging sidecar container that reads its logs and ships them elsewhere. These two containers share the same network and storage — they are a single deployable unit, which is exactly what a Pod represents.</p>
+<p>However, for most AI engineering work, each Pod contains exactly one container. Think of a Pod as a "wrapper" around your Docker container that gives it a Kubernetes identity, IP address, and lifecycle.</p>
+
+<div class="diag">
+<div class="diag-t">Pod Anatomy — What's Inside a Pod</div>
+<div style="background:var(--blue-lt);border:2px solid var(--blue);border-radius:4px;padding:8mm;position:relative;">
+  <div style="font-family:var(--mono);font-size:9px;color:var(--blue);font-weight:700;margin-bottom:5mm;text-align:center;">POD (shared network IP: 10.0.0.42)</div>
+  <div class="two" style="gap:5mm;margin-bottom:4mm;">
+    <div style="background:var(--white);border:1.5px solid var(--blue-md);border-radius:3px;padding:8px;text-align:center;">
+      <div style="font-family:var(--mono);font-size:9px;color:var(--navy);font-weight:700;margin-bottom:3px;">Main Container</div>
+      <div style="font-size:11px;color:var(--muted);">Your RAG app / model server</div>
+      <div style="font-family:var(--mono);font-size:9px;color:var(--blue);margin-top:3px;">port 8080</div>
+    </div>
+    <div style="background:var(--white);border:1.5px dashed var(--border2);border-radius:3px;padding:8px;text-align:center;">
+      <div style="font-family:var(--mono);font-size:9px;color:var(--muted);font-weight:700;margin-bottom:3px;">Sidecar Container</div>
+      <div style="font-size:11px;color:var(--muted);">Log collector / Proxy (optional)</div>
+      <div style="font-family:var(--mono);font-size:9px;color:var(--muted);margin-top:3px;">shares network</div>
+    </div>
+  </div>
+  <div class="two" style="gap:5mm;">
+    <div style="background:var(--white);border:1.5px solid var(--green-md);border-radius:3px;padding:5px 8px;text-align:center;font-family:var(--mono);font-size:9px;color:var(--green);">Shared Volume / Storage</div>
+    <div style="background:var(--white);border:1.5px solid var(--amber-md);border-radius:3px;padding:5px 8px;text-align:center;font-family:var(--mono);font-size:9px;color:var(--amber);">Shared Environment Variables</div>
+  </div>
+</div>
+</div>
+
+<h3>Pod Lifecycle — The States a Pod Goes Through</h3>
+<div class="diag">
+<div class="diag-t">Pod State Machine</div>
+<div class="flow" style="gap:0;">
+  <div class="fb navy" style="font-size:9px;min-width:72px;">Pending<br><span style="color:var(--ghost);font-size:8px;">Scheduled,<br>not started</span></div><div class="fa">→</div>
+  <div class="fb blue" style="font-size:9px;min-width:72px;">Running<br><span style="font-size:8px;font-weight:400;">≥1 container<br>running</span></div><div class="fa">→</div>
+  <div class="fb green" style="font-size:9px;min-width:72px;">Succeeded<br><span style="font-size:8px;font-weight:400;">All containers<br>completed OK</span></div>
+  <div style="padding:0 6px;color:var(--border2);">or</div>
+  <div class="fb red" style="font-size:9px;min-width:72px;">Failed<br><span style="font-size:8px;font-weight:400;">Container exited<br>with error</span></div>
+  <div style="padding:0 6px;color:var(--border2);">or</div>
+  <div class="fb amber" style="font-size:9px;min-width:72px;">Unknown<br><span style="font-size:8px;font-weight:400;">Node lost<br>connection</span></div>
+</div>
+</div>
+
+<h3>Key Pod Commands</h3>
+<div class="cmd-block">
+<div class="cmd-head"><div class="cmd-dots"><div class="cmd-dot"></div><div class="cmd-dot"></div><div class="cmd-dot"></div></div><div class="cmd-label">kubectl · Pod Commands</div></div>
+<div class="cmd-body"><span class="cmd-prompt">$ </span><span class="cmd-cmd">kubectl get pods</span>                        <span class="cmd-cmt"># List all Pods in current namespace</span>
+<span class="cmd-prompt">$ </span><span class="cmd-cmd">kubectl get pods</span> <span class="cmd-flag">-o wide</span>               <span class="cmd-cmt"># Show Pod IPs and which Node they run on</span>
+<span class="cmd-prompt">$ </span><span class="cmd-cmd">kubectl describe pod</span> my-pod              <span class="cmd-cmt"># Full details: events, conditions, containers</span>
+<span class="cmd-prompt">$ </span><span class="cmd-cmd">kubectl logs</span> my-pod                      <span class="cmd-cmt"># View container logs</span>
+<span class="cmd-prompt">$ </span><span class="cmd-cmd">kubectl logs</span> my-pod <span class="cmd-flag">-f</span>                  <span class="cmd-cmt"># Follow logs in real-time (like tail -f)</span>
+<span class="cmd-prompt">$ </span><span class="cmd-cmd">kubectl exec</span> <span class="cmd-flag">-it</span> my-pod <span class="cmd-flag">--</span> /bin/bash   <span class="cmd-cmt"># Open interactive shell inside Pod</span>
+<span class="cmd-prompt">$ </span><span class="cmd-cmd">kubectl delete pod</span> my-pod                <span class="cmd-cmt"># Delete a Pod (Deployment will recreate it)</span></div>
+</div>
+
+<div class="box warn">
+<span class="bl">⚠ Pods Are Ephemeral By Design</span>
+Pods are disposable. They can be killed and restarted at any time. <strong>Never store important data inside a Pod's filesystem</strong> — it will be lost when the Pod dies. Use Persistent Volumes (covered in §11) for any data that must survive.
+</div>
+</div>
+
+<!-- ═══════ PAGE 7 — NODES & CLUSTERS ═══════ -->
+<div class="page" data-page="7">
+<div class="page-stripe"></div>
+<div class="ph"><span class="ph-s">Kubernetes Level 1</span><span class="ph-c">05 — Nodes & Clusters</span></div>
+<div class="gn">05</div>
+<div class="sm">Concept #5</div>
+<h2><span class="n">05.</span>Nodes & Clusters</h2>
+
+<div class="box def">
+<span class="bl">📖 Definitions</span>
+A <strong>Node</strong> is a physical or virtual machine in your Kubernetes cluster that runs Pods. A <strong>Cluster</strong> is the complete set of all nodes (Control Plane + Worker Nodes) managed by a single Kubernetes installation. Every cluster has at least one node.
+</div>
+
+<h3>The Node as a Worker Machine</h3>
+<p>Think of a Node as a physical office worker's desk — it has a fixed amount of resources (CPU, memory, disk, possibly GPU). The Kubernetes Scheduler is the manager who decides which desk each piece of work (Pod) gets assigned to, based on available space.</p>
+<p>Each Worker Node runs three key components: <strong>kubelet</strong> (the agent that communicates with the Control Plane), <strong>container runtime</strong> (usually containerd or Docker, which actually runs the containers), and <strong>kube-proxy</strong> (manages network rules for Pod communication).</p>
+
+<h3>How the Scheduler Chooses a Node</h3>
+<p>When a new Pod needs to be placed, the Scheduler goes through a two-phase process:</p>
+
+<div class="diag">
+<div class="diag-t">Scheduler Decision Process — Filtering then Scoring</div>
+<div style="display:flex;flex-direction:column;gap:4px;">
+  <div class="arch-box" style="border-left-color:var(--blue);">
+    <span class="ab-t" style="color:var(--blue);">Phase 1: Filter</span>
+    <span class="ab-d">Eliminate nodes that <em>cannot</em> run the Pod: not enough CPU, not enough memory, node has a taint the Pod can't tolerate, node doesn't have required hardware (e.g., GPU). This narrows down from all nodes to a feasible set.</span>
+  </div>
+  <div class="arch-box" style="border-left-color:var(--green);">
+    <span class="ab-t" style="color:var(--green);">Phase 2: Score</span>
+    <span class="ab-d">Among feasible nodes, score each one using priority functions: prefer nodes with more free resources, prefer the node that already has the container image cached, spread Pods across different nodes for fault tolerance. Highest score wins.</span>
+  </div>
+  <div class="arch-box" style="border-left-color:var(--amber);">
+    <span class="ab-t" style="color:var(--amber);">Result: Bind</span>
+    <span class="ab-d">Scheduler binds the Pod to the winning node. kubelet on that node receives the Pod spec and starts the container. The binding is stored in etcd.</span>
+  </div>
+</div>
+</div>
+
+<h3>Node Commands</h3>
+<div class="cmd-block">
+<div class="cmd-head"><div class="cmd-dots"><div class="cmd-dot"></div><div class="cmd-dot"></div><div class="cmd-dot"></div></div><div class="cmd-label">kubectl · Node Commands</div></div>
+<div class="cmd-body"><span class="cmd-prompt">$ </span><span class="cmd-cmd">kubectl get nodes</span>                       <span class="cmd-cmt"># List all nodes and their status</span>
+<span class="cmd-prompt">$ </span><span class="cmd-cmd">kubectl get nodes</span> <span class="cmd-flag">-o wide</span>              <span class="cmd-cmt"># Show OS, kernel version, internal/external IPs</span>
+<span class="cmd-prompt">$ </span><span class="cmd-cmd">kubectl describe node</span> node-1            <span class="cmd-cmt"># Full node info: capacity, allocated resources, Pods</span>
+<span class="cmd-prompt">$ </span><span class="cmd-cmd">kubectl top node</span>                        <span class="cmd-cmt"># Show real-time CPU and memory usage per node</span>
+<span class="cmd-prompt">$ </span><span class="cmd-cmd">kubectl cordon</span> node-1                   <span class="cmd-cmt"># Mark node as unschedulable (no new Pods)</span>
+<span class="cmd-prompt">$ </span><span class="cmd-cmd">kubectl drain</span> node-1                    <span class="cmd-cmt"># Evict all Pods from node (for maintenance)</span>
+<span class="cmd-prompt">$ </span><span class="cmd-cmd">kubectl uncordon</span> node-1                 <span class="cmd-cmt"># Re-enable scheduling on node after maintenance</span></div>
+</div>
+
+<h3>Node Status Conditions</h3>
+<table>
+<tr><th>Condition</th><th>Meaning</th><th>Action if False/Unknown</th></tr>
+<tr><td><strong>Ready</strong></td><td>Node is healthy and can accept new Pods</td><td>Check kubelet status on the node, check node resources</td></tr>
+<tr><td><strong>MemoryPressure</strong></td><td>Node is running low on memory</td><td>K8s may evict Pods; scale down or add nodes</td></tr>
+<tr><td><strong>DiskPressure</strong></td><td>Node disk is running full</td><td>Clean up old images/logs; add storage</td></tr>
+<tr><td><strong>PIDPressure</strong></td><td>Too many processes running on node</td><td>Investigate runaway processes</td></tr>
+</table>
+</div>
+
+<!-- ═══════ PAGE 8 — DEPLOYMENTS ═══════ -->
+<div class="page" data-page="8">
+<div class="page-stripe"></div>
+<div class="ph"><span class="ph-s">Kubernetes Level 1</span><span class="ph-c">06 — Deployments</span></div>
+<div class="gn">06</div>
+<div class="sm">Concept #6</div>
+<h2><span class="n">06.</span>Deployments — Managing Pods at Scale</h2>
+
+<div class="box def">
+<span class="bl">📖 Definition</span>
+A <strong>Deployment</strong> is a Kubernetes object that manages a group of identical Pods. You tell the Deployment what you want (e.g., "run 3 replicas of my RAG app container"), and it continuously ensures that exact state exists in the cluster — creating, deleting, or replacing Pods as needed.
+</div>
+
+<h3>Why You Almost Never Create Pods Directly</h3>
+<p>If you create a Pod directly (without a Deployment), and that Pod crashes or the node it's on fails — the Pod is gone forever. Nobody recreates it. You would have to notice and manually restart it.</p>
+<p>A Deployment solves this: it watches its Pods at all times and automatically recreates any that disappear. This is called <strong>self-healing</strong> and is one of the most important features of Kubernetes.</p>
+
+<div class="analogy">
+A Deployment is like a staffing agency contract. You tell the agency "I always need 3 developers working on Project X." If one developer quits, the agency automatically hires a replacement. You don't have to notice or react — the agency (Deployment) ensures the count is always 3.
+</div>
+
+<h3>The Desired State Model — The Heart of Kubernetes</h3>
+<p>Kubernetes operates on a <strong>desired state</strong> model. You declare what you want (3 replicas, image v2, 500m CPU) and Kubernetes continuously compares the <em>actual state</em> against the <em>desired state</em>. Any difference triggers automatic corrective action by the Controller Manager.</p>
+
+<div class="diag">
+<div class="diag-t">Desired State Reconciliation Loop — Runs Continuously</div>
+<div style="display:flex;flex-direction:column;align-items:center;gap:3px;">
+  <div class="fb blue" style="min-width:220px;font-size:9px;padding:7px;">Desired State: 3 replicas of my-rag-app:v2</div>
+  <div class="fa" style="font-size:16px;">↓</div>
+  <div class="fb navy" style="min-width:220px;font-size:9px;padding:7px;">Controller Manager: Observe Actual State</div>
+  <div class="fa" style="font-size:16px;">↓</div>
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:5mm;width:100%;max-width:350px;">
+    <div style="text-align:center;">
+      <div class="fb green" style="font-size:9px;padding:6px;margin-bottom:3px;">Actual = 3 replicas ✅</div>
+      <div style="font-family:var(--mono);font-size:9px;color:var(--muted);">No action needed</div>
+    </div>
+    <div style="text-align:center;">
+      <div class="fb red" style="font-size:9px;padding:6px;margin-bottom:3px;">Actual = 2 replicas ❌</div>
+      <div style="font-family:var(--mono);font-size:9px;color:var(--muted);">Create 1 new Pod</div>
+    </div>
+  </div>
+  <div class="fa" style="font-size:16px;">↓</div>
+  <div class="fb amber" style="min-width:220px;font-size:9px;padding:7px;">Loop repeats every few seconds forever</div>
+</div>
+</div>
+
+<h3>Deployment Commands</h3>
+<div class="cmd-block">
+<div class="cmd-head"><div class="cmd-dots"><div class="cmd-dot"></div><div class="cmd-dot"></div><div class="cmd-dot"></div></div><div class="cmd-label">kubectl · Deployment Commands</div></div>
+<div class="cmd-body"><span class="cmd-prompt">$ </span><span class="cmd-cmd">kubectl create deployment</span> my-rag <span class="cmd-flag">--image</span>=myregistry/rag-app:v1   <span class="cmd-cmt"># Create deployment</span>
+<span class="cmd-prompt">$ </span><span class="cmd-cmd">kubectl get deployments</span>                                             <span class="cmd-cmt"># List deployments</span>
+<span class="cmd-prompt">$ </span><span class="cmd-cmd">kubectl describe deployment</span> my-rag                                  <span class="cmd-cmt"># Full details + events</span>
+<span class="cmd-prompt">$ </span><span class="cmd-cmd">kubectl scale deployment</span> my-rag <span class="cmd-flag">--replicas</span>=5                        <span class="cmd-cmt"># Scale to 5 replicas</span>
+<span class="cmd-prompt">$ </span><span class="cmd-cmd">kubectl set image deployment</span> my-rag rag-app=myregistry/rag-app:v2   <span class="cmd-cmt"># Update image</span>
+<span class="cmd-prompt">$ </span><span class="cmd-cmd">kubectl rollout status deployment</span> my-rag                            <span class="cmd-cmt"># Watch rolling update</span>
+<span class="cmd-prompt">$ </span><span class="cmd-cmd">kubectl rollout undo deployment</span> my-rag                              <span class="cmd-cmt"># Rollback to previous version</span>
+<span class="cmd-prompt">$ </span><span class="cmd-cmd">kubectl delete deployment</span> my-rag                                    <span class="cmd-cmt"># Delete deployment + all Pods</span></div>
+</div>
+</div>
+
+<!-- ═══════ PAGE 9 — REPLICASETS ═══════ -->
+<div class="page" data-page="9">
+<div class="page-stripe"></div>
+<div class="ph"><span class="ph-s">Kubernetes Level 1</span><span class="ph-c">07 — ReplicaSets</span></div>
+<div class="gn">07</div>
+<div class="sm">Concept #7</div>
+<h2><span class="n">07.</span>ReplicaSets — How Deployments Maintain Pod Count</h2>
+
+<div class="box def">
+<span class="bl">📖 Definition</span>
+A <strong>ReplicaSet</strong> is the Kubernetes object that ensures a specified number of identical Pod replicas are running at all times. A Deployment automatically creates and manages a ReplicaSet on your behalf. You will rarely interact with ReplicaSets directly — the Deployment is your primary interface.
+</div>
+
+<h3>The Relationship: Deployment → ReplicaSet → Pods</h3>
+<div class="diag">
+<div class="diag-t">Object Hierarchy — How Deployment, ReplicaSet, and Pods Relate</div>
+<div style="display:flex;flex-direction:column;align-items:center;gap:3px;">
+  <div class="fb blue" style="min-width:260px;font-size:9.5px;padding:8px;">Deployment: my-rag-app<br><span style="font-weight:400;color:var(--muted);">Manages the update strategy &amp; image version</span></div>
+  <div class="fa" style="font-size:16px;">↓ creates and manages</div>
+  <div class="fb cyan" style="min-width:260px;font-size:9.5px;padding:8px;">ReplicaSet: my-rag-app-7d4f9c (v1)<br><span style="font-weight:400;color:var(--muted);">Ensures exactly 3 Pods always running</span></div>
+  <div class="fa" style="font-size:16px;">↓ creates and maintains</div>
+  <div style="display:flex;gap:5mm;">
+    <div class="fb green" style="font-size:9px;padding:6px;min-width:80px;">Pod-abc<br>Running</div>
+    <div class="fb green" style="font-size:9px;padding:6px;min-width:80px;">Pod-def<br>Running</div>
+    <div class="fb green" style="font-size:9px;padding:6px;min-width:80px;">Pod-ghi<br>Running</div>
+  </div>
+</div>
+</div>
+
+<h3>What Happens During a Deployment Update</h3>
+<p>When you update a Deployment (e.g., change the Docker image from v1 to v2), the Deployment creates a <em>new</em> ReplicaSet for the new version and gradually scales it up while scaling down the old ReplicaSet. This is the rolling update strategy, and it is why Kubernetes can update applications with zero downtime.</p>
+
+<div class="diag">
+<div class="diag-t">Rolling Update — Old ReplicaSet Scales Down, New Scales Up</div>
+<table style="margin:0;">
+<tr><th>Step</th><th>Old RS (v1) Pods</th><th>New RS (v2) Pods</th><th>Total</th></tr>
+<tr><td>Before update</td><td style="color:var(--blue);font-family:var(--mono);">3 running</td><td style="color:var(--muted);font-family:var(--mono);">0</td><td style="font-family:var(--mono);">3</td></tr>
+<tr><td>Step 1</td><td style="color:var(--blue);font-family:var(--mono);">2 running</td><td style="color:var(--green);font-family:var(--mono);">1 running</td><td style="font-family:var(--mono);">3</td></tr>
+<tr><td>Step 2</td><td style="color:var(--blue);font-family:var(--mono);">1 running</td><td style="color:var(--green);font-family:var(--mono);">2 running</td><td style="font-family:var(--mono);">3</td></tr>
+<tr><td>Step 3</td><td style="color:var(--muted);font-family:var(--mono);">0 (old RS kept empty)</td><td style="color:var(--green);font-family:var(--mono);">3 running</td><td style="font-family:var(--mono);">3</td></tr>
+</table>
+<p style="font-family:var(--mono);font-size:9px;color:var(--muted);margin-top:4px;text-align:center;">At every step, at least 3 Pods are serving traffic. Zero downtime achieved. Old RS kept for rollback.</p>
+</div>
+
+<div class="box tip">
+<span class="bl">💡 Why Old ReplicaSet Is Kept After Update</span>
+After a rolling update completes, Kubernetes keeps the old (now empty) ReplicaSet around. This is intentional — if you need to roll back to the previous version, the Deployment simply scales the old ReplicaSet back up and scales down the new one. The rollback is instant because the old Pod spec is still recorded.
+</div>
+
+<h3>ReplicaSet Commands</h3>
+<div class="cmd-block">
+<div class="cmd-head"><div class="cmd-dots"><div class="cmd-dot"></div><div class="cmd-dot"></div><div class="cmd-dot"></div></div><div class="cmd-label">kubectl · ReplicaSet Commands</div></div>
+<div class="cmd-body"><span class="cmd-prompt">$ </span><span class="cmd-cmd">kubectl get replicasets</span>             <span class="cmd-cmt"># List ReplicaSets (see old + new during rollout)</span>
+<span class="cmd-prompt">$ </span><span class="cmd-cmd">kubectl get rs</span>                      <span class="cmd-cmt"># Short form</span>
+<span class="cmd-prompt">$ </span><span class="cmd-cmd">kubectl describe rs</span> my-rag-7d4f9c   <span class="cmd-cmt"># Details of a specific ReplicaSet</span>
+<span class="cmd-prompt">$ </span><span class="cmd-cmd">kubectl rollout history deployment</span> my-rag  <span class="cmd-cmt"># See all revisions (each is a RS)</span></div>
+</div>
+</div>
+
+<!-- ═══════ PAGE 10 — SERVICES ═══════ -->
+<div class="page" data-page="10">
+<div class="page-stripe"></div>
+<div class="ph"><span class="ph-s">Kubernetes Level 1</span><span class="ph-c">08 — Services</span></div>
+<div class="gn">08</div>
+<div class="sm">Concept #8</div>
+<h2><span class="n">08.</span>Services — Networking & Service Discovery</h2>
+
+<div class="box def">
+<span class="bl">📖 Definition</span>
+A <strong>Service</strong> is a stable Kubernetes object that provides a fixed network address and DNS name for a group of Pods. Because Pods are ephemeral (they can be created and destroyed at any time, getting new IP addresses), a Service provides the stable "front door" through which traffic reaches your application.
+</div>
+
+<h3>The Pod IP Problem — Why Services Exist</h3>
+<p>Every Pod gets its own IP address. But Pods die and are replaced constantly, and each new Pod gets a <em>new</em> IP address. If Service B needs to call Service A, it cannot hard-code Service A's IP — that IP might be gone in 5 minutes. A Service solves this by giving Service A a <strong>stable virtual IP (ClusterIP)</strong> and a DNS name that never changes, regardless of which Pods are behind it.</p>
+
+<div class="diag">
+<div class="diag-t">Service as a Stable Front Door to Ephemeral Pods</div>
+<div class="flow" style="justify-content:flex-start;gap:0;align-items:flex-start;flex-wrap:wrap;">
+  <div class="fb blue" style="min-width:110px;font-size:9px;padding:8px;">Client / Other<br>Service B</div>
+  <div class="fa" style="align-self:center;">→</div>
+  <div style="border:2px solid var(--cyan);background:var(--cyan-lt);border-radius:3px;padding:8px 10px;text-align:center;min-width:120px;">
+    <div style="font-family:var(--mono);font-size:9px;color:var(--cyan);font-weight:700;">SERVICE A</div>
+    <div style="font-family:var(--mono);font-size:8px;color:var(--muted);">IP: 10.96.0.1 (stable)</div>
+    <div style="font-family:var(--mono);font-size:8px;color:var(--muted);">DNS: rag-service</div>
+  </div>
+  <div class="fa" style="align-self:center;">→ load balances →</div>
+  <div style="display:flex;flex-direction:column;gap:3px;">
+    <div class="fb green" style="font-size:9px;padding:5px;">Pod A1<br>10.0.0.11</div>
+    <div class="fb green" style="font-size:9px;padding:5px;">Pod A2<br>10.0.0.47</div>
+    <div class="fb green" style="font-size:9px;padding:5px;">Pod A3<br>10.0.0.83</div>
+  </div>
+</div>
+</div>
+
+<h3>The Four Service Types</h3>
+<table>
+<tr><th>Type</th><th>Accessible From</th><th>Use Case</th></tr>
+<tr><td><strong>ClusterIP</strong> <span class="tag tb">Default</span></td><td>Inside cluster only</td><td>Internal communication between microservices (RAG pipeline → vector DB service)</td></tr>
+<tr><td><strong>NodePort</strong></td><td>Outside cluster via Node IP + port</td><td>Development/testing. Exposes on a port (30000–32767) on every node's IP.</td></tr>
+<tr><td><strong>LoadBalancer</strong></td><td>Outside cluster via cloud LB IP</td><td>Production external traffic. Cloud provider creates a real load balancer (AWS ELB, GCP LB).</td></tr>
+<tr><td><strong>ExternalName</strong></td><td>Inside cluster → external DNS</td><td>Map a cluster-internal name to an external service (e.g., a managed database)</td></tr>
+</table>
+
+<h3>Service Commands</h3>
+<div class="cmd-block">
+<div class="cmd-head"><div class="cmd-dots"><div class="cmd-dot"></div><div class="cmd-dot"></div><div class="cmd-dot"></div></div><div class="cmd-label">kubectl · Service Commands</div></div>
+<div class="cmd-body"><span class="cmd-prompt">$ </span><span class="cmd-cmd">kubectl get services</span>               <span class="cmd-cmt"># List all Services (svc is shorthand)</span>
+<span class="cmd-prompt">$ </span><span class="cmd-cmd">kubectl get svc</span>                    <span class="cmd-cmt"># Short form of above</span>
+<span class="cmd-prompt">$ </span><span class="cmd-cmd">kubectl describe svc</span> my-rag-svc    <span class="cmd-cmt"># Full details: endpoints (Pod IPs), port mapping</span>
+<span class="cmd-prompt">$ </span><span class="cmd-cmd">kubectl expose deployment</span> my-rag <span class="cmd-flag">--port</span>=80 <span class="cmd-flag">--type</span>=LoadBalancer  <span class="cmd-cmt"># Create service</span>
+<span class="cmd-prompt">$ </span><span class="cmd-cmd">kubectl port-forward svc</span>/my-rag-svc 8080:80  <span class="cmd-cmt"># Forward local port to service (for testing)</span>
+<span class="cmd-prompt">$ </span><span class="cmd-cmd">kubectl delete svc</span> my-rag-svc     <span class="cmd-cmt"># Delete service</span></div>
+</div>
+
+<div class="box key">
+<span class="bl">🔑 DNS in Kubernetes</span>
+Every Service automatically gets a DNS name in the format: <strong>service-name.namespace.svc.cluster.local</strong>. Within the same namespace you can just use the service name. So your RAG app can reach the vector database at <code>vectordb-service</code> — no IP addresses needed.
+</div>
+</div>
+
+<!-- ═══════ PAGE 11 — CONFIGMAPS & SECRETS ═══════ -->
+<div class="page" data-page="11">
+<div class="page-stripe"></div>
+<div class="ph"><span class="ph-s">Kubernetes Level 1</span><span class="ph-c">09 — ConfigMaps & Secrets</span></div>
+<div class="gn">09</div>
+<div class="sm">Concept #9</div>
+<h2><span class="n">09.</span>ConfigMaps & Secrets</h2>
+
+<div class="box def">
+<span class="bl">📖 Definitions</span>
+A <strong>ConfigMap</strong> stores non-sensitive configuration data (environment variables, config files) separately from the container image. A <strong>Secret</strong> stores sensitive data (API keys, passwords, tokens) in an encoded format, injected securely into Pods at runtime. Both solve the same problem: <em>decouple configuration from code</em>.
+</div>
+
+<h3>Why Not Hard-Code Config in Your Image?</h3>
+<p>If you bake your OpenAI API key, database password, or environment-specific settings directly into your Docker image, you face several problems: you must rebuild the image every time a config value changes, your API keys are visible to anyone with access to the image, and you need different images for dev/staging/production. ConfigMaps and Secrets solve all three.</p>
+
+<div class="analogy">
+ConfigMaps are like the employee handbook — general company policies that everyone can read. Secrets are like individual salary information — only the relevant employee and HR can see it, and it's stored in a locked cabinet (encoded/encrypted), not posted on the wall.
+</div>
+
+<h3>ConfigMap vs Secret — Key Differences</h3>
+<table>
+<tr><th>Aspect</th><th>ConfigMap</th><th>Secret</th></tr>
+<tr><td>Data type</td><td>Non-sensitive: URLs, config settings, feature flags</td><td>Sensitive: API keys, passwords, certificates, tokens</td></tr>
+<tr><td>Storage in etcd</td><td>Plaintext</td><td>Base64 encoded (encrypted at rest with proper setup)</td></tr>
+<tr><td>Access restriction</td><td>Any Pod in namespace can read</td><td>RBAC-controlled; should be tightly restricted</td></tr>
+<tr><td>AI Engineer Example</td><td>MODEL_NAME=gpt-4o, CHUNK_SIZE=500</td><td>OPENAI_API_KEY, PINECONE_API_KEY</td></tr>
+</table>
+
+<h3>How ConfigMaps and Secrets Are Injected into Pods</h3>
+<div class="diag">
+<div class="diag-t">Two Injection Methods — Environment Variables or Volume Files</div>
+<div class="two" style="gap:5mm;">
+  <div>
+    <div style="font-family:var(--mono);font-size:9px;color:var(--blue);font-weight:700;margin-bottom:4px;">METHOD 1: Environment Variables</div>
+    <div style="background:var(--ivory);border:1px solid var(--border2);padding:8px;font-family:var(--mono);font-size:10px;border-radius:2px;line-height:1.9;">
+      <div style="color:var(--muted);"># ConfigMap creates:</div>
+      <div style="color:var(--navy);">MODEL_NAME=gpt-4o</div>
+      <div style="color:var(--navy);">CHUNK_SIZE=500</div>
+      <div style="color:var(--muted);margin-top:5px;"># Inside container, env vars</div>
+      <div style="color:var(--navy);"># are available directly:</div>
+      <div style="color:var(--green);">os.environ["MODEL_NAME"]</div>
+    </div>
+  </div>
+  <div>
+    <div style="font-family:var(--mono);font-size:9px;color:var(--cyan);font-weight:700;margin-bottom:4px;">METHOD 2: Mounted as Files</div>
+    <div style="background:var(--ivory);border:1px solid var(--border2);padding:8px;font-family:var(--mono);font-size:10px;border-radius:2px;line-height:1.9;">
+      <div style="color:var(--muted);"># Secret mounts at path:</div>
+      <div style="color:var(--navy);">/etc/secrets/openai-key</div>
+      <div style="color:var(--navy);">/etc/secrets/pinecone-key</div>
+      <div style="color:var(--muted);margin-top:5px;"># Container reads files:</div>
+      <div style="color:var(--green);">open("/etc/secrets/openai-key")</div>
+    </div>
+  </div>
+</div>
+</div>
+
+<h3>ConfigMap & Secret Commands</h3>
+<div class="cmd-block">
+<div class="cmd-head"><div class="cmd-dots"><div class="cmd-dot"></div><div class="cmd-dot"></div><div class="cmd-dot"></div></div><div class="cmd-label">kubectl · ConfigMap & Secret Commands</div></div>
+<div class="cmd-body"><span class="cmd-prompt">$ </span><span class="cmd-cmd">kubectl create configmap</span> app-config <span class="cmd-flag">--from-literal</span>=MODEL=gpt-4o <span class="cmd-flag">--from-literal</span>=CHUNK=500
+<span class="cmd-prompt">$ </span><span class="cmd-cmd">kubectl create secret generic</span> api-keys <span class="cmd-flag">--from-literal</span>=OPENAI_KEY=sk-...
+<span class="cmd-prompt">$ </span><span class="cmd-cmd">kubectl get configmaps</span>             <span class="cmd-cmt"># List all configmaps (cm is shorthand)</span>
+<span class="cmd-prompt">$ </span><span class="cmd-cmd">kubectl get secrets</span>                <span class="cmd-cmt"># List secrets (values are redacted)</span>
+<span class="cmd-prompt">$ </span><span class="cmd-cmd">kubectl describe configmap</span> app-config  <span class="cmd-cmt"># View configmap contents</span>
+<span class="cmd-prompt">$ </span><span class="cmd-cmd">kubectl get secret</span> api-keys <span class="cmd-flag">-o jsonpath</span>='{.data.OPENAI_KEY}' | base64 -d
+<span class="cmd-cmt">                                   # Decode and view a secret value</span></div>
+</div>
+</div>
+
+<!-- ═══════ PAGE 12 — NAMESPACES ═══════ -->
+<div class="page" data-page="12">
+<div class="page-stripe"></div>
+<div class="ph"><span class="ph-s">Kubernetes Level 1</span><span class="ph-c">10 — Namespaces</span></div>
+<div class="gn">10</div>
+<div class="sm">Concept #10</div>
+<h2><span class="n">10.</span>Namespaces — Logical Isolation</h2>
+
+<div class="box def">
+<span class="bl">📖 Definition</span>
+A <strong>Namespace</strong> is a virtual partition within a Kubernetes cluster. All cluster resources (Pods, Deployments, Services, ConfigMaps, Secrets) live inside a namespace. Namespaces provide a way to organise, isolate, and control access to resources — allowing multiple teams or environments to share the same physical cluster without interfering with each other.
+</div>
+
+<h3>The Default Namespaces in Every K8s Cluster</h3>
+<table>
+<tr><th>Namespace</th><th>Purpose</th><th>Should You Use It?</th></tr>
+<tr><td><strong>default</strong></td><td>Where resources go if no namespace is specified</td><td>Only for learning/experimenting. Production work should use custom namespaces.</td></tr>
+<tr><td><strong>kube-system</strong></td><td>K8s system components: DNS, scheduler, controller manager</td><td>Never put your apps here. Read-only observation only.</td></tr>
+<tr><td><strong>kube-public</strong></td><td>Publicly readable config (cluster info)</td><td>Rarely needed directly</td></tr>
+<tr><td><strong>kube-node-lease</strong></td><td>Node heartbeat objects for availability tracking</td><td>Never — internal use only</td></tr>
+</table>
+
+<h3>Common Namespace Strategy for AI Engineers</h3>
+<div class="diag">
+<div class="diag-t">Namespace Organisation — Per Environment and Per Team</div>
+<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:4mm;">
+  <div>
+    <div style="background:var(--green);color:white;font-family:var(--mono);font-size:9px;font-weight:700;padding:4px;text-align:center;border-radius:2px;margin-bottom:4px;">ns: production</div>
+    <div style="background:var(--green-lt);border:1px solid var(--green-md);border-radius:2px;padding:8px;font-family:var(--mono);font-size:9px;line-height:1.8;">
+      <div>rag-app Deployment</div>
+      <div>embedding-service</div>
+      <div>api-keys Secret</div>
+      <div>prod-config ConfigMap</div>
+    </div>
+  </div>
+  <div>
+    <div style="background:var(--amber);color:white;font-family:var(--mono);font-size:9px;font-weight:700;padding:4px;text-align:center;border-radius:2px;margin-bottom:4px;">ns: staging</div>
+    <div style="background:var(--amber-lt);border:1px solid var(--amber-md);border-radius:2px;padding:8px;font-family:var(--mono);font-size:9px;line-height:1.8;">
+      <div>rag-app Deployment</div>
+      <div>embedding-service</div>
+      <div>api-keys Secret</div>
+      <div>staging-config ConfigMap</div>
+    </div>
+  </div>
+  <div>
+    <div style="background:var(--blue);color:white;font-family:var(--mono);font-size:9px;font-weight:700;padding:4px;text-align:center;border-radius:2px;margin-bottom:4px;">ns: development</div>
+    <div style="background:var(--blue-lt);border:1px solid var(--blue-md);border-radius:2px;padding:8px;font-family:var(--mono);font-size:9px;line-height:1.8;">
+      <div>rag-app Deployment</div>
+      <div>mock-llm-service</div>
+      <div>dev-secrets Secret</div>
+      <div>dev-config ConfigMap</div>
+    </div>
+  </div>
+</div>
+<p style="font-family:var(--mono);font-size:9px;color:var(--muted);text-align:center;margin-top:5mm;">Namespaces share the same physical cluster but are completely isolated from each other — a Deployment in 'production' cannot accidentally be modified by someone working in 'development'.</p>
+</div>
+
+<h3>Namespace Commands</h3>
+<div class="cmd-block">
+<div class="cmd-head"><div class="cmd-dots"><div class="cmd-dot"></div><div class="cmd-dot"></div><div class="cmd-dot"></div></div><div class="cmd-label">kubectl · Namespace Commands</div></div>
+<div class="cmd-body"><span class="cmd-prompt">$ </span><span class="cmd-cmd">kubectl get namespaces</span>                    <span class="cmd-cmt"># List all namespaces</span>
+<span class="cmd-prompt">$ </span><span class="cmd-cmd">kubectl create namespace</span> production        <span class="cmd-cmt"># Create a new namespace</span>
+<span class="cmd-prompt">$ </span><span class="cmd-cmd">kubectl get pods</span> <span class="cmd-flag">-n</span> production            <span class="cmd-cmt"># List pods in a specific namespace</span>
+<span class="cmd-prompt">$ </span><span class="cmd-cmd">kubectl get all</span> <span class="cmd-flag">-n</span> production             <span class="cmd-cmt"># All resources in namespace</span>
+<span class="cmd-prompt">$ </span><span class="cmd-cmd">kubectl config set-context</span> <span class="cmd-flag">--current</span> <span class="cmd-flag">--namespace</span>=production
+<span class="cmd-cmt">                                            # Set default namespace for all commands</span>
+<span class="cmd-prompt">$ </span><span class="cmd-cmd">kubectl delete namespace</span> old-namespace     <span class="cmd-cmt"># Delete namespace + ALL resources inside it ⚠</span></div>
+</div>
+</div>
+
+<!-- ═══════ PAGE 13 — VOLUMES ═══════ -->
+<div class="page" data-page="13">
+<div class="page-stripe"></div>
+<div class="ph"><span class="ph-s">Kubernetes Level 1</span><span class="ph-c">11 — Volumes & Persistent Storage</span></div>
+<div class="gn">11</div>
+<div class="sm">Concept #11</div>
+<h2><span class="n">11.</span>Volumes & Persistent Storage</h2>
+
+<div class="box def">
+<span class="bl">📖 The Storage Problem</span>
+By default, a Pod's filesystem is <strong>ephemeral</strong> — when the Pod dies, all data in its filesystem is lost. For an AI application this is catastrophic: your vector index, model weights, uploaded documents, and database files would all disappear. Kubernetes solves this with Volumes.
+</div>
+
+<h3>The Storage Hierarchy</h3>
+<div class="three">
+<div class="comp-card">
+  <div class="comp-name">Volume</div>
+  <div class="comp-role">Basic storage attached to a Pod</div>
+  <div class="comp-desc">Lives as long as the Pod. Shared between containers in a Pod. Deleted when Pod is deleted.</div>
+</div>
+<div class="comp-card">
+  <div class="comp-name">Persistent Volume (PV)</div>
+  <div class="comp-role">Cluster-level storage resource</div>
+  <div class="comp-desc">Exists independently of any Pod. An administrator (or StorageClass) provisions it. Backed by real storage: AWS EBS, GCP Persistent Disk, NFS, etc.</div>
+</div>
+<div class="comp-card">
+  <div class="comp-name">Persistent Volume Claim (PVC)</div>
+  <div class="comp-role">A Pod's request for storage</div>
+  <div class="comp-desc">Your application says "I need 10GB of storage." K8s finds an appropriate PV and binds it. Your Pod uses the PVC — it doesn't care about the underlying storage type.</div>
+</div>
+</div>
+
+<h3>The PVC → PV Binding Workflow</h3>
+<div class="diag">
+<div class="diag-t">How Storage Is Provisioned and Used in Kubernetes</div>
+<div class="flow" style="gap:0;flex-wrap:wrap;">
+  <div class="fb blue" style="font-size:9px;min-width:90px;">Pod needs<br>10GB storage</div><div class="fa">→</div>
+  <div class="fb navy" style="font-size:9px;min-width:100px;">Creates PVC:<br>"I need 10GB,<br>ReadWrite"</div><div class="fa">→</div>
+  <div class="fb cyan" style="font-size:9px;min-width:100px;">K8s finds<br>matching PV<br>or creates one</div><div class="fa">→</div>
+  <div class="fb green" style="font-size:9px;min-width:100px;">PV Bound<br>to PVC ✅</div><div class="fa">→</div>
+  <div class="fb amber" style="font-size:9px;min-width:90px;">Pod mounts<br>PVC as a<br>directory</div>
+</div>
+</div>
+
+<h3>Access Modes — Who Can Read/Write the Volume</h3>
+<table>
+<tr><th>Mode</th><th>Abbreviation</th><th>Meaning</th><th>Use Case</th></tr>
+<tr><td><strong>ReadWriteOnce</strong></td><td>RWO</td><td>One node can read AND write</td><td>Database files, model weights (most common)</td></tr>
+<tr><td><strong>ReadOnlyMany</strong></td><td>ROX</td><td>Many nodes can read (no write)</td><td>Shared configuration files, reference data</td></tr>
+<tr><td><strong>ReadWriteMany</strong></td><td>RWX</td><td>Many nodes can read AND write</td><td>Shared storage for multiple Pods (NFS, EFS)</td></tr>
+</table>
+
+<div class="box warn">
+<span class="bl">⚠ Critical for AI Engineers</span>
+If your RAG application uses a local vector database (like ChromaDB with disk persistence), that data MUST be stored in a PersistentVolume. Without a PV, every Pod restart wipes your entire vector index — meaning you must re-index all your documents from scratch. Always use PVCs for any data that took time to create.
+</div>
+
+<h3>Storage Commands</h3>
+<div class="cmd-block">
+<div class="cmd-head"><div class="cmd-dots"><div class="cmd-dot"></div><div class="cmd-dot"></div><div class="cmd-dot"></div></div><div class="cmd-label">kubectl · Storage Commands</div></div>
+<div class="cmd-body"><span class="cmd-prompt">$ </span><span class="cmd-cmd">kubectl get persistentvolumes</span>           <span class="cmd-cmt"># List all PVs in cluster</span>
+<span class="cmd-prompt">$ </span><span class="cmd-cmd">kubectl get persistentvolumeclaims</span>       <span class="cmd-cmt"># List all PVCs</span>
+<span class="cmd-prompt">$ </span><span class="cmd-cmd">kubectl get pv</span>                           <span class="cmd-cmt"># Short form for PVs</span>
+<span class="cmd-prompt">$ </span><span class="cmd-cmd">kubectl get pvc</span>                          <span class="cmd-cmt"># Short form for PVCs</span>
+<span class="cmd-prompt">$ </span><span class="cmd-cmd">kubectl describe pvc</span> my-vector-db-pvc    <span class="cmd-cmt"># Check if PVC is Bound to a PV</span>
+<span class="cmd-prompt">$ </span><span class="cmd-cmd">kubectl get storageclass</span>                 <span class="cmd-cmt"># See available storage types in cluster</span></div>
+</div>
+</div>
+
+<!-- ═══════ PAGE 14 — KUBECTL REFERENCE ═══════ -->
+<div class="page" data-page="14">
+<div class="page-stripe"></div>
+<div class="ph"><span class="ph-s">Kubernetes Level 1</span><span class="ph-c">12 — kubectl Command Reference</span></div>
+<div class="gn">12</div>
+<div class="sm">Concept #12</div>
+<h2><span class="n">12.</span>kubectl — The Complete Command Reference</h2>
+
+<div class="box def">
+<span class="bl">📖 What Is kubectl?</span>
+<strong>kubectl</strong> (pronounced "kube-control" or "kube-cuttle") is the command-line tool for communicating with a Kubernetes cluster. It sends commands to the API Server and displays results. Every operation you perform on a cluster — creating, reading, updating, deleting resources — goes through kubectl.
+</div>
+
+<h3>The kubectl Command Structure</h3>
+<div class="diag">
+<div class="diag-t">kubectl Syntax — Every Command Follows This Pattern</div>
+<div style="font-family:var(--mono);font-size:13px;text-align:center;padding:8px;background:var(--navy);color:white;border-radius:3px;line-height:2;">
+  <span style="color:#7ab8f5;">kubectl</span> &nbsp;
+  <span style="color:#f0c860;">&lt;verb&gt;</span> &nbsp;
+  <span style="color:#85e89d;">&lt;resource-type&gt;</span> &nbsp;
+  <span style="color:#ffab70;">[resource-name]</span> &nbsp;
+  <span style="color:#c9d4e8;">[flags]</span>
+</div>
+<div style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr 1fr;gap:3mm;margin-top:4mm;font-family:var(--mono);font-size:9px;text-align:center;">
+  <div style="color:var(--blue);">kubectl</div>
+  <div style="color:var(--amber);">get | create | apply | delete | describe | logs | exec | scale | rollout</div>
+  <div style="color:var(--green);">pods | deployment | service | configmap | secret | node | namespace | pvc</div>
+  <div style="color:var(--orange,#b04800);">my-pod<br>my-deployment</div>
+  <div style="color:var(--muted);">-n ns<br>-o wide<br>-f file.yaml</div>
+</div>
+</div>
+
+<h3>The Essential kubectl Commands — Every AI Engineer Must Know These</h3>
+<div class="cmd-block">
+<div class="cmd-head"><div class="cmd-dots"><div class="cmd-dot"></div><div class="cmd-dot"></div><div class="cmd-dot"></div></div><div class="cmd-label">kubectl · Complete Level 1 Reference</div></div>
+<div class="cmd-body"><span class="cmd-cmt">── CLUSTER INFO ───────────────────────────────────────────────────────────</span>
+<span class="cmd-prompt">$ </span><span class="cmd-cmd">kubectl cluster-info</span>              <span class="cmd-cmt"># Control plane and DNS addresses</span>
+<span class="cmd-prompt">$ </span><span class="cmd-cmd">kubectl get all</span>                   <span class="cmd-cmt"># All resources in current namespace</span>
+<span class="cmd-prompt">$ </span><span class="cmd-cmd">kubectl get all</span> <span class="cmd-flag">-A</span>                <span class="cmd-cmt"># All resources in ALL namespaces</span>
+<span class="cmd-prompt">$ </span><span class="cmd-cmd">kubectl api-resources</span>             <span class="cmd-cmt"># List all resource types K8s supports</span>
+
+<span class="cmd-cmt">── VIEWING RESOURCES ──────────────────────────────────────────────────────</span>
+<span class="cmd-prompt">$ </span><span class="cmd-cmd">kubectl get</span> &lt;resource&gt;            <span class="cmd-cmt"># Basic list view</span>
+<span class="cmd-prompt">$ </span><span class="cmd-cmd">kubectl get</span> &lt;resource&gt; <span class="cmd-flag">-o wide</span>   <span class="cmd-cmt"># More columns (IPs, nodes)</span>
+<span class="cmd-prompt">$ </span><span class="cmd-cmd">kubectl get</span> &lt;resource&gt; <span class="cmd-flag">-o yaml</span>   <span class="cmd-cmt"># Full YAML spec (great for learning)</span>
+<span class="cmd-prompt">$ </span><span class="cmd-cmd">kubectl get</span> &lt;resource&gt; <span class="cmd-flag">-o json</span>   <span class="cmd-cmt"># Full JSON spec</span>
+<span class="cmd-prompt">$ </span><span class="cmd-cmd">kubectl get</span> &lt;resource&gt; <span class="cmd-flag">--watch</span>   <span class="cmd-cmt"># Auto-refresh every 2s (like watch command)</span>
+<span class="cmd-prompt">$ </span><span class="cmd-cmd">kubectl describe</span> &lt;resource&gt; &lt;name&gt; <span class="cmd-cmt"># Human-readable details + events</span>
+
+<span class="cmd-cmt">── CREATING / APPLYING ────────────────────────────────────────────────────</span>
+<span class="cmd-prompt">$ </span><span class="cmd-cmd">kubectl apply</span> <span class="cmd-flag">-f</span> deployment.yaml   <span class="cmd-cmt"># Apply a YAML manifest (create or update)</span>
+<span class="cmd-prompt">$ </span><span class="cmd-cmd">kubectl apply</span> <span class="cmd-flag">-f</span> ./k8s-manifests/  <span class="cmd-cmt"># Apply all YAML files in a directory</span>
+<span class="cmd-prompt">$ </span><span class="cmd-cmd">kubectl create</span> <span class="cmd-flag">-f</span> resource.yaml    <span class="cmd-cmt"># Create (fails if resource exists)</span>
+
+<span class="cmd-cmt">── DEBUGGING ──────────────────────────────────────────────────────────────</span>
+<span class="cmd-prompt">$ </span><span class="cmd-cmd">kubectl logs</span> &lt;pod&gt;                 <span class="cmd-cmt"># Container stdout logs</span>
+<span class="cmd-prompt">$ </span><span class="cmd-cmd">kubectl logs</span> &lt;pod&gt; <span class="cmd-flag">--previous</span>     <span class="cmd-cmt"># Logs from last crashed container</span>
+<span class="cmd-prompt">$ </span><span class="cmd-cmd">kubectl exec</span> <span class="cmd-flag">-it</span> &lt;pod&gt; <span class="cmd-flag">--</span> bash    <span class="cmd-cmt"># Shell into running container</span>
+<span class="cmd-prompt">$ </span><span class="cmd-cmd">kubectl events</span> <span class="cmd-flag">--sort-by</span>=.lastTimestamp  <span class="cmd-cmt"># Recent cluster events sorted by time</span>
+<span class="cmd-prompt">$ </span><span class="cmd-cmd">kubectl top pods</span>                   <span class="cmd-cmt"># Real-time CPU + memory per Pod</span>
+
+<span class="cmd-cmt">── EDITING ────────────────────────────────────────────────────────────────</span>
+<span class="cmd-prompt">$ </span><span class="cmd-cmd">kubectl edit deployment</span> my-rag     <span class="cmd-cmt"># Open deployment YAML in $EDITOR, save = apply</span>
+<span class="cmd-prompt">$ </span><span class="cmd-cmd">kubectl patch deployment</span> my-rag <span class="cmd-flag">-p</span> '{"spec":{"replicas":5}}'  <span class="cmd-cmt"># Patch inline</span></div>
+</div>
+</div>
+
+<!-- ═══════ PAGE 15 — SCALING & ROLLING UPDATES ═══════ -->
+<div class="page" data-page="15">
+<div class="page-stripe"></div>
+<div class="ph"><span class="ph-s">Kubernetes Level 1</span><span class="ph-c">13 — Scaling & Rolling Updates</span></div>
+<div class="gn">13</div>
+<div class="sm">Concept #13</div>
+<h2><span class="n">13.</span>Scaling & Rolling Updates</h2>
+
+<div class="box def">
+<span class="bl">📖 Two Types of Scaling</span>
+<strong>Horizontal scaling</strong> (more Pods = more instances of the same app) vs <strong>Vertical scaling</strong> (more CPU/memory per Pod). Kubernetes excels at horizontal scaling — you can go from 3 to 30 replicas with a single command, and the Horizontal Pod Autoscaler (HPA) can do it automatically based on metrics.
+</div>
+
+<h3>Manual Horizontal Scaling</h3>
+<div class="cmd-block">
+<div class="cmd-head"><div class="cmd-dots"><div class="cmd-dot"></div><div class="cmd-dot"></div><div class="cmd-dot"></div></div><div class="cmd-label">kubectl · Scaling Commands</div></div>
+<div class="cmd-body"><span class="cmd-prompt">$ </span><span class="cmd-cmd">kubectl scale deployment</span> my-rag <span class="cmd-flag">--replicas</span>=10   <span class="cmd-cmt"># Scale to 10 replicas</span>
+<span class="cmd-prompt">$ </span><span class="cmd-cmd">kubectl scale deployment</span> my-rag <span class="cmd-flag">--replicas</span>=1    <span class="cmd-cmt"># Scale down to 1 replica</span>
+<span class="cmd-prompt">$ </span><span class="cmd-cmd">kubectl get pods</span> <span class="cmd-flag">-w</span>                              <span class="cmd-cmt"># Watch Pods being created/terminated</span></div>
+</div>
+
+<h3>Horizontal Pod Autoscaler (HPA)</h3>
+<p>The HPA automatically scales the number of Pod replicas based on CPU utilisation (or custom metrics like requests-per-second). You define a minimum and maximum replica count, and the HPA adjusts between them to meet your CPU target.</p>
+
+<div class="diag">
+<div class="diag-t">HPA Scaling Behaviour — Reacts to CPU Load</div>
+<table style="margin:0;">
+<tr><th>Time</th><th>Avg CPU Usage</th><th>Target CPU</th><th>Current Replicas</th><th>HPA Action</th></tr>
+<tr><td>09:00</td><td style="color:var(--green);font-family:var(--mono);">25%</td><td style="font-family:var(--mono);">50%</td><td style="font-family:var(--mono);">3</td><td style="color:var(--muted);">No change (below target)</td></tr>
+<tr><td>10:00</td><td style="color:var(--amber);font-family:var(--mono);">72%</td><td style="font-family:var(--mono);">50%</td><td style="font-family:var(--mono);">3 → 5</td><td style="color:var(--blue);font-weight:600;">Scale UP to 5</td></tr>
+<tr><td>11:00</td><td style="color:var(--red);font-family:var(--mono);">91%</td><td style="font-family:var(--mono);">50%</td><td style="font-family:var(--mono);">5 → 10</td><td style="color:var(--blue);font-weight:600;">Scale UP to 10</td></tr>
+<tr><td>15:00</td><td style="color:var(--amber);font-family:var(--mono);">48%</td><td style="font-family:var(--mono);">50%</td><td style="font-family:var(--mono);">10</td><td style="color:var(--muted);">No change (within target)</td></tr>
+<tr><td>20:00</td><td style="color:var(--green);font-family:var(--mono);">12%</td><td style="font-family:var(--mono);">50%</td><td style="font-family:var(--mono);">10 → 3</td><td style="color:var(--cyan);font-weight:600;">Scale DOWN to 3</td></tr>
+</table>
+</div>
+
+<div class="cmd-block">
+<div class="cmd-head"><div class="cmd-dots"><div class="cmd-dot"></div><div class="cmd-dot"></div><div class="cmd-dot"></div></div><div class="cmd-label">kubectl · HPA Commands</div></div>
+<div class="cmd-body"><span class="cmd-prompt">$ </span><span class="cmd-cmd">kubectl autoscale deployment</span> my-rag <span class="cmd-flag">--min</span>=3 <span class="cmd-flag">--max</span>=20 <span class="cmd-flag">--cpu-percent</span>=50
+<span class="cmd-cmt">                                            # Create HPA: min 3, max 20 replicas, target 50% CPU</span>
+<span class="cmd-prompt">$ </span><span class="cmd-cmd">kubectl get hpa</span>                        <span class="cmd-cmt"># View HPA status and current metrics</span>
+<span class="cmd-prompt">$ </span><span class="cmd-cmd">kubectl describe hpa</span> my-rag           <span class="cmd-cmt"># Full HPA details including scaling events</span>
+<span class="cmd-prompt">$ </span><span class="cmd-cmd">kubectl delete hpa</span> my-rag             <span class="cmd-cmt"># Remove autoscaler (manual control returns)</span></div>
+</div>
+
+<h3>Rolling Update Strategy Options</h3>
+<table>
+<tr><th>Strategy</th><th>Behaviour</th><th>Use Case</th></tr>
+<tr><td><strong>RollingUpdate</strong> (default)</td><td>Gradually replace old Pods with new Pods. Always keeps minimum available replicas running.</td><td>Production apps requiring zero downtime</td></tr>
+<tr><td><strong>Recreate</strong></td><td>Kill ALL old Pods first, then create all new Pods. Causes downtime.</td><td>Dev environments where speed matters more than availability</td></tr>
+</table>
+</div>
+
+<!-- ═══════ PAGE 16 — HEALTH CHECKS ═══════ -->
+<div class="page" data-page="16">
+<div class="page-stripe"></div>
+<div class="ph"><span class="ph-s">Kubernetes Level 1</span><span class="ph-c">14 — Health Checks & Probes</span></div>
+<div class="gn">14</div>
+<div class="sm">Concept #14</div>
+<h2><span class="n">14.</span>Health Checks — Liveness, Readiness & Startup Probes</h2>
+
+<div class="box def">
+<span class="bl">📖 Definition</span>
+<strong>Probes</strong> are periodic health checks that Kubernetes performs on your containers. They allow K8s to know if a container is alive, ready to accept traffic, or still starting up — and to take automatic corrective action (restart, stop sending traffic) based on the results.
+</div>
+
+<h3>The Three Probe Types — Each Solves a Different Problem</h3>
+
+<div style="display:flex;flex-direction:column;gap:4px;">
+<div class="arch-box" style="border-left-color:var(--red);">
+  <span class="ab-t" style="color:var(--red);">Liveness Probe</span>
+  <span class="ab-d"><strong>Question it answers:</strong> "Is this container still alive?" If the probe fails, K8s restarts the container. Use for detecting deadlocks — situations where the app is running but completely stuck and will never recover without a restart. Example: your RAG app's Python process is alive but the embedding model thread deadlocked.</span>
+</div>
+<div class="arch-box" style="border-left-color:var(--green);">
+  <span class="ab-t" style="color:var(--green);">Readiness Probe</span>
+  <span class="ab-d"><strong>Question it answers:</strong> "Is this container ready to receive traffic?" If the probe fails, K8s removes the Pod from the Service's load balancer (stops sending traffic to it) but does NOT restart it. Use for apps that need warm-up time — e.g., loading a 13GB language model into GPU memory takes 60 seconds, during which you don't want traffic.</span>
+</div>
+<div class="arch-box" style="border-left-color:var(--blue);">
+  <span class="ab-t" style="color:var(--blue);">Startup Probe</span>
+  <span class="ab-d"><strong>Question it answers:</strong> "Has this container finished starting?" Disables liveness and readiness checks until it succeeds. Use for slow-starting apps — prevents K8s from killing a container that's still loading model weights because the liveness probe fired too early.</span>
+</div>
+</div>
+
+<h3>Probe Decision Flowchart</h3>
+<div class="diag">
+<div class="diag-t">How Kubernetes Uses Each Probe Type</div>
+<div style="display:flex;flex-direction:column;gap:3px;align-items:center;font-family:var(--mono);font-size:9px;">
+  <div class="fb dark" style="min-width:200px;padding:6px;">Container starts</div>
+  <div class="fa" style="font-size:14px;">↓</div>
+  <div class="fb blue" style="min-width:200px;padding:6px;">Startup Probe runs (if configured)<br><span style="font-weight:400;font-size:8px;">Waits until success before other probes start</span></div>
+  <div class="fa" style="font-size:14px;">↓ (success or not configured)</div>
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:6mm;width:100%;max-width:380px;">
+    <div style="display:flex;flex-direction:column;align-items:center;gap:3px;">
+      <div class="fb red" style="font-size:9px;padding:5px;width:100%;text-align:center;">Liveness Probe (continuous)</div>
+      <div style="font-size:8.5px;color:var(--muted);text-align:center;">Fail → RESTART container</div>
+    </div>
+    <div style="display:flex;flex-direction:column;align-items:center;gap:3px;">
+      <div class="fb green" style="font-size:9px;padding:5px;width:100%;text-align:center;">Readiness Probe (continuous)</div>
+      <div style="font-size:8.5px;color:var(--muted);text-align:center;">Fail → remove from Service (no traffic)</div>
+    </div>
+  </div>
+</div>
+</div>
+
+<h3>Probe Check Methods</h3>
+<table>
+<tr><th>Method</th><th>How It Works</th><th>Best For</th></tr>
+<tr><td><strong>HTTP GET</strong></td><td>K8s calls an HTTP endpoint (e.g., /health). 200–399 = success, anything else = failure.</td><td>Web apps, REST APIs. Most common for AI services.</td></tr>
+<tr><td><strong>TCP Socket</strong></td><td>K8s tries to open a TCP connection to a port. Connection accepted = success.</td><td>Databases, message brokers, non-HTTP services</td></tr>
+<tr><td><strong>Exec Command</strong></td><td>K8s runs a command inside the container. Exit code 0 = success.</td><td>Custom health logic, checking file existence, scripts</td></tr>
+</table>
+
+<div class="box tip">
+<span class="bl">💡 AI Engineer Best Practice: Always Define Readiness Probes for Model Serving</span>
+Loading a large language model (LLaMA 70B, Mistral 7B) into GPU memory can take 30–120 seconds. Without a readiness probe, K8s adds the Pod to the Service immediately after container start — sending real user traffic to a server that's still loading. The requests fail. Always use a readiness probe that only passes after the model is fully loaded and able to respond.
+</div>
+</div>
+
+<!-- ═══════ PAGE 17 — RESOURCE REQUESTS & LIMITS ═══════ -->
+<div class="page" data-page="17">
+<div class="page-stripe"></div>
+<div class="ph"><span class="ph-s">Kubernetes Level 1</span><span class="ph-c">15 — Resource Requests & Limits</span></div>
+<div class="gn">15</div>
+<div class="sm">Concept #15</div>
+<h2><span class="n">15.</span>Resource Requests & Limits</h2>
+
+<div class="box def">
+<span class="bl">📖 Definitions</span>
+A <strong>Resource Request</strong> is the amount of CPU/memory a container is <em>guaranteed</em> — the Scheduler uses requests to choose which node to place the Pod on (the node must have at least this much free). A <strong>Resource Limit</strong> is the maximum a container can <em>ever</em> use — if exceeded, CPU is throttled (slowed) and memory causes the container to be killed (OOMKilled).
+</div>
+
+<h3>CPU and Memory Units</h3>
+<div class="two">
+<div class="box note" style="margin:0;">
+<span class="bl">CPU Units</span>
+CPU is measured in <strong>millicores</strong> (m). 1000m = 1 CPU core. So <code>500m</code> = half a CPU core, <code>2000m</code> = 2 cores. For an AI inference pod that does heavy computation, you might set a limit of 4000m (4 cores) per replica.
+</div>
+<div class="box note" style="margin:0;">
+<span class="bl">Memory Units</span>
+Memory is measured in <strong>bytes</strong> with SI suffixes. <code>512Mi</code> = 512 mebibytes, <code>4Gi</code> = 4 gibibytes, <code>16Gi</code> = 16 GB. An embedding model might need 2Gi, while a 7B parameter LLM needs 14–28Gi of RAM.
+</div>
+</div>
+
+<h3>Why Requests and Limits Are Both Important</h3>
+<div class="diag">
+<div class="diag-t">Resource Guarantee vs Hard Cap — The Two Roles</div>
+<table style="margin:0;">
+<tr><th>Scenario</th><th>Request Role</th><th>Limit Role</th></tr>
+<tr><td>Scheduling: Node has 8GB free</td><td>Pod with request=4Gi is placed here. Node is "safe" — guaranteed capacity for this pod.</td><td>Not used for scheduling decisions</td></tr>
+<tr><td>Runtime: Pod uses 5Gi memory (over request)</td><td>Request was 4Gi — overuse is allowed if node has free memory</td><td>If limit=6Gi, K8s allows it. If no limit set, K8s kills other Pods for memory.</td></tr>
+<tr><td>Runtime: Pod tries to use 10Gi (over limit)</td><td>Not relevant</td><td>If limit=6Gi, container is killed with OOMKilled error</td></tr>
+</table>
+</div>
+
+<h3>Typical Resource Profiles for AI Engineering Workloads</h3>
+<table>
+<tr><th>Workload</th><th>CPU Request</th><th>CPU Limit</th><th>Memory Request</th><th>Memory Limit</th><th>GPU</th></tr>
+<tr><td>RAG API server</td><td>500m</td><td>2000m</td><td>512Mi</td><td>2Gi</td><td>—</td></tr>
+<tr><td>Embedding service (CPU)</td><td>1000m</td><td>4000m</td><td>2Gi</td><td>4Gi</td><td>—</td></tr>
+<tr><td>Small LLM (7B, GPU)</td><td>2000m</td><td>4000m</td><td>16Gi</td><td>32Gi</td><td>1 GPU</td></tr>
+<tr><td>Vector DB (Qdrant/Chroma)</td><td>500m</td><td>2000m</td><td>4Gi</td><td>16Gi</td><td>—</td></tr>
+<tr><td>Async indexing worker</td><td>200m</td><td>1000m</td><td>256Mi</td><td>1Gi</td><td>—</td></tr>
+</table>
+
+<h3>GPU Resources in Kubernetes</h3>
+<div class="box key">
+<span class="bl">🔑 How Kubernetes Handles GPUs</span>
+GPUs are treated as extended resources in Kubernetes. A node with 4 NVIDIA A100 GPUs advertises <code>nvidia.com/gpu: 4</code>. Your Pod requests <code>nvidia.com/gpu: 1</code> in its resource spec, and the Scheduler ensures it lands on a node with a free GPU. GPU resources cannot be shared between Pods (unlike CPU/memory) — one request of 1 GPU = exclusive access to one physical GPU.
+</div>
+
+<div class="cmd-block">
+<div class="cmd-head"><div class="cmd-dots"><div class="cmd-dot"></div><div class="cmd-dot"></div><div class="cmd-dot"></div></div><div class="cmd-label">kubectl · Resource Commands</div></div>
+<div class="cmd-body"><span class="cmd-prompt">$ </span><span class="cmd-cmd">kubectl top pods</span>                   <span class="cmd-cmt"># Real-time CPU + memory usage per Pod</span>
+<span class="cmd-prompt">$ </span><span class="cmd-cmd">kubectl top nodes</span>                  <span class="cmd-cmt"># Real-time CPU + memory usage per Node</span>
+<span class="cmd-prompt">$ </span><span class="cmd-cmd">kubectl describe node</span> gpu-node-1   <span class="cmd-cmt"># See GPU capacity: "nvidia.com/gpu: 4"</span>
+<span class="cmd-prompt">$ </span><span class="cmd-cmd">kubectl describe pod</span> llm-pod       <span class="cmd-cmt"># See OOMKilled events if memory exceeded</span></div>
+</div>
+</div>
+
+<!-- ═══════ PAGE 18 — K8S FOR AI ENGINEERS ═══════ -->
+<div class="page" data-page="18">
+<div class="page-stripe"></div>
+<div class="ph"><span class="ph-s">Kubernetes Level 1</span><span class="ph-c">16 — Kubernetes for AI Engineers</span></div>
+<div class="gn">16</div>
+<div class="sm">AI Engineer Focus</div>
+<h2><span class="n">16.</span>Kubernetes for AI Engineers</h2>
+
+<p>Everything you've learned comes together when deploying a real AI system. Here is how a complete RAG application maps onto Kubernetes objects.</p>
+
+<h3>A RAG Pipeline as Kubernetes Objects</h3>
+<div class="diag">
+<div class="diag-t">Full RAG Application on Kubernetes — Object Mapping</div>
+<div style="display:flex;flex-direction:column;gap:3px;">
+  <div class="arch-box" style="border-left-color:var(--violet);">
+    <span class="ab-t" style="color:var(--violet);">Ingress / LB</span>
+    <span class="ab-d">External LoadBalancer Service exposes the API to the internet. Users hit api.myapp.com, routed to the API pods.</span>
+    <span style="font-family:var(--mono);font-size:8.5px;color:var(--ghost);min-width:80px;">Service (LB type)</span>
+  </div>
+  <div class="arch-box" style="border-left-color:var(--blue);">
+    <span class="ab-t" style="color:var(--blue);">RAG API Server</span>
+    <span class="ab-d">Deployment with 3–10 replicas. Handles incoming user queries. Calls embedding service and LLM service internally. Readiness probe on /health. HPA scales on CPU.</span>
+    <span style="font-family:var(--mono);font-size:8.5px;color:var(--ghost);min-width:80px;">Deployment + Service</span>
+  </div>
+  <div class="arch-box" style="border-left-color:var(--cyan);">
+    <span class="ab-t" style="color:var(--cyan);">Embedding Service</span>
+    <span class="ab-d">Deployment running sentence-transformers or OpenAI client. Converts text to vectors. ClusterIP Service — only internal traffic. ConfigMap holds model name; Secret holds API key.</span>
+    <span style="font-family:var(--mono);font-size:8.5px;color:var(--ghost);min-width:80px;">Deployment + Service</span>
+  </div>
+  <div class="arch-box" style="border-left-color:var(--amber);">
+    <span class="ab-t" style="color:var(--amber);">LLM Service (vLLM)</span>
+    <span class="ab-d">Deployment requesting <code>nvidia.com/gpu: 1</code>. Startup probe waits until model loaded (90s+). Readiness probe on /v1/models. Single replica initially, scale based on queue depth.</span>
+    <span style="font-family:var(--mono);font-size:8.5px;color:var(--ghost);min-width:80px;">Deployment + GPU</span>
+  </div>
+  <div class="arch-box" style="border-left-color:var(--green);">
+    <span class="ab-t" style="color:var(--green);">Vector DB (Qdrant)</span>
+    <span class="ab-d">Deployment with PVC attached (100Gi, ReadWriteOnce). Stores all embeddings persistently. ClusterIP Service. Resource limit: 8Gi memory. Single replica (stateful = no easy horizontal scale).</span>
+    <span style="font-family:var(--mono);font-size:8.5px;color:var(--ghost);min-width:80px;">Deployment + PVC</span>
+  </div>
+  <div class="arch-box" style="border-left-color:var(--red);">
+    <span class="ab-t" style="color:var(--red);">Indexing Workers</span>
+    <span class="ab-d">Deployment of async workers consuming a queue. Process uploaded documents: parse → chunk → embed → upsert to vector DB. Scale by queue depth via KEDA. Low priority — batch processing.</span>
+    <span style="font-family:var(--mono);font-size:8.5px;color:var(--ghost);min-width:80px;">Deployment + HPA</span>
+  </div>
+  <div class="arch-box" style="border-left-color:var(--navy);">
+    <span class="ab-t" style="color:var(--navy);">Secrets &amp; Config</span>
+    <span class="ab-d">Secrets: OPENAI_API_KEY, PINECONE_KEY, database passwords. ConfigMaps: CHUNK_SIZE=500, MODEL_NAME=gpt-4o, LOG_LEVEL=INFO. Injected as env vars into all Pods that need them.</span>
+    <span style="font-family:var(--mono);font-size:8.5px;color:var(--ghost);min-width:80px;">Secret + ConfigMap</span>
+  </div>
+</div>
+</div>
+
+<h3>Namespace Strategy for RAG Projects</h3>
+<div class="cmd-block">
+<div class="cmd-head"><div class="cmd-dots"><div class="cmd-dot"></div><div class="cmd-dot"></div><div class="cmd-dot"></div></div><div class="cmd-label">kubectl · Common AI Engineer Workflow</div></div>
+<div class="cmd-body"><span class="cmd-cmt"># Day 1: Set up namespace</span>
+<span class="cmd-prompt">$ </span><span class="cmd-cmd">kubectl create namespace</span> rag-production
+
+<span class="cmd-cmt"># Set it as default so you don't type -n every time</span>
+<span class="cmd-prompt">$ </span><span class="cmd-cmd">kubectl config set-context</span> <span class="cmd-flag">--current</span> <span class="cmd-flag">--namespace</span>=rag-production
+
+<span class="cmd-cmt"># Deploy all your YAML manifests at once</span>
+<span class="cmd-prompt">$ </span><span class="cmd-cmd">kubectl apply</span> <span class="cmd-flag">-f</span> ./kubernetes/
+
+<span class="cmd-cmt"># Check everything came up</span>
+<span class="cmd-prompt">$ </span><span class="cmd-cmd">kubectl get all</span>
+
+<span class="cmd-cmt"># Watch LLM pod startup (slow due to model loading)</span>
+<span class="cmd-prompt">$ </span><span class="cmd-cmd">kubectl logs</span> <span class="cmd-flag">-f</span> deployment/llm-service
+
+<span class="cmd-cmt"># Test the API service locally</span>
+<span class="cmd-prompt">$ </span><span class="cmd-cmd">kubectl port-forward svc</span>/rag-api-service 8080:80</div>
+</div>
+</div>
+
+<!-- ═══════ PAGE 19 — COMMON MISTAKES ═══════ -->
+<div class="page" data-page="19">
+<div class="page-stripe"></div>
+<div class="ph"><span class="ph-s">Kubernetes Level 1</span><span class="ph-c">17 — Common Mistakes at Level 1</span></div>
+<div class="gn">17</div>
+<div class="sm">Watch Out</div>
+<h2><span class="n">17.</span>Common Mistakes at Level 1</h2>
+
+<div class="box crit">
+<span class="bl">❌ Mistake 1: Storing Data in Pod Filesystem</span>
+<strong>What happens:</strong> You store your vector database files inside the container's local filesystem. The Pod gets restarted due to a node failure. All your vectors are gone — you must re-index thousands of documents from scratch.
+<strong>Fix:</strong> Always use a PersistentVolumeClaim for any data that took time to create or that must survive Pod restarts.
+</div>
+
+<div class="box warn">
+<span class="bl">⚠ Mistake 2: Hardcoding API Keys in Docker Images</span>
+<strong>What happens:</strong> Your OpenAI API key is in your application code. You push the Docker image to a registry. Anyone with registry access now has your API key.
+<strong>Fix:</strong> Always use Secrets to inject sensitive values at runtime. Your code reads from environment variables, never from hardcoded strings.
+</div>
+
+<div class="box warn">
+<span class="bl">⚠ Mistake 3: No Readiness Probe on LLM Service</span>
+<strong>What happens:</strong> Your model-serving Pod starts, the container is running, K8s adds it to the Service immediately. But the model (15GB) is still loading. Requests flood in and all fail with errors for 90 seconds.
+<strong>Fix:</strong> Add a readiness probe that hits an endpoint that only returns 200 after the model is fully loaded.
+</div>
+
+<div class="box warn">
+<span class="bl">⚠ Mistake 4: Creating Pods Directly (Not via Deployments)</span>
+<strong>What happens:</strong> You run a Pod directly without a Deployment. The pod crashes. Nobody restarts it. Your service is down until you notice.
+<strong>Fix:</strong> Almost always use a Deployment (or StatefulSet for stateful apps). Direct Pod creation is only for debugging.
+</div>
+
+<div class="box warn">
+<span class="bl">⚠ Mistake 5: No Resource Requests/Limits</span>
+<strong>What happens:</strong> A memory leak in one container gradually consumes all memory on a node. Other Pods on that node are killed. The Scheduler had no warning because there were no declared resource needs.
+<strong>Fix:</strong> Always set resource requests (so Scheduler can place Pods correctly) and limits (to protect the node from runaway containers).
+</div>
+
+<div class="box warn">
+<span class="bl">⚠ Mistake 6: Working in the 'default' Namespace in Production</span>
+<strong>What happens:</strong> Your team's dev work and production services all run in 'default'. Someone accidentally deletes a deployment they thought was the dev one — it was production.
+<strong>Fix:</strong> Create separate namespaces for dev, staging, and production from day one.
+</div>
+
+<div class="box note">
+<span class="bl">💡 Mistake 7: Ignoring kubectl describe and Events</span>
+When something isn't working, most beginners only look at <code>kubectl get pods</code> and see "Pending" or "CrashLoopBackOff" without understanding why. The answer is almost always in <code>kubectl describe pod &lt;name&gt;</code> — the Events section at the bottom tells you exactly what went wrong: out of memory, image not found, port conflict, PVC not bound, etc.
+</div>
+
+<h3>Common Error States and What They Mean</h3>
+<table>
+<tr><th>Pod Status</th><th>Meaning</th><th>First Command to Run</th></tr>
+<tr><td><strong>Pending</strong></td><td>Pod created but not yet assigned to a node — scheduler can't find a suitable node</td><td><code>kubectl describe pod</code> — look at Events for "Insufficient cpu/memory/gpu"</td></tr>
+<tr><td><strong>CrashLoopBackOff</strong></td><td>Container keeps crashing and K8s keeps restarting it (with increasing delays)</td><td><code>kubectl logs --previous</code> to see crash reason</td></tr>
+<tr><td><strong>ImagePullBackOff</strong></td><td>K8s cannot pull the Docker image — wrong name, missing credentials, registry down</td><td><code>kubectl describe pod</code> — check Events for "401 Unauthorized" or "not found"</td></tr>
+<tr><td><strong>OOMKilled</strong></td><td>Container exceeded its memory limit and was killed by the OS</td><td>Increase memory limit, or fix memory leak in application</td></tr>
+<tr><td><strong>Evicted</strong></td><td>Node was under memory pressure; lower-priority Pod was evicted</td><td>Set resource requests so Scheduler picks better nodes; add nodes to cluster</td></tr>
+</table>
+</div>
+
+<!-- ═══════ PAGE 20 — SUMMARY ═══════ -->
+<div class="page" data-page="20">
+<div class="page-stripe"></div>
+<div class="ph"><span class="ph-s">Kubernetes Level 1</span><span class="ph-c">18 — Complete Summary</span></div>
+<div class="gn">18</div>
+<div class="sm">Level 1 Complete</div>
+<h2><span class="n">18.</span>Level 1 Complete — Everything You've Learned</h2>
+
+<div class="two" style="gap:6mm;">
+<div>
+<h3>Core Concepts</h3>
+<div class="sr"><div class="si">🚢</div><div class="st"><span class="sb">Kubernetes</span> — Container orchestration. Automates deployment, scaling, healing. The "air traffic control" of your containers.</div></div>
+<div class="sr"><div class="si">📦</div><div class="st"><span class="sb">Container</span> — Isolated, portable app package. Lighter than VMs, starts in seconds, shares host OS kernel.</div></div>
+<div class="sr"><div class="si">🧠</div><div class="st"><span class="sb">Control Plane</span> — API Server + etcd + Scheduler + Controller Manager. The brain that makes all decisions.</div></div>
+<div class="sr"><div class="si">💪</div><div class="st"><span class="sb">Worker Node</span> — Physical/virtual machine running your Pods. Has kubelet agent + container runtime.</div></div>
+<div class="sr"><div class="si">⚛️</div><div class="st"><span class="sb">Pod</span> — Smallest K8s unit. Wraps one (usually) container. Ephemeral — always use Deployments.</div></div>
+<div class="sr"><div class="si">🔁</div><div class="st"><span class="sb">Deployment</span> — Manages Pod count + updates. Desired state. Self-healing. Rolling updates. Rollback.</div></div>
+<div class="sr"><div class="si">🔢</div><div class="st"><span class="sb">ReplicaSet</span> — Underneath Deployment. Ensures exact N replicas exist. Created automatically.</div></div>
+<div class="sr"><div class="si">🌐</div><div class="st"><span class="sb">Service</span> — Stable IP + DNS for a group of Pods. Types: ClusterIP, NodePort, LoadBalancer.</div></div>
+<div class="sr"><div class="si">⚙️</div><div class="st"><span class="sb">ConfigMap</span> — Non-sensitive config injected into Pods as env vars or files. No rebuild needed.</div></div>
+<div class="sr"><div class="si">🔐</div><div class="st"><span class="sb">Secret</span> — Sensitive data (API keys, passwords). Base64-encoded. RBAC-controlled access.</div></div>
+<div class="sr"><div class="si">🏠</div><div class="st"><span class="sb">Namespace</span> — Logical partition of a cluster. Use per-environment (dev/staging/prod) isolation.</div></div>
+<div class="sr"><div class="si">💾</div><div class="st"><span class="sb">PVC</span> — Persistent storage that survives Pod restarts. Required for databases, vector indexes.</div></div>
+<div class="sr"><div class="si">❤️</div><div class="st"><span class="sb">Probes</span> — Liveness (restart if stuck), Readiness (traffic if ready), Startup (wait for slow start).</div></div>
+<div class="sr"><div class="si">📊</div><div class="st"><span class="sb">Resources</span> — Request = scheduled guarantee. Limit = hard cap. CPU in millicores, memory in Mi/Gi.</div></div>
+</div>
+
+<div>
+<h3>Essential Commands to Memorise</h3>
+<div class="cmd-block" style="margin:0 0 5mm 0;">
+<div class="cmd-head"><div class="cmd-dots"><div class="cmd-dot"></div><div class="cmd-dot"></div><div class="cmd-dot"></div></div><div class="cmd-label">kubectl · Level 1 Must-Know Commands</div></div>
+<div class="cmd-body"><span class="cmd-cmd">get pods / get all / get nodes</span>
+<span class="cmd-cmd">describe pod</span> &lt;name&gt;
+<span class="cmd-cmd">logs</span> &lt;pod&gt; / logs <span class="cmd-flag">-f</span> &lt;pod&gt;
+<span class="cmd-cmd">exec -it</span> &lt;pod&gt; <span class="cmd-flag">--</span> bash
+<span class="cmd-cmd">apply -f</span> &lt;file.yaml&gt;
+<span class="cmd-cmd">scale deployment</span> &lt;name&gt; <span class="cmd-flag">--replicas</span>=N
+<span class="cmd-cmd">rollout status</span> deployment &lt;name&gt;
+<span class="cmd-cmd">rollout undo</span> deployment &lt;name&gt;
+<span class="cmd-cmd">port-forward svc</span>/&lt;name&gt; local:remote
+<span class="cmd-cmd">top pods / top nodes</span></div>
+</div>
+
+<h3>What Comes in Level 2</h3>
+<div class="box def" style="margin:0 0 4px;">
+<span class="bl">Next: Kubernetes Level 2</span>
+<ul style="margin:0;padding-left:16px;">
+<li>YAML manifests — writing your own K8s configs</li>
+<li>StatefulSets — for databases and ordered services</li>
+<li>DaemonSets — running a Pod on every node</li>
+<li>Jobs and CronJobs — batch and scheduled tasks</li>
+<li>Ingress Controllers — intelligent HTTP routing</li>
+<li>RBAC — Role-Based Access Control</li>
+<li>Helm — the K8s package manager</li>
+<li>Network Policies — firewall rules between Pods</li>
+</ul>
+</div>
+
+<div class="box tip" style="margin:0;">
+<span class="bl">✅ Your Level 1 Assignment</span>
+Install <strong>minikube</strong> or <strong>kind</strong> (local K8s), deploy a simple FastAPI or Flask RAG app as a Deployment, expose it with a Service, port-forward to test it locally, then scale it to 3 replicas and watch the Pods appear. That exercise will cement everything in these notes.
+</div>
+</div>
+</div>
+
+<div style="margin-top:5mm;background:var(--off2);border:1.5px solid var(--border2);border-top:3px solid var(--navy);border-radius:2px;padding:8px 13px;text-align:center;">
+<span style="font-family:var(--mono);font-size:8.5px;color:var(--muted);letter-spacing:.14em;text-transform:uppercase;">END OF LEVEL 1 · KUBERNETES FOR AI ENGINEERS · NEXT: LEVEL 2 — YAML MANIFESTS, STATEFULSETS &amp; HELM</span>
+</div>
+</div>
+
+</body>
+</html>
