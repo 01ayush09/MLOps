@@ -1,0 +1,1309 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Docker Notes — Networks · Compose · Registries</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&family=Syne:wght@700;800&display=swap');
+
+  :root {
+    --blue:    #1B6FEB;
+    --navy:    #0D1B40;
+    --cyan:    #00C8E0;
+    --green:   #12B981;
+    --orange:  #F59E0B;
+    --red:     #EF4444;
+    --purple:  #8B5CF6;
+    --bg:      #FFFFFF;
+    --surface: #F7F9FC;
+    --border:  #E2E8F0;
+    --text:    #1E293B;
+    --muted:   #64748B;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Inter', sans-serif;
+    background: #fff;
+    color: var(--text);
+    font-size: 13.5px;
+    line-height: 1.65;
+  }
+
+  /* ── PAGE SHELL ── */
+  .page {
+    width: 210mm;
+    min-height: 297mm;
+    margin: 0 auto 8mm;
+    background: #fff;
+    position: relative;
+    overflow: hidden;
+    page-break-after: always;
+  }
+
+  /* ── COVER ── */
+  .cover {
+    background: var(--navy);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 50px 40px;
+    text-align: center;
+    min-height: 297mm;
+  }
+  .cover-whale {
+    font-size: 90px;
+    line-height: 1;
+    margin-bottom: 24px;
+    filter: drop-shadow(0 0 30px #1B6FEB66);
+  }
+  .cover h1 {
+    font-family: 'Syne', sans-serif;
+    font-size: 46px;
+    font-weight: 800;
+    color: #fff;
+    letter-spacing: -1px;
+  }
+  .cover h1 span { color: var(--cyan); }
+  .cover-sub {
+    font-size: 15px;
+    color: #94A3B8;
+    margin-top: 10px;
+    font-weight: 400;
+    letter-spacing: .5px;
+  }
+  .cover-chips {
+    display: flex;
+    gap: 12px;
+    margin-top: 32px;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+  .chip {
+    padding: 7px 18px;
+    border-radius: 100px;
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: .4px;
+  }
+  .chip-blue   { background: #1B6FEB22; color: var(--cyan); border: 1px solid #1B6FEB44; }
+  .chip-green  { background: #12B98122; color: #34D399;      border: 1px solid #12B98144; }
+  .chip-purple { background: #8B5CF622; color: #A78BFA;      border: 1px solid #8B5CF644; }
+  .cover-meta {
+    position: absolute;
+    bottom: 28px;
+    font-size: 11px;
+    color: #475569;
+    letter-spacing: .5px;
+  }
+  /* animated grid */
+  .cover-grid {
+    position: absolute;
+    inset: 0;
+    background-image:
+      linear-gradient(rgba(27,111,235,.08) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(27,111,235,.08) 1px, transparent 1px);
+    background-size: 32px 32px;
+    pointer-events: none;
+  }
+  .cover-glow {
+    position: absolute;
+    width: 400px; height: 400px;
+    border-radius: 50%;
+    background: radial-gradient(circle, #1B6FEB33 0%, transparent 70%);
+    top: -80px; right: -80px;
+    pointer-events: none;
+  }
+  .cover-glow2 {
+    position: absolute;
+    width: 300px; height: 300px;
+    border-radius: 50%;
+    background: radial-gradient(circle, #00C8E033 0%, transparent 70%);
+    bottom: 40px; left: -60px;
+    pointer-events: none;
+  }
+
+  /* ── INNER PAGES ── */
+  .inner {
+    padding: 28px 36px 36px;
+  }
+
+  /* page header stripe */
+  .page-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding-bottom: 12px;
+    border-bottom: 2px solid var(--border);
+    margin-bottom: 20px;
+  }
+  .page-header-icon {
+    width: 34px; height: 34px;
+    border-radius: 9px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 18px;
+  }
+  .ph-blue   { background: #EFF6FF; }
+  .ph-green  { background: #ECFDF5; }
+  .ph-purple { background: #F5F3FF; }
+  .page-header h2 {
+    font-family: 'Syne', sans-serif;
+    font-size: 20px;
+    font-weight: 800;
+    color: var(--navy);
+  }
+  .page-header .badge {
+    margin-left: auto;
+    font-size: 10px;
+    font-weight: 600;
+    color: var(--muted);
+    background: var(--surface);
+    border: 1px solid var(--border);
+    padding: 3px 10px;
+    border-radius: 100px;
+    letter-spacing: .5px;
+  }
+
+  /* section headings */
+  h3 {
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--navy);
+    text-transform: uppercase;
+    letter-spacing: .7px;
+    margin: 18px 0 8px;
+    display: flex;
+    align-items: center;
+    gap: 7px;
+  }
+  h3::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: var(--border);
+  }
+
+  p { margin-bottom: 7px; color: #334155; font-size: 12.5px; }
+
+  /* ── CALLOUT BOX ── */
+  .callout {
+    border-left: 3px solid;
+    border-radius: 0 8px 8px 0;
+    padding: 10px 14px;
+    margin: 10px 0;
+    font-size: 12px;
+  }
+  .callout-blue   { border-color: var(--blue);   background: #EFF6FF; }
+  .callout-green  { border-color: var(--green);  background: #ECFDF5; }
+  .callout-orange { border-color: var(--orange); background: #FFFBEB; }
+  .callout strong { display: block; margin-bottom: 3px; font-size: 11px; text-transform: uppercase; letter-spacing: .5px; }
+  .callout-blue   strong { color: var(--blue); }
+  .callout-green  strong { color: var(--green); }
+  .callout-orange strong { color: var(--orange); }
+
+  /* ── DIAGRAMS ── */
+  .diagram {
+    background: var(--surface);
+    border: 1.5px solid var(--border);
+    border-radius: 12px;
+    padding: 18px;
+    margin: 12px 0;
+    position: relative;
+  }
+  .diagram-label {
+    position: absolute;
+    top: -9px; left: 14px;
+    background: #fff;
+    padding: 0 8px;
+    font-size: 10px;
+    font-weight: 700;
+    color: var(--muted);
+    letter-spacing: .5px;
+    text-transform: uppercase;
+  }
+
+  /* network diagram */
+  .net-diagram {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+  }
+  .net-row { display: flex; align-items: center; gap: 10px; }
+  .net-bridge {
+    background: linear-gradient(135deg, #EFF6FF, #DBEAFE);
+    border: 2px dashed #93C5FD;
+    border-radius: 10px;
+    padding: 10px 18px;
+    text-align: center;
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--blue);
+    min-width: 130px;
+  }
+  .net-container {
+    background: #fff;
+    border: 2px solid var(--border);
+    border-radius: 8px;
+    padding: 7px 14px;
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--text);
+    text-align: center;
+    box-shadow: 0 2px 6px #0001;
+  }
+  .net-container .port { font-size: 10px; color: var(--muted); font-weight: 400; }
+  .arrow { font-size: 16px; color: var(--blue); }
+  .arrow-v { writing-mode: vertical-rl; font-size: 16px; color: var(--blue); }
+  .host-box {
+    background: #F1F5F9;
+    border: 2px solid #CBD5E1;
+    border-radius: 10px;
+    padding: 8px 18px;
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--navy);
+    letter-spacing: .4px;
+  }
+  .internet-cloud {
+    background: linear-gradient(135deg, #F0FDF4, #DCFCE7);
+    border: 2px dashed #86EFAC;
+    border-radius: 30px;
+    padding: 8px 22px;
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--green);
+  }
+
+  /* compose diagram */
+  .compose-stack {
+    display: flex;
+    gap: 10px;
+    align-items: flex-start;
+    flex-wrap: wrap;
+  }
+  .compose-service {
+    flex: 1;
+    min-width: 80px;
+    border: 2px solid;
+    border-radius: 10px;
+    overflow: hidden;
+    font-size: 11px;
+  }
+  .compose-service-header {
+    padding: 6px 10px;
+    font-weight: 700;
+    font-size: 11px;
+    text-align: center;
+  }
+  .compose-service-body {
+    padding: 8px 10px;
+    font-size: 10px;
+    color: var(--text);
+    line-height: 1.6;
+  }
+  .svc-web   { border-color: var(--blue);   }
+  .svc-web   .compose-service-header   { background: #EFF6FF; color: var(--blue); }
+  .svc-web   .compose-service-body     { background: #F8FAFF; }
+  .svc-db    { border-color: var(--green);  }
+  .svc-db    .compose-service-header   { background: #ECFDF5; color: var(--green); }
+  .svc-db    .compose-service-body     { background: #F7FFF9; }
+  .svc-cache { border-color: var(--orange); }
+  .svc-cache .compose-service-header   { background: #FFFBEB; color: var(--orange); }
+  .svc-cache .compose-service-body     { background: #FFFDF5; }
+  .compose-arrow {
+    font-size: 22px;
+    color: var(--muted);
+    align-self: center;
+    padding: 0 2px;
+  }
+  .compose-net-bar {
+    background: linear-gradient(90deg, #EFF6FF, #DBEAFE, #EFF6FF);
+    border: 1.5px dashed #93C5FD;
+    border-radius: 8px;
+    padding: 6px 14px;
+    font-size: 10px;
+    font-weight: 600;
+    color: var(--blue);
+    text-align: center;
+    margin-top: 8px;
+  }
+
+  /* registry diagram */
+  .reg-diagram {
+    display: flex;
+    align-items: center;
+    justify-content: space-around;
+    gap: 10px;
+  }
+  .reg-box {
+    border: 2px solid;
+    border-radius: 10px;
+    padding: 12px 16px;
+    text-align: center;
+    font-size: 11px;
+    font-weight: 600;
+    min-width: 90px;
+  }
+  .reg-registry { border-color: var(--purple); background: #F5F3FF; color: var(--purple); }
+  .reg-dev      { border-color: var(--blue);   background: #EFF6FF; color: var(--blue); }
+  .reg-ci       { border-color: var(--orange); background: #FFFBEB; color: var(--orange); }
+  .reg-prod     { border-color: var(--green);  background: #ECFDF5; color: var(--green); }
+  .reg-arrow {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2px;
+    font-size: 10px;
+    color: var(--muted);
+    font-weight: 600;
+  }
+  .reg-arrow span { font-size: 18px; }
+
+  /* code block */
+  pre {
+    background: var(--navy);
+    color: #E2E8F0;
+    border-radius: 9px;
+    padding: 12px 16px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10.5px;
+    line-height: 1.7;
+    overflow-x: auto;
+    margin: 8px 0;
+  }
+  pre .kw  { color: var(--cyan); }
+  pre .val { color: #A5F3FC; }
+  pre .cmt { color: #475569; }
+  pre .str { color: #86EFAC; }
+
+  /* two-col */
+  .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  .three-col { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; }
+
+  /* network type card */
+  .net-card {
+    border: 1.5px solid var(--border);
+    border-radius: 10px;
+    overflow: hidden;
+  }
+  .net-card-head {
+    padding: 7px 12px;
+    font-size: 11px;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .net-card-body {
+    padding: 8px 12px;
+    font-size: 11px;
+    color: #475569;
+    line-height: 1.5;
+  }
+  .nc-bridge .net-card-head { background: #EFF6FF; color: var(--blue); }
+  .nc-host   .net-card-head { background: #ECFDF5; color: var(--green); }
+  .nc-none   .net-card-head { background: #FEF2F2; color: var(--red); }
+  .nc-overlay .net-card-head { background: #F5F3FF; color: var(--purple); }
+  .nc-macvlan .net-card-head { background: #FFFBEB; color: var(--orange); }
+
+  /* ── COMMAND TABLE ── */
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 11px;
+    margin: 10px 0;
+  }
+  thead tr {
+    background: var(--navy);
+    color: #fff;
+  }
+  thead th {
+    padding: 8px 10px;
+    text-align: left;
+    font-weight: 600;
+    font-size: 10.5px;
+    letter-spacing: .4px;
+  }
+  tbody tr:nth-child(even) { background: var(--surface); }
+  tbody tr:hover { background: #EFF6FF; }
+  tbody td {
+    padding: 7px 10px;
+    vertical-align: top;
+    border-bottom: 1px solid var(--border);
+    line-height: 1.45;
+  }
+  .cmd-cell {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    color: var(--navy);
+    font-weight: 500;
+    white-space: nowrap;
+  }
+  .tag {
+    display: inline-block;
+    padding: 1px 7px;
+    border-radius: 100px;
+    font-size: 9.5px;
+    font-weight: 700;
+    letter-spacing: .3px;
+  }
+  .tag-net    { background: #DBEAFE; color: var(--blue); }
+  .tag-compose{ background: #D1FAE5; color: #065F46; }
+  .tag-reg    { background: #EDE9FE; color: #5B21B6; }
+
+  /* footer */
+  .page-footer {
+    position: absolute;
+    bottom: 10px; left: 36px; right: 36px;
+    display: flex;
+    justify-content: space-between;
+    font-size: 9.5px;
+    color: var(--border);
+    border-top: 1px solid var(--border);
+    padding-top: 6px;
+  }
+
+  /* concept number pill */
+  .concept-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: var(--navy);
+    color: #fff;
+    border-radius: 100px;
+    padding: 3px 12px 3px 5px;
+    font-size: 11px;
+    font-weight: 600;
+    margin-bottom: 10px;
+  }
+  .concept-pill-num {
+    width: 20px; height: 20px;
+    border-radius: 50%;
+    background: var(--cyan);
+    color: var(--navy);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 11px;
+    font-weight: 800;
+  }
+
+  /* info row */
+  .info-row {
+    display: flex;
+    gap: 10px;
+    margin: 10px 0;
+  }
+  .info-block {
+    flex: 1;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 9px;
+    padding: 10px 12px;
+    font-size: 11px;
+  }
+  .info-block strong {
+    display: block;
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: .5px;
+    color: var(--muted);
+    margin-bottom: 4px;
+  }
+
+  @media print {
+    body { background: #fff; }
+    .page { margin: 0; box-shadow: none; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ═══════════════════════════════════════════════════ PAGE 1: COVER -->
+<div class="page">
+  <div class="cover">
+    <div class="cover-grid"></div>
+    <div class="cover-glow"></div>
+    <div class="cover-glow2"></div>
+    <div class="cover-whale">🐳</div>
+    <h1><span>Docker</span> Deep Dive</h1>
+    <p class="cover-sub">Comprehensive Study Notes for AI Engineers &amp; Beginners</p>
+    <div class="cover-chips">
+      <span class="chip chip-blue">🌐 Networks</span>
+      <span class="chip chip-green">📦 Docker Compose</span>
+      <span class="chip chip-purple">🗂️ Registries</span>
+    </div>
+    <div style="margin-top:40px; display:flex; gap:40px; text-align:center;">
+      <div><div style="font-size:28px;font-weight:800;color:#fff;">3</div><div style="font-size:11px;color:#64748B;">Core Topics</div></div>
+      <div><div style="font-size:28px;font-weight:800;color:#fff;">8</div><div style="font-size:11px;color:#64748B;">Pages</div></div>
+      <div><div style="font-size:28px;font-weight:800;color:#fff;">60+</div><div style="font-size:11px;color:#64748B;">Commands</div></div>
+    </div>
+    <p class="cover-meta">Docker Notes · AI Engineer Edition · 2024</p>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════ PAGE 2: NETWORKS THEORY -->
+<div class="page">
+  <div class="inner">
+    <div class="page-header">
+      <div class="page-header-icon ph-blue">🌐</div>
+      <h2>Docker Networks</h2>
+      <span class="badge">CONCEPT 01</span>
+    </div>
+
+    <div class="concept-pill"><div class="concept-pill-num">1</div> What is a Docker Network?</div>
+    <p>Docker networking allows containers to communicate with each other, with the host machine, and with the outside world. Think of it like a virtual LAN (Local Area Network) that Docker manages automatically. When you run a container, it needs to talk to other services — a web app talks to a database, an AI model server exposes an API endpoint, and so on. Docker networks make this possible in a controlled, secure way.</p>
+
+    <div class="callout callout-blue">
+      <strong>💡 Why it matters for AI Engineers</strong>
+      When you run inference servers (e.g. Ollama, TGI, vLLM) alongside API gateways and monitoring stacks, Docker networks let these containers talk privately without exposing internal ports to the internet.
+    </div>
+
+    <h3>Network Driver Types</h3>
+    <div class="three-col">
+      <div class="net-card nc-bridge">
+        <div class="net-card-head">🔗 Bridge</div>
+        <div class="net-card-body"><b>Default.</b> Isolated virtual network on the host. Containers on the same bridge can communicate. Best for single-host setups.</div>
+      </div>
+      <div class="net-card nc-host">
+        <div class="net-card-head">🖥️ Host</div>
+        <div class="net-card-body">Container shares the host's network stack directly. No isolation. Lowest latency — useful for high-performance inference.</div>
+      </div>
+      <div class="net-card nc-none">
+        <div class="net-card-head">🚫 None</div>
+        <div class="net-card-body">No networking at all. Container is fully isolated. Used for batch jobs that need no network access.</div>
+      </div>
+      <div class="net-card nc-overlay">
+        <div class="net-card-head">🌍 Overlay</div>
+        <div class="net-card-body">Spans multiple Docker hosts (Docker Swarm). Enables distributed, multi-node container communication.</div>
+      </div>
+      <div class="net-card nc-macvlan">
+        <div class="net-card-head">🪪 Macvlan</div>
+        <div class="net-card-body">Assigns a real MAC address to a container. Makes it appear as a physical device on the network.</div>
+      </div>
+      <div class="net-card" style="border-color:#E2E8F0;">
+        <div class="net-card-head" style="background:#F8FAFC;color:#475569;">🔌 IPvlan</div>
+        <div class="net-card-body">Like Macvlan but shares the parent MAC. Better for environments where the switch limits MACs per port.</div>
+      </div>
+    </div>
+
+    <h3>Bridge Network Architecture Diagram</h3>
+    <div class="diagram">
+      <span class="diagram-label">BRIDGE NETWORK — DEFAULT DOCKER0</span>
+      <div class="net-diagram">
+        <div class="internet-cloud">🌐 Internet / External Traffic</div>
+        <div class="arrow">↕</div>
+        <div class="host-box">🖥️ Docker Host &nbsp;·&nbsp; eth0</div>
+        <div class="arrow">↕ NAT / Port Mapping</div>
+        <div class="net-bridge">docker0 Bridge Network<br><span style="font-size:10px;font-weight:400;color:#64748B;">172.17.0.0/16 (default)</span></div>
+        <div style="display:flex;gap:20px;margin-top:4px;">
+          <div>
+            <div class="net-container">🤖 AI API<br><span class="port">172.17.0.2 · :8080</span></div>
+          </div>
+          <div style="display:flex;align-items:center;color:#CBD5E1;font-size:18px;">⟷</div>
+          <div>
+            <div class="net-container">🗄️ Database<br><span class="port">172.17.0.3 · :5432</span></div>
+          </div>
+          <div style="display:flex;align-items:center;color:#CBD5E1;font-size:18px;">⟷</div>
+          <div>
+            <div class="net-container">📊 Monitor<br><span class="port">172.17.0.4 · :9090</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <h3>DNS Resolution in Docker</h3>
+    <p>Docker runs an embedded DNS server at <code style="background:#F1F5F9;padding:1px 5px;border-radius:4px;font-family:monospace;font-size:11px;">127.0.0.11</code>. On user-defined networks, containers can reference each other by <b>container name</b> — no need to track IP addresses. For example, a Flask app can connect to <code style="background:#F1F5F9;padding:1px 5px;border-radius:4px;font-family:monospace;font-size:11px;">postgres:5432</code> simply because both containers share the same custom network.</p>
+
+    <div class="two-col">
+      <div class="callout callout-green">
+        <strong>✅ User-Defined Networks</strong>
+        Always create custom networks instead of using the default bridge. You get automatic DNS, better isolation, and containers can be attached/detached while running.
+      </div>
+      <div class="callout callout-orange">
+        <strong>⚠️ Port Publishing</strong>
+        <code>-p host:container</code> exposes a container port to the host. Without this, services are only reachable inside the Docker network, not from your browser or external clients.
+      </div>
+    </div>
+  </div>
+  <div class="page-footer"><span>Docker Deep Dive Notes</span><span>Page 2 of 8</span></div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════ PAGE 3: COMPOSE THEORY -->
+<div class="page">
+  <div class="inner">
+    <div class="page-header">
+      <div class="page-header-icon ph-green">📦</div>
+      <h2>Docker Compose</h2>
+      <span class="badge">CONCEPT 02</span>
+    </div>
+
+    <div class="concept-pill"><div class="concept-pill-num">2</div> What is Docker Compose?</div>
+    <p>Docker Compose is a tool for defining and running <b>multi-container applications</b> using a single YAML file (<code style="background:#F1F5F9;padding:1px 5px;border-radius:4px;font-family:monospace;font-size:11px;">docker-compose.yml</code>). Instead of typing long <code style="background:#F1F5F9;padding:1px 5px;border-radius:4px;font-family:monospace;font-size:11px;">docker run</code> commands with dozens of flags, you describe your entire stack — web server, database, cache, model server — declaratively in one file, then bring it all up with a single command.</p>
+
+    <div class="callout callout-green">
+      <strong>💡 AI Engineer Use Case</strong>
+      A typical ML deployment stack: FastAPI inference server + PostgreSQL metadata store + Redis feature cache + Prometheus metrics. With Compose, the entire stack launches in one command: <code>docker compose up</code>.
+    </div>
+
+    <h3>Key Compose Concepts</h3>
+    <div class="three-col">
+      <div class="info-block"><strong>Services</strong>Each container in your stack is a "service." Each service has its own image, ports, environment, volumes, and dependencies.</div>
+      <div class="info-block"><strong>Networks</strong>Compose auto-creates a default network so all services can communicate by name. You can also define custom networks.</div>
+      <div class="info-block"><strong>Volumes</strong>Persistent data storage. Databases store data in volumes so it survives container restarts and recreations.</div>
+    </div>
+
+    <h3>Multi-Container Stack Diagram</h3>
+    <div class="diagram">
+      <span class="diagram-label">DOCKER COMPOSE — AI INFERENCE STACK</span>
+      <div style="display:flex;flex-direction:column;align-items:center;gap:8px;">
+        <div style="font-size:11px;font-weight:700;color:#64748B;background:#F1F5F9;padding:4px 16px;border-radius:100px;">docker-compose.yml</div>
+        <div class="compose-stack" style="width:100%;">
+          <div class="compose-service svc-web">
+            <div class="compose-service-header">🤖 api</div>
+            <div class="compose-service-body">image: fastapi:latest<br>ports: 8000:8000<br>depends_on: db, cache</div>
+          </div>
+          <div class="compose-arrow">⇄</div>
+          <div class="compose-service svc-db">
+            <div class="compose-service-header">🗄️ db</div>
+            <div class="compose-service-body">image: postgres:15<br>ports: 5432:5432<br>volumes: pgdata:/var/lib/postgresql</div>
+          </div>
+          <div class="compose-arrow">⇄</div>
+          <div class="compose-service svc-cache">
+            <div class="compose-service-header">⚡ cache</div>
+            <div class="compose-service-body">image: redis:7<br>ports: 6379:6379<br>volumes: redisdata:/data</div>
+          </div>
+          <div class="compose-arrow">⇄</div>
+          <div class="compose-service" style="border-color:#8B5CF6;flex:1;min-width:80px;">
+            <div class="compose-service-header" style="background:#F5F3FF;color:#8B5CF6;">📊 monitor</div>
+            <div class="compose-service-body">image: prom/prometheus<br>ports: 9090:9090<br>volumes: prom.yml:/etc/prometheus</div>
+          </div>
+        </div>
+        <div class="compose-net-bar" style="width:100%;">🔗 app_default network — all services discover each other by service name</div>
+      </div>
+    </div>
+
+    <h3>Anatomy of docker-compose.yml</h3>
+    <pre><span class="kw">version</span>: <span class="str">"3.9"</span>
+<span class="kw">services</span>:
+  <span class="kw">api</span>:                         <span class="cmt"># service name = DNS hostname</span>
+    <span class="kw">image</span>: <span class="str">myapp:latest</span>
+    <span class="kw">build</span>: <span class="str">.</span>                   <span class="cmt"># build from local Dockerfile</span>
+    <span class="kw">ports</span>:
+      - <span class="str">"8000:8000"</span>            <span class="cmt"># host:container port mapping</span>
+    <span class="kw">environment</span>:               <span class="cmt"># env vars injected into container</span>
+      - <span class="val">DATABASE_URL=postgresql://db:5432/mydb</span>
+    <span class="kw">depends_on</span>:                <span class="cmt"># start order dependency</span>
+      - <span class="str">db</span>
+    <span class="kw">networks</span>:
+      - <span class="str">appnet</span>
+  <span class="kw">db</span>:
+    <span class="kw">image</span>: <span class="str">postgres:15</span>
+    <span class="kw">volumes</span>:
+      - <span class="val">pgdata:/var/lib/postgresql/data</span>  <span class="cmt"># named volume</span>
+    <span class="kw">networks</span>:
+      - <span class="str">appnet</span>
+<span class="kw">volumes</span>:
+  <span class="val">pgdata</span>:                      <span class="cmt"># declare named volume</span>
+<span class="kw">networks</span>:
+  <span class="val">appnet</span>:                      <span class="cmt"># declare custom network</span>
+    <span class="kw">driver</span>: <span class="str">bridge</span></pre>
+
+    <div class="two-col">
+      <div class="callout callout-blue">
+        <strong>🔄 depends_on vs healthcheck</strong>
+        <code>depends_on</code> only waits for the container to start, not for the service inside to be ready. Use <code>healthcheck</code> in Compose v3+ for proper readiness gating.
+      </div>
+      <div class="callout callout-orange">
+        <strong>📁 .env Files</strong>
+        Compose automatically reads a <code>.env</code> file in the same directory. Use this to manage secrets like API keys, database passwords — never hard-code them in the YAML.
+      </div>
+    </div>
+  </div>
+  <div class="page-footer"><span>Docker Deep Dive Notes</span><span>Page 3 of 8</span></div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════ PAGE 4: REGISTRIES THEORY -->
+<div class="page">
+  <div class="inner">
+    <div class="page-header">
+      <div class="page-header-icon ph-purple">🗂️</div>
+      <h2>Docker Registries</h2>
+      <span class="badge">CONCEPT 03</span>
+    </div>
+
+    <div class="concept-pill"><div class="concept-pill-num">3</div> What is a Docker Registry?</div>
+    <p>A Docker Registry is a <b>storage and distribution system for Docker images</b>. Just like GitHub stores code, a registry stores container images. When you run <code style="background:#F1F5F9;padding:1px 5px;border-radius:4px;font-family:monospace;font-size:11px;">docker pull nginx</code>, Docker downloads the nginx image from the <b>Docker Hub</b> registry. You can also push your own images so teammates, CI/CD pipelines, or cloud servers can pull and run them.</p>
+
+    <div class="callout callout-blue">
+      <strong>💡 AI Engineer Use Case</strong>
+      You build a Docker image containing your trained model weights + inference server. Push it to AWS ECR or GitHub Container Registry. Your production GPU cluster pulls and runs it — guaranteed same environment every time.
+    </div>
+
+    <h3>Registry Ecosystem</h3>
+    <div class="three-col">
+      <div class="info-block" style="border-color:#2496ED;"><strong style="color:#2496ED;">🐳 Docker Hub</strong>Default public registry. Millions of official images. Free tier available. hub.docker.com</div>
+      <div class="info-block" style="border-color:#FF9900;"><strong style="color:#FF9900;">☁️ AWS ECR</strong>Amazon Elastic Container Registry. Private, scales with AWS. Integrates natively with ECS, EKS, Lambda.</div>
+      <div class="info-block" style="border-color:#4285F4;"><strong style="color:#4285F4;">🔵 GCP Artifact Registry</strong>Google's registry. Works with GKE and Cloud Run. Replaced the older GCR.</div>
+      <div class="info-block" style="border-color:#0078D4;"><strong style="color:#0078D4;">🔷 Azure ACR</strong>Azure Container Registry. Geo-replicated, integrates with AKS and Azure Pipelines.</div>
+      <div class="info-block" style="border-color:#24292E;"><strong style="color:#24292E;">🐙 GitHub GHCR</strong>GitHub Container Registry. Free for public images. Stores images alongside your source code.</div>
+      <div class="info-block" style="border-color:#12B981;"><strong style="color:#12B981;">🏠 Self-Hosted</strong>Run your own with the official <code>registry:2</code> image. Full control, on-premises compliance.</div>
+    </div>
+
+    <h3>Image Tag & Push/Pull Lifecycle</h3>
+    <div class="diagram">
+      <span class="diagram-label">REGISTRY WORKFLOW — BUILD → PUSH → PULL → RUN</span>
+      <div class="reg-diagram">
+        <div>
+          <div class="reg-box reg-dev">👩‍💻 Developer<br>Workstation</div>
+          <div style="font-size:10px;text-align:center;margin-top:4px;color:#64748B;">docker build &amp; tag</div>
+        </div>
+        <div class="reg-arrow"><span>→</span>push</div>
+        <div>
+          <div class="reg-box reg-registry">🗂️ Registry<br>Docker Hub / ECR</div>
+          <div style="font-size:10px;text-align:center;margin-top:4px;color:#64748B;">myapp:v1.0 stored</div>
+        </div>
+        <div class="reg-arrow"><span>→</span>pull</div>
+        <div>
+          <div class="reg-box reg-ci">🔄 CI/CD<br>Pipeline</div>
+          <div style="font-size:10px;text-align:center;margin-top:4px;color:#64748B;">automated deploy</div>
+        </div>
+        <div class="reg-arrow"><span>→</span>pull &amp; run</div>
+        <div>
+          <div class="reg-box reg-prod">🚀 Production<br>GPU Cluster</div>
+          <div style="font-size:10px;text-align:center;margin-top:4px;color:#64748B;">docker run / k8s pod</div>
+        </div>
+      </div>
+    </div>
+
+    <h3>Image Naming Convention</h3>
+    <pre><span class="cmt"># Full image reference format:</span>
+<span class="val">[registry-host]/[namespace]/[repository]:[tag]</span>
+
+<span class="cmt"># Docker Hub (default registry, can omit host):</span>
+<span class="kw">docker pull</span> <span class="str">nginx:latest</span>               <span class="cmt"># → docker.io/library/nginx:latest</span>
+<span class="kw">docker pull</span> <span class="str">username/myapp:v2.1</span>        <span class="cmt"># → docker.io/username/myapp:v2.1</span>
+
+<span class="cmt"># AWS ECR:</span>
+<span class="kw">docker pull</span> <span class="str">123456789.dkr.ecr.us-east-1.amazonaws.com/myapp:prod</span>
+
+<span class="cmt"># GitHub Container Registry:</span>
+<span class="kw">docker pull</span> <span class="str">ghcr.io/myorg/inference-server:sha-abc123</span></pre>
+
+    <div class="two-col">
+      <div class="callout callout-green">
+        <strong>🏷️ Tagging Strategy</strong>
+        Use semantic tags: <code>:latest</code> (unstable), <code>:v1.0.0</code> (stable release), <code>:sha-abc123</code> (immutable, tied to git commit). For AI models, tag with the model version too: <code>:llama3-v1.2</code>.
+      </div>
+      <div class="callout callout-orange">
+        <strong>🔐 Private Registry Auth</strong>
+        Use <code>docker login</code> before pushing to private registries. In CI/CD, inject credentials as environment variables. Never bake credentials into a Dockerfile.
+      </div>
+    </div>
+  </div>
+  <div class="page-footer"><span>Docker Deep Dive Notes</span><span>Page 4 of 8</span></div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════ PAGE 5: NETWORKS ADVANCED -->
+<div class="page">
+  <div class="inner">
+    <div class="page-header">
+      <div class="page-header-icon ph-blue">🌐</div>
+      <h2>Docker Networks — Advanced Concepts</h2>
+      <span class="badge">CONCEPT 01 · EXTENDED</span>
+    </div>
+
+    <h3>Container-to-Container Communication</h3>
+    <p>On a <b>user-defined bridge</b> network, containers can reach each other using their <b>service/container name as hostname</b>. The embedded DNS server resolves names automatically. On the <i>default</i> bridge (docker0), you must use IP addresses or <code>--link</code> (deprecated).</p>
+
+    <div class="diagram">
+      <span class="diagram-label">HOST vs BRIDGE vs OVERLAY NETWORK COMPARISON</span>
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;font-size:11px;">
+        <div style="border:2px solid #DBEAFE;border-radius:9px;overflow:hidden;">
+          <div style="background:#1B6FEB;color:#fff;padding:7px;text-align:center;font-weight:700;">Bridge Network</div>
+          <div style="padding:10px;background:#F8FAFF;">
+            <div style="text-align:center;">🖥️ Host</div>
+            <div style="margin:6px auto;width:80%;border:1.5px dashed #93C5FD;border-radius:6px;padding:8px;text-align:center;background:#EFF6FF;">
+              <div>📦 C1 &nbsp;&nbsp; 📦 C2</div>
+              <div style="font-size:9px;color:#64748B;margin-top:3px;">172.17.0.x subnet</div>
+            </div>
+            <div style="font-size:10px;color:#475569;text-align:center;">Isolated · NAT to host · DNS by name</div>
+          </div>
+        </div>
+        <div style="border:2px solid #D1FAE5;border-radius:9px;overflow:hidden;">
+          <div style="background:#12B981;color:#fff;padding:7px;text-align:center;font-weight:700;">Host Network</div>
+          <div style="padding:10px;background:#F7FFF9;">
+            <div style="text-align:center;">🖥️ Host (eth0)</div>
+            <div style="margin:6px auto;width:80%;border:1.5px dashed #86EFAC;border-radius:6px;padding:8px;text-align:center;background:#ECFDF5;">
+              <div>📦 C1 shares host network</div>
+              <div style="font-size:9px;color:#64748B;margin-top:3px;">No isolation</div>
+            </div>
+            <div style="font-size:10px;color:#475569;text-align:center;">Low latency · No NAT · Less secure</div>
+          </div>
+        </div>
+        <div style="border:2px solid #EDE9FE;border-radius:9px;overflow:hidden;">
+          <div style="background:#8B5CF6;color:#fff;padding:7px;text-align:center;font-weight:700;">Overlay Network</div>
+          <div style="padding:10px;background:#FAFAFF;">
+            <div style="display:flex;justify-content:space-around;">
+              <div style="text-align:center;font-size:10px;">🖥️ Node 1</div>
+              <div style="text-align:center;font-size:10px;">🖥️ Node 2</div>
+            </div>
+            <div style="margin:6px 0;border:1.5px dashed #C4B5FD;border-radius:6px;padding:6px;text-align:center;background:#F5F3FF;">
+              <div style="font-size:10px;">📦 C1 ⟷ 📦 C2</div>
+              <div style="font-size:9px;color:#64748B;margin-top:2px;">VXLAN tunnel</div>
+            </div>
+            <div style="font-size:10px;color:#475569;text-align:center;">Multi-host · Swarm mode · Encrypted</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <h3>Network Inspection &amp; Debugging</h3>
+    <p>When troubleshooting connectivity between containers, the most useful workflow is: inspect the network to see which containers are attached, then exec into a container and test connectivity with <code style="background:#F1F5F9;padding:1px 5px;border-radius:4px;font-family:monospace;font-size:11px;">ping</code> or <code style="background:#F1F5F9;padding:1px 5px;border-radius:4px;font-family:monospace;font-size:11px;">curl</code>.</p>
+
+    <pre><span class="cmt"># Create a custom network</span>
+<span class="kw">docker network create</span> <span class="val">--driver bridge</span> <span class="str">my-ai-net</span>
+
+<span class="cmt"># Connect running container to a network (hot-attach)</span>
+<span class="kw">docker network connect</span> <span class="str">my-ai-net</span> <span class="val">inference-server</span>
+
+<span class="cmt"># Inspect network — see all connected containers + IPs</span>
+<span class="kw">docker network inspect</span> <span class="str">my-ai-net</span>
+
+<span class="cmt"># Test connectivity from inside a container</span>
+<span class="kw">docker exec</span> <span class="val">-it</span> <span class="str">myapp</span> <span class="val">ping db</span>
+<span class="kw">docker exec</span> <span class="val">-it</span> <span class="str">myapp</span> <span class="val">curl http://api-server:8080/health</span></pre>
+
+    <h3>Port Publishing Deep Dive</h3>
+    <div class="two-col">
+      <div>
+        <p>Port publishing with <code style="background:#F1F5F9;padding:1px 5px;border-radius:4px;font-family:monospace;font-size:11px;">-p</code> exposes container ports to the host and beyond. The format is always <b>HOST_PORT:CONTAINER_PORT</b>.</p>
+        <pre><span class="cmt"># Bind to all host interfaces</span>
+<span class="kw">docker run</span> <span class="val">-p 8080:80</span> nginx
+
+<span class="cmt"># Bind to specific IP only (secure)</span>
+<span class="kw">docker run</span> <span class="val">-p 127.0.0.1:8080:80</span> nginx
+
+<span class="cmt"># Random host port</span>
+<span class="kw">docker run</span> <span class="val">-p 80</span> nginx
+
+<span class="cmt"># UDP port</span>
+<span class="kw">docker run</span> <span class="val">-p 5353:5353/udp</span> dns-server</pre>
+      </div>
+      <div>
+        <div class="callout callout-orange" style="margin-top:0;">
+          <strong>⚠️ Security Tip</strong>
+          Binding to <code>0.0.0.0</code> (default) exposes the port on ALL network interfaces, including public ones. In development, use <code>127.0.0.1:HOST:CONTAINER</code> to limit access to localhost only.
+        </div>
+        <div class="callout callout-blue">
+          <strong>🔍 View Port Mappings</strong>
+          Run <code>docker port &lt;container&gt;</code> to quickly see all published port mappings for a running container.
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="page-footer"><span>Docker Deep Dive Notes</span><span>Page 5 of 8</span></div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════ PAGE 6: COMPOSE ADVANCED + REGISTRIES ADVANCED -->
+<div class="page">
+  <div class="inner">
+    <div class="page-header">
+      <div class="page-header-icon ph-green">📦</div>
+      <h2>Compose Advanced &amp; Registry Workflows</h2>
+      <span class="badge">CONCEPTS 02–03 · EXTENDED</span>
+    </div>
+
+    <h3>Compose Health Checks &amp; Profiles</h3>
+    <div class="two-col">
+      <div>
+        <p><b>Health checks</b> let Compose wait until a service is truly ready (not just started) before starting dependent services.</p>
+        <pre><span class="kw">db</span>:
+  <span class="kw">image</span>: <span class="str">postgres:15</span>
+  <span class="kw">healthcheck</span>:
+    <span class="kw">test</span>: [<span class="str">"CMD"</span>, <span class="str">"pg_isready"</span>]
+    <span class="kw">interval</span>: <span class="val">10s</span>
+    <span class="kw">timeout</span>: <span class="val">5s</span>
+    <span class="kw">retries</span>: <span class="val">5</span>
+<span class="kw">api</span>:
+  <span class="kw">depends_on</span>:
+    <span class="kw">db</span>:
+      <span class="kw">condition</span>: <span class="val">service_healthy</span></pre>
+      </div>
+      <div>
+        <p><b>Profiles</b> let you define optional services activated only when needed (e.g., only start Prometheus in monitoring mode).</p>
+        <pre><span class="kw">prometheus</span>:
+  <span class="kw">image</span>: <span class="str">prom/prometheus</span>
+  <span class="kw">profiles</span>:
+    - <span class="str">"monitoring"</span>
+
+<span class="cmt"># Start with monitoring profile:</span>
+<span class="kw">docker compose</span> \
+  <span class="val">--profile monitoring up</span></pre>
+      </div>
+    </div>
+
+    <h3>Scaling Services with Compose</h3>
+    <pre><span class="cmt"># Scale the api service to 3 replicas</span>
+<span class="kw">docker compose up</span> <span class="val">--scale api=3</span>
+
+<span class="cmt"># In compose file, define resource limits</span>
+<span class="kw">api</span>:
+  <span class="kw">image</span>: <span class="str">myapp:latest</span>
+  <span class="kw">deploy</span>:
+    <span class="kw">replicas</span>: <span class="val">3</span>
+    <span class="kw">resources</span>:
+      <span class="kw">limits</span>:
+        <span class="kw">cpus</span>: <span class="str">'0.5'</span>
+        <span class="kw">memory</span>: <span class="str">512M</span></pre>
+
+    <h3>Full Registry Workflow — Push to Docker Hub</h3>
+    <pre><span class="cmt"># Step 1: Build image with a proper tag</span>
+<span class="kw">docker build</span> <span class="val">-t username/inference-server:v1.0</span> <span class="str">.</span>
+
+<span class="cmt"># Step 2: Login to Docker Hub</span>
+<span class="kw">docker login</span>                              <span class="cmt"># prompts username + password/PAT</span>
+
+<span class="cmt"># Step 3: Push image to registry</span>
+<span class="kw">docker push</span> <span class="str">username/inference-server:v1.0</span>
+
+<span class="cmt"># Step 4: Also tag as latest</span>
+<span class="kw">docker tag</span> <span class="str">username/inference-server:v1.0</span> <span class="val">username/inference-server:latest</span>
+<span class="kw">docker push</span> <span class="str">username/inference-server:latest</span>
+
+<span class="cmt"># Step 5: On another machine — pull and run</span>
+<span class="kw">docker pull</span> <span class="str">username/inference-server:v1.0</span>
+<span class="kw">docker run</span> <span class="val">-d -p 8000:8000</span> <span class="str">username/inference-server:v1.0</span></pre>
+
+    <h3>Self-Hosted Registry with docker-compose.yml</h3>
+    <pre><span class="kw">version</span>: <span class="str">"3.9"</span>
+<span class="kw">services</span>:
+  <span class="kw">registry</span>:
+    <span class="kw">image</span>: <span class="str">registry:2</span>
+    <span class="kw">ports</span>:
+      - <span class="str">"5000:5000"</span>
+    <span class="kw">volumes</span>:
+      - <span class="val">registry-data:/var/lib/registry</span>
+    <span class="kw">environment</span>:
+      - <span class="val">REGISTRY_STORAGE_FILESYSTEM_ROOTDIRECTORY=/var/lib/registry</span>
+<span class="kw">volumes</span>:
+  <span class="val">registry-data</span>:
+
+<span class="cmt"># Push to self-hosted registry:</span>
+<span class="kw">docker tag</span> <span class="str">myapp:latest localhost:5000/myapp:latest</span>
+<span class="kw">docker push</span> <span class="str">localhost:5000/myapp:latest</span></pre>
+
+    <div class="callout callout-blue">
+      <strong>🔍 Inspecting Images in a Registry</strong>
+      Use <code>docker manifest inspect</code> to check an image's architecture, layers, and digest without pulling it. Use <code>docker image ls</code> with filters to manage local image cache.
+    </div>
+  </div>
+  <div class="page-footer"><span>Docker Deep Dive Notes</span><span>Page 6 of 8</span></div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════ PAGE 7: NETWORK + COMPOSE COMMANDS TABLE -->
+<div class="page">
+  <div class="inner">
+    <div class="page-header">
+      <div class="page-header-icon ph-blue">📋</div>
+      <h2>Command Reference — Networks &amp; Compose</h2>
+      <span class="badge">QUICK REFERENCE</span>
+    </div>
+
+    <h3>Docker Network Commands</h3>
+    <table>
+      <thead>
+        <tr>
+          <th style="width:34%">Command</th>
+          <th style="width:10%">Topic</th>
+          <th>What it does</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td class="cmd-cell">docker network ls</td>
+          <td><span class="tag tag-net">Network</span></td>
+          <td>Lists all networks on the Docker host — shows name, driver, and scope.</td>
+        </tr>
+        <tr>
+          <td class="cmd-cell">docker network create &lt;name&gt;</td>
+          <td><span class="tag tag-net">Network</span></td>
+          <td>Creates a new user-defined bridge network. Containers on this network can communicate by name.</td>
+        </tr>
+        <tr>
+          <td class="cmd-cell">docker network create --driver overlay &lt;name&gt;</td>
+          <td><span class="tag tag-net">Network</span></td>
+          <td>Creates an overlay network for multi-host Docker Swarm communication using VXLAN tunneling.</td>
+        </tr>
+        <tr>
+          <td class="cmd-cell">docker network inspect &lt;name&gt;</td>
+          <td><span class="tag tag-net">Network</span></td>
+          <td>Shows detailed JSON info about a network: subnet, gateway, connected containers, and their IPs.</td>
+        </tr>
+        <tr>
+          <td class="cmd-cell">docker network connect &lt;net&gt; &lt;container&gt;</td>
+          <td><span class="tag tag-net">Network</span></td>
+          <td>Attaches a running container to an existing network. Container immediately gets a new IP on that subnet.</td>
+        </tr>
+        <tr>
+          <td class="cmd-cell">docker network disconnect &lt;net&gt; &lt;container&gt;</td>
+          <td><span class="tag tag-net">Network</span></td>
+          <td>Detaches a container from a network. Useful for isolating a container mid-run for debugging.</td>
+        </tr>
+        <tr>
+          <td class="cmd-cell">docker network rm &lt;name&gt;</td>
+          <td><span class="tag tag-net">Network</span></td>
+          <td>Removes a network. Fails if any containers are still connected. Disconnect all first.</td>
+        </tr>
+        <tr>
+          <td class="cmd-cell">docker network prune</td>
+          <td><span class="tag tag-net">Network</span></td>
+          <td>Removes all networks not currently used by any container. Great for cleaning up after testing.</td>
+        </tr>
+        <tr>
+          <td class="cmd-cell">docker run --network=host &lt;image&gt;</td>
+          <td><span class="tag tag-net">Network</span></td>
+          <td>Runs container using the host's network stack directly. No port mapping needed but no isolation.</td>
+        </tr>
+        <tr>
+          <td class="cmd-cell">docker run --network=none &lt;image&gt;</td>
+          <td><span class="tag tag-net">Network</span></td>
+          <td>Runs container with no network interfaces — completely isolated, useful for offline batch processing.</td>
+        </tr>
+        <tr>
+          <td class="cmd-cell">docker run -p 8080:80 &lt;image&gt;</td>
+          <td><span class="tag tag-net">Network</span></td>
+          <td>Maps host port 8080 to container port 80. External traffic hitting host:8080 is forwarded to the container.</td>
+        </tr>
+        <tr>
+          <td class="cmd-cell">docker port &lt;container&gt;</td>
+          <td><span class="tag tag-net">Network</span></td>
+          <td>Shows all port mappings for a running container — quick way to verify which ports are published.</td>
+        </tr>
+        <tr>
+          <td class="cmd-cell">docker run --network &lt;name&gt; &lt;image&gt;</td>
+          <td><span class="tag tag-net">Network</span></td>
+          <td>Starts a container and immediately attaches it to the specified custom network.</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <h3>Docker Compose Commands</h3>
+    <table>
+      <thead>
+        <tr>
+          <th style="width:34%">Command</th>
+          <th style="width:10%">Topic</th>
+          <th>What it does</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td class="cmd-cell">docker compose up</td>
+          <td><span class="tag tag-compose">Compose</span></td>
+          <td>Builds images (if needed), creates containers, networks, and volumes, then starts all services defined in the YAML.</td>
+        </tr>
+        <tr>
+          <td class="cmd-cell">docker compose up -d</td>
+          <td><span class="tag tag-compose">Compose</span></td>
+          <td>Same as above but detached — runs in background so your terminal is free. Most common in production.</td>
+        </tr>
+        <tr>
+          <td class="cmd-cell">docker compose up --build</td>
+          <td><span class="tag tag-compose">Compose</span></td>
+          <td>Forces rebuild of images before starting containers, even if Docker thinks the image is up-to-date.</td>
+        </tr>
+        <tr>
+          <td class="cmd-cell">docker compose down</td>
+          <td><span class="tag tag-compose">Compose</span></td>
+          <td>Stops and removes all containers, networks created by Compose. Volumes are preserved by default.</td>
+        </tr>
+        <tr>
+          <td class="cmd-cell">docker compose down -v</td>
+          <td><span class="tag tag-compose">Compose</span></td>
+          <td>Stops and removes containers AND volumes. Use for a clean slate — deletes database data too.</td>
+        </tr>
+        <tr>
+          <td class="cmd-cell">docker compose ps</td>
+          <td><span class="tag tag-compose">Compose</span></td>
+          <td>Lists all containers in the current Compose project — shows name, state, and port bindings.</td>
+        </tr>
+        <tr>
+          <td class="cmd-cell">docker compose logs -f</td>
+          <td><span class="tag tag-compose">Compose</span></td>
+          <td>Streams live logs from all services. Add a service name to filter: <code>docker compose logs -f api</code>.</td>
+        </tr>
+        <tr>
+          <td class="cmd-cell">docker compose exec &lt;svc&gt; bash</td>
+          <td><span class="tag tag-compose">Compose</span></td>
+          <td>Opens an interactive shell inside a running service container — equivalent to docker exec for Compose.</td>
+        </tr>
+        <tr>
+          <td class="cmd-cell">docker compose build</td>
+          <td><span class="tag tag-compose">Compose</span></td>
+          <td>Builds (or rebuilds) images defined with a <code>build:</code> key in the Compose file without starting containers.</td>
+        </tr>
+        <tr>
+          <td class="cmd-cell">docker compose pull</td>
+          <td><span class="tag tag-compose">Compose</span></td>
+          <td>Pulls the latest version of all images specified in the Compose file from their respective registries.</td>
+        </tr>
+        <tr>
+          <td class="cmd-cell">docker compose restart &lt;svc&gt;</td>
+          <td><span class="tag tag-compose">Compose</span></td>
+          <td>Restarts a specific service without recreating it. Useful for applying config changes that don't need a rebuild.</td>
+        </tr>
+        <tr>
+          <td class="cmd-cell">docker compose scale api=3</td>
+          <td><span class="tag tag-compose">Compose</span></td>
+          <td>Scales the api service to 3 running instances. Requires a load balancer to distribute traffic between replicas.</td>
+        </tr>
+        <tr>
+          <td class="cmd-cell">docker compose config</td>
+          <td><span class="tag tag-compose">Compose</span></td>
+          <td>Validates and shows the merged effective configuration after resolving env vars and overrides. Great for debugging.</td>
+        </tr>
+        <tr>
+          <td class="cmd-cell">docker compose -f custom.yml up</td>
+          <td><span class="tag tag-compose">Compose</span></td>
+          <td>Uses a custom-named Compose file instead of the default <code>docker-compose.yml</code>.</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+  <div class="page-footer"><span>Docker Deep Dive Notes</span><span>Page 7 of 8</span></div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════ PAGE 8: REGISTRY COMMANDS TABLE + SUMMARY -->
+<div class="page">
+  <div class="inner">
+    <div class="page-header">
+      <div class="page-header-icon ph-purple">📋</div>
+      <h2>Command Reference — Registries &amp; Summary</h2>
+      <span class="badge">QUICK REFERENCE</span>
+    </div>
+
+    <h3>Docker Registry Commands</h3>
+    <table>
+      <thead>
+        <tr>
+          <th style="width:36%">Command</th>
+          <th style="width:10%">Topic</th>
+          <th>What it does</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td class="cmd-cell">docker login</td>
+          <td><span class="tag tag-reg">Registry</span></td>
+          <td>Authenticates with Docker Hub (or another registry if a hostname is given). Saves credentials in <code>~/.docker/config.json</code>.</td>
+        </tr>
+        <tr>
+          <td class="cmd-cell">docker login &lt;registry-url&gt;</td>
+          <td><span class="tag tag-reg">Registry</span></td>
+          <td>Logs into a private registry like AWS ECR, GHCR, or a self-hosted registry at the given URL.</td>
+        </tr>
+        <tr>
+          <td class="cmd-cell">docker logout</td>
+          <td><span class="tag tag-reg">Registry</span></td>
+          <td>Removes stored credentials for a registry from your Docker config. Use in shared/CI environments after pushing.</td>
+        </tr>
+        <tr>
+          <td class="cmd-cell">docker pull &lt;image&gt;:&lt;tag&gt;</td>
+          <td><span class="tag tag-reg">Registry</span></td>
+          <td>Downloads an image and all its layers from a registry to local cache. If the tag is omitted, pulls <code>:latest</code>.</td>
+        </tr>
+        <tr>
+          <td class="cmd-cell">docker push &lt;image&gt;:&lt;tag&gt;</td>
+          <td><span class="tag tag-reg">Registry</span></td>
+          <td>Uploads a locally built/tagged image to the registry. Only uploads layers not already present (delta push).</td>
+        </tr>
+        <tr>
+          <td class="cmd-cell">docker tag &lt;src&gt; &lt;dst&gt;</td>
+          <td><span class="tag tag-reg">Registry</span></td>
+          <td>Creates a new name/tag pointing to the same image layers. Used to rename or re-tag images before pushing to a registry.</td>
+        </tr>
+        <tr>
+          <td class="cmd-cell">docker image ls</td>
+          <td><span class="tag tag-reg">Registry</span></td>
+          <td>Lists all locally cached images with their repository, tag, image ID, and size. Does not show dangling images by default.</td>
+        </tr>
+        <tr>
+          <td class="cmd-cell">docker image ls -a</td>
+          <td><span class="tag tag-reg">Registry</span></td>
+          <td>Shows ALL images including intermediate layers and dangling images (untagged images from old builds).</td>
+        </tr>
+        <tr>
+          <td class="cmd-cell">docker image rm &lt;image&gt;</td>
+          <td><span class="tag tag-reg">Registry</span></td>
+          <td>Removes a local image from the cache. Fails if a container (even stopped) is using it. Use <code>-f</code> to force.</td>
+        </tr>
+        <tr>
+          <td class="cmd-cell">docker image prune</td>
+          <td><span class="tag tag-reg">Registry</span></td>
+          <td>Deletes all dangling (untagged) images to free up disk space. Add <code>-a</code> to remove all unused images.</td>
+        </tr>
+        <tr>
+          <td class="cmd-cell">docker image inspect &lt;image&gt;</td>
+          <td><span class="tag tag-reg">Registry</span></td>
+          <td>Returns detailed JSON: image ID, layers, architecture, OS, environment variables, exposed ports, and more.</td>
+        </tr>
+        <tr>
+          <td class="cmd-cell">docker image history &lt;image&gt;</td>
+          <td><span class="tag tag-reg">Registry</span></td>
+          <td>Shows the build history — each Dockerfile instruction that created a layer, its size, and timestamp.</td>
+        </tr>
+        <tr>
+          <td class="cmd-cell">docker search &lt;term&gt;</td>
+          <td><span class="tag tag-reg">Registry</span></td>
+          <td>Searches Docker Hub for public images matching a term. Shows name, description, star count, and official flag.</td>
+        </tr>
+        <tr>
+          <td class="cmd-cell">docker manifest inspect &lt;image&gt;</td>
+          <td><span class="tag tag-reg">Registry</span></td>
+          <td>Fetches the manifest from the registry without pulling — shows OS, architecture, digest, and layer info.</td>
+        </tr>
+        <tr>
+          <td class="cmd-cell">docker save -o file.tar &lt;image&gt;</td>
+          <td><span class="tag tag-reg">Registry</span></td>
+          <td>Exports an image as a tarball to a file — useful for air-gapped environments with no internet registry access.</td>
+        </tr>
+        <tr>
+          <td class="cmd-cell">docker load -i file.tar</td>
+          <td><span class="tag tag-reg">Registry</span></td>
+          <td>Loads an image from a tarball created by <code>docker save</code>. Restores image with original name and tag.</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <h3>Key Concepts Summary</h3>
+    <div class="three-col" style="margin-top:8px;">
+      <div style="background:linear-gradient(135deg,#EFF6FF,#DBEAFE);border:1.5px solid #93C5FD;border-radius:10px;padding:12px;">
+        <div style="font-weight:800;color:var(--blue);margin-bottom:6px;font-size:12px;">🌐 Networks</div>
+        <div style="font-size:11px;color:#334155;line-height:1.5;">Bridge = default isolated · Host = shared stack · Overlay = multi-host · User-defined networks get DNS resolution by container name. Always use custom networks over default docker0.</div>
+      </div>
+      <div style="background:linear-gradient(135deg,#ECFDF5,#D1FAE5);border:1.5px solid #86EFAC;border-radius:10px;padding:12px;">
+        <div style="font-weight:800;color:var(--green);margin-bottom:6px;font-size:12px;">📦 Docker Compose</div>
+        <div style="font-size:11px;color:#334155;line-height:1.5;">Define multi-container stacks in YAML. Services communicate by service name. Use healthchecks for readiness. Profiles for optional services. Volumes for data persistence across restarts.</div>
+      </div>
+      <div style="background:linear-gradient(135deg,#F5F3FF,#EDE9FE);border:1.5px solid #C4B5FD;border-radius:10px;padding:12px;">
+        <div style="font-weight:800;color:var(--purple);margin-bottom:6px;font-size:12px;">🗂️ Registries</div>
+        <div style="font-size:11px;color:#334155;line-height:1.5;">Login → build → tag → push → pull → run. Tag images semantically (v1.0.0, sha-abc). Use private registries (ECR, GHCR, ACR) for production AI workloads. Never bake credentials into images.</div>
+      </div>
+    </div>
+
+    <div style="margin-top:14px;background:var(--navy);border-radius:12px;padding:14px 20px;display:flex;align-items:center;gap:16px;">
+      <div style="font-size:32px;">🐳</div>
+      <div>
+        <div style="font-family:'Syne',sans-serif;font-size:14px;font-weight:800;color:#fff;">You're ready to containerize anything.</div>
+        <div style="font-size:11px;color:#64748B;margin-top:3px;">Networks isolate · Compose orchestrates · Registries distribute. Master these three and you control the full container lifecycle.</div>
+      </div>
+    </div>
+  </div>
+  <div class="page-footer"><span>Docker Deep Dive Notes</span><span>Page 8 of 8</span></div>
+</div>
+
+</body>
+</html>
