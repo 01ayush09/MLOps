@@ -1,0 +1,1781 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Git &amp; GitHub — Beginner to Junior AI Engineer Notes</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&family=Playfair+Display:wght@700&display=swap');
+  :root {
+    --bg:#ffffff;--surface:#f8f9fc;--surface2:#eef1f8;--border:#e2e8f0;
+    --accent:#2563eb;--accent2:#7c3aed;--accent3:#059669;--accent4:#dc2626;--accent5:#d97706;
+    --text:#0f172a;--text2:#475569;--text3:#94a3b8;
+    --code-bg:#1e293b;--code-text:#e2e8f0;
+    --tag-blue:#dbeafe;--tag-blue-text:#1d4ed8;
+    --tag-purple:#ede9fe;--tag-purple-text:#6d28d9;
+    --tag-green:#d1fae5;--tag-green-text:#065f46;
+    --tag-orange:#fef3c7;--tag-orange-text:#92400e;
+    --tag-red:#fee2e2;--tag-red-text:#991b1b;
+  }
+  *{box-sizing:border-box;margin:0;padding:0;}
+  body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);line-height:1.7;font-size:15px;}
+  .page{width:210mm;min-height:297mm;margin:0 auto;padding:14mm 16mm;background:var(--bg);position:relative;page-break-after:always;}
+  @media print{body{background:white;}.page{margin:0;padding:12mm 14mm;page-break-after:always;box-shadow:none!important;}}
+  @media screen{body{background:#dde3ed;padding:20px 0;}.page{box-shadow:0 4px 32px rgba(0,0,0,.12);margin:0 auto 20px;}}
+  .cover{display:flex;flex-direction:column;justify-content:center;align-items:center;text-align:center;min-height:297mm;background:linear-gradient(145deg,#0f172a 0%,#1e3a8a 50%,#312e81 100%);color:white;padding:20mm;}
+  .cover-badge{background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.2);border-radius:100px;padding:6px 18px;font-size:11px;font-weight:600;letter-spacing:2px;text-transform:uppercase;margin-bottom:28px;color:#93c5fd;}
+  .cover h1{font-family:'Playfair Display',serif;font-size:48px;line-height:1.1;margin-bottom:12px;color:white;}
+  .cover h1 span{color:#60a5fa;}
+  .cover-sub{font-size:16px;color:#94a3b8;margin-bottom:40px;font-weight:400;}
+  .cover-divider{width:60px;height:3px;background:linear-gradient(90deg,#3b82f6,#7c3aed);border-radius:2px;margin:0 auto 40px;}
+  .cover-topics{display:grid;grid-template-columns:1fr 1fr;gap:10px;max-width:360px;margin-bottom:48px;}
+  .cover-topic{background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.12);border-radius:8px;padding:8px 14px;font-size:12px;font-weight:500;color:#cbd5e1;text-align:left;display:flex;align-items:center;gap:8px;}
+  .cover-topic::before{content:'▸';color:#60a5fa;font-size:10px;flex-shrink:0;}
+  .cover-footer{font-size:11px;color:#475569;margin-top:auto;padding-top:32px;border-top:1px solid rgba(255,255,255,.08);width:100%;text-align:center;}
+  h1.section-title{font-family:'Playfair Display',serif;font-size:26px;color:var(--text);margin-bottom:6px;line-height:1.2;}
+  h2{font-size:17px;font-weight:700;color:var(--text);margin:20px 0 10px;display:flex;align-items:center;gap:8px;}
+  h3{font-size:14px;font-weight:700;color:var(--accent);margin:14px 0 6px;text-transform:uppercase;letter-spacing:.5px;}
+  h4{font-size:14px;font-weight:600;color:var(--text);margin:12px 0 5px;}
+  p{color:var(--text2);margin-bottom:10px;font-size:13.5px;}
+  strong{color:var(--text);font-weight:600;}
+  .page-header{display:flex;align-items:center;justify-content:space-between;padding-bottom:10px;border-bottom:2px solid var(--border);margin-bottom:18px;}
+  .page-header-left{display:flex;align-items:center;gap:10px;}
+  .section-num{background:var(--accent);color:white;width:30px;height:30px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;flex-shrink:0;}
+  .section-num.purple{background:var(--accent2);}
+  .section-num.green{background:var(--accent3);}
+  .section-num.red{background:var(--accent4);}
+  .section-num.orange{background:var(--accent5);}
+  .section-num.teal{background:#0891b2;}
+  .section-num.pink{background:#db2777;}
+  .breadcrumb{font-size:11px;color:var(--text3);font-weight:500;letter-spacing:.5px;}
+  .page-num{font-size:11px;color:var(--text3);font-weight:500;}
+  .def-box{background:linear-gradient(135deg,#eff6ff,#f0f9ff);border-left:4px solid var(--accent);border-radius:0 10px 10px 0;padding:12px 16px;margin:12px 0;}
+  .def-box.purple{background:linear-gradient(135deg,#f5f3ff,#fdf4ff);border-left-color:var(--accent2);}
+  .def-box.green{background:linear-gradient(135deg,#ecfdf5,#f0fdf4);border-left-color:var(--accent3);}
+  .def-box.orange{background:linear-gradient(135deg,#fffbeb,#fefce8);border-left-color:var(--accent5);}
+  .def-box .def-label{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--accent);margin-bottom:4px;}
+  .def-box.purple .def-label{color:var(--accent2);}
+  .def-box.green .def-label{color:var(--accent3);}
+  .def-box.orange .def-label{color:var(--accent5);}
+  .def-box p{margin-bottom:0;font-size:13.5px;}
+  .card-grid{display:grid;gap:10px;margin:12px 0;}
+  .card-grid.cols2{grid-template-columns:1fr 1fr;}
+  .card-grid.cols3{grid-template-columns:1fr 1fr 1fr;}
+  .card{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:12px 14px;}
+  .card.accent-top{border-top:3px solid var(--accent);}
+  .card.accent-top.purple{border-top-color:var(--accent2);}
+  .card.accent-top.green{border-top-color:var(--accent3);}
+  .card.accent-top.orange{border-top-color:var(--accent5);}
+  .card.accent-top.red{border-top-color:var(--accent4);}
+  .card.accent-top.teal{border-top-color:#0891b2;}
+  .card h4{margin-top:0;}
+  .card p{margin-bottom:0;font-size:12.5px;}
+  .tag{display:inline-block;border-radius:4px;padding:2px 8px;font-size:11px;font-weight:600;margin-right:4px;}
+  .tag.blue{background:var(--tag-blue);color:var(--tag-blue-text);}
+  .tag.purple{background:var(--tag-purple);color:var(--tag-purple-text);}
+  .tag.green{background:var(--tag-green);color:var(--tag-green-text);}
+  .tag.orange{background:var(--tag-orange);color:var(--tag-orange-text);}
+  .tag.red{background:var(--tag-red);color:var(--tag-red-text);}
+  .code-block{background:var(--code-bg);border-radius:8px;padding:12px 16px;margin:10px 0;font-family:'JetBrains Mono',monospace;font-size:11.5px;color:var(--code-text);overflow-x:auto;line-height:1.6;}
+  .code-block .comment{color:#64748b;}
+  .code-block .cmd{color:#60a5fa;}
+  .code-block .flag{color:#f59e0b;}
+  .code-block .str{color:#34d399;}
+  .diagram-wrap{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:16px;margin:14px 0;text-align:center;}
+  .diagram-wrap .diagram-title{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--text3);margin-bottom:12px;}
+  .diagram-wrap svg{max-width:100%;}
+  .compare-table{width:100%;border-collapse:collapse;margin:12px 0;font-size:12.5px;}
+  .compare-table th{background:var(--code-bg);color:white;padding:8px 12px;text-align:left;font-weight:600;font-size:12px;}
+  .compare-table th:first-child{border-radius:8px 0 0 0;}
+  .compare-table th:last-child{border-radius:0 8px 0 0;}
+  .compare-table td{padding:8px 12px;border-bottom:1px solid var(--border);color:var(--text2);vertical-align:top;}
+  .compare-table tr:nth-child(even) td{background:var(--surface);}
+  .section-divider{height:2px;background:linear-gradient(90deg,var(--accent),transparent);border-radius:2px;margin:16px 0 14px;}
+  code{font-family:'JetBrains Mono',monospace;font-size:11.5px;background:var(--surface2);padding:1px 5px;border-radius:4px;color:var(--accent);font-weight:500;}
+  .commit-card{border-radius:10px;padding:10px 14px;margin-bottom:8px;display:flex;gap:12px;align-items:flex-start;border:1px solid var(--border);background:var(--surface);}
+  .commit-tag{border-radius:6px;padding:3px 9px;font-size:11px;font-weight:700;font-family:'JetBrains Mono',monospace;flex-shrink:0;margin-top:1px;}
+  .commit-info h4{margin:0 0 3px;font-size:13px;}
+  .commit-info p{margin:0;font-size:12px;color:var(--text2);}
+  .tip-box{border-radius:8px;padding:10px 14px;margin:10px 0;font-size:12.5px;display:flex;gap:10px;align-items:flex-start;}
+  .tip-box.blue{background:var(--tag-blue);color:var(--tag-blue-text);}
+  .tip-box.green{background:var(--tag-green);color:var(--tag-green-text);}
+  .tip-box.orange{background:var(--tag-orange);color:var(--tag-orange-text);}
+  .tip-box .tip-icon{font-size:16px;line-height:1;flex-shrink:0;margin-top:1px;}
+  .tip-box .tip-text{line-height:1.5;}
+  .tip-box .tip-text strong{font-weight:700;}
+  ul.styled-list{list-style:none;padding:0;margin:8px 0 12px;}
+  ul.styled-list li{display:flex;gap:8px;align-items:flex-start;color:var(--text2);font-size:13px;margin-bottom:6px;line-height:1.5;}
+  ul.styled-list li::before{content:'●';color:var(--accent);font-size:8px;margin-top:5px;flex-shrink:0;}
+  ul.styled-list.green li::before{color:var(--accent3);}
+  ul.styled-list.purple li::before{color:var(--accent2);}
+  .toc-list{list-style:none;padding:0;}
+  .toc-item{display:flex;align-items:center;justify-content:space-between;padding:7px 12px;border-radius:7px;margin-bottom:4px;background:var(--surface);font-size:13px;}
+  .toc-item-left{display:flex;align-items:center;gap:10px;}
+  .toc-dot{width:8px;height:8px;border-radius:50%;background:var(--accent);flex-shrink:0;}
+  .toc-dot.purple{background:var(--accent2);}
+  .toc-dot.green{background:var(--accent3);}
+  .toc-dot.orange{background:var(--accent5);}
+  .toc-dot.red{background:var(--accent4);}
+  .toc-dot.teal{background:#0891b2;}
+  .toc-dot.pink{background:#db2777;}
+  .toc-page{font-size:11px;color:var(--text3);font-weight:600;}
+</style>
+</head>
+<body>
+
+<!-- PAGE 1: COVER -->
+<div class="page" style="padding:0;">
+  <div class="cover">
+    <div class="cover-badge">Beginner → Junior AI Engineer</div>
+    <h1>Git &amp; <span>GitHub</span><br>Complete Notes</h1>
+    <div class="cover-sub">Version Control Mastery for AI Engineers</div>
+    <div class="cover-divider"></div>
+    <div class="cover-topics">
+      <div class="cover-topic">Version Control</div>
+      <div class="cover-topic">Git &amp; GitHub</div>
+      <div class="cover-topic">Architecture &amp; Workflow</div>
+      <div class="cover-topic">Commits &amp; Types</div>
+      <div class="cover-topic">Branching Strategy</div>
+      <div class="cover-topic">Merging &amp; Rebasing</div>
+      <div class="cover-topic">Remote Operations</div>
+      <div class="cover-topic">Best Practices</div>
+    </div>
+    <div class="cover-footer">Structured study notes &middot; White-background print-ready &middot; 16 pages</div>
+  </div>
+</div>
+
+<!-- PAGE 2: TABLE OF CONTENTS -->
+<div class="page">
+  <div class="page-header">
+    <div class="page-header-left">
+      <div class="section-num" style="background:#334155;">&#8801;</div>
+      <div>
+        <div style="font-weight:700;font-size:16px;">Table of Contents</div>
+        <div class="breadcrumb">GIT &amp; GITHUB NOTES</div>
+      </div>
+    </div>
+    <div class="page-num">Page 2</div>
+  </div>
+  <ul class="toc-list">
+    <li class="toc-item"><div class="toc-item-left"><div class="toc-dot"></div><span><strong>1. Version Control</strong> &mdash; Definition, Why We Need It &amp; Types</span></div><div class="toc-page">Page 3</div></li>
+    <li class="toc-item"><div class="toc-item-left"><div class="toc-dot purple"></div><span><strong>2. Git &amp; GitHub</strong> &mdash; Definitions, Repositories &amp; Differences</span></div><div class="toc-page">Page 4</div></li>
+    <li class="toc-item"><div class="toc-item-left"><div class="toc-dot green"></div><span><strong>3. Architecture &amp; Workflow</strong> &mdash; Complete Motion of Git &amp; GitHub</span></div><div class="toc-page">Page 5</div></li>
+    <li class="toc-item"><div class="toc-item-left"><div class="toc-dot orange"></div><span><strong>4. Commits</strong> &mdash; Concept, Types &amp; What Each Does</span></div><div class="toc-page">Page 6</div></li>
+    <li class="toc-item"><div class="toc-item-left"><div class="toc-dot red"></div><span><strong>5. Branching</strong> &mdash; Strategy, Diagrams &amp; Detailed Explanation</span></div><div class="toc-page">Page 7</div></li>
+    <li class="toc-item"><div class="toc-item-left"><div class="toc-dot teal"></div><span><strong>6. Merging &amp; Rebasing</strong> &mdash; Strategies with Diagrams</span></div><div class="toc-page">Page 8</div></li>
+    <li class="toc-item"><div class="toc-item-left"><div class="toc-dot pink"></div><span><strong>7. Remote Operations</strong> &mdash; Push, Pull, Fetch &amp; Conflicts</span></div><div class="toc-page">Page 9</div></li>
+    <li class="toc-item"><div class="toc-item-left"><div class="toc-dot" style="background:#b45309;"></div><span><strong>8. Advanced Topics &amp; AI Engineer Extras</strong></span></div><div class="toc-page">Page 10 &amp; 11</div></li>
+  </ul>
+  <div style="margin-top:20px;">
+    <div class="def-box">
+      <div class="def-label">About These Notes</div>
+      <p>These notes are structured for someone progressing from <strong>Beginner to Junior AI Engineer</strong> level. Topics are covered with precise theory, clear definitions, and visual SVG diagrams. <strong>Section 3 is the only section that includes commands.</strong> All other sections are pure theory to build strong conceptual foundations before touching a terminal.</p>
+    </div>
+  </div>
+  <div style="margin-top:16px;" class="card-grid cols3">
+    <div class="card" style="background:#eff6ff;border:1px solid #bfdbfe;text-align:center;padding:14px 10px;">
+      <div style="font-size:24px;margin-bottom:6px;">&#128196;</div>
+      <div style="font-size:11px;font-weight:700;color:#1d4ed8;">16 Pages</div>
+      <div style="font-size:11px;color:#475569;">Structured content</div>
+    </div>
+    <div class="card" style="background:#f0fdf4;border:1px solid #bbf7d0;text-align:center;padding:14px 10px;">
+      <div style="font-size:24px;margin-bottom:6px;">&#128202;</div>
+      <div style="font-size:11px;font-weight:700;color:#065f46;">15+ Diagrams</div>
+      <div style="font-size:11px;color:#475569;">Visual explanations</div>
+    </div>
+    <div class="card" style="background:#fdf4ff;border:1px solid #e9d5ff;text-align:center;padding:14px 10px;">
+      <div style="font-size:24px;margin-bottom:6px;">&#127919;</div>
+      <div style="font-size:11px;font-weight:700;color:#6d28d9;">AI-Focused</div>
+      <div style="font-size:11px;color:#475569;">Engineer perspective</div>
+    </div>
+  </div>
+</div>
+
+<!-- PAGE 3: VERSION CONTROL -->
+<div class="page">
+  <div class="page-header">
+    <div class="page-header-left">
+      <div class="section-num">1</div>
+      <div>
+        <div style="font-weight:700;font-size:16px;">Version Control</div>
+        <div class="breadcrumb">DEFINITION &middot; WHY WE NEED IT &middot; TYPES</div>
+      </div>
+    </div>
+    <div class="page-num">Page 3</div>
+  </div>
+
+  <div class="def-box">
+    <div class="def-label">Definition</div>
+    <p><strong>Version Control</strong> (also known as <strong>Source Control</strong> or <strong>Revision Control</strong>) is a system that records changes to one or more files over time so that you can recall specific versions later. It maintains a complete, timestamped history of every modification, enabling teams to collaborate without overwriting each other's work, revert to any prior state, and understand exactly what changed, when, and by whom.</p>
+  </div>
+
+  <h2>Why Do We Need Version Control?</h2>
+  <div class="card-grid cols2">
+    <div class="card accent-top">
+      <h4>&#128260; History &amp; Rollback</h4>
+      <p>Every change is timestamped and attributed to an author. If a bug is introduced, you can rewind the entire project to any earlier working state &mdash; even weeks or months back &mdash; without losing other work. For AI engineers, this means reverting a bad model architecture change instantly.</p>
+    </div>
+    <div class="card accent-top purple">
+      <h4>&#129309; Team Collaboration</h4>
+      <p>Multiple developers can work on different features simultaneously. Changes from each person are tracked independently and merged together, preventing one person's work from silently overwriting another's. Essential in data science teams where multiple experiments run in parallel.</p>
+    </div>
+    <div class="card accent-top green">
+      <h4>&#128300; Experimentation Safety</h4>
+      <p>Developers can create isolated environments (branches) to try new ideas, test model architectures, or refactor pipelines &mdash; without risking the stability of the main codebase. If the experiment fails, it is simply discarded with zero consequence.</p>
+    </div>
+    <div class="card accent-top orange">
+      <h4>&#128203; Accountability &amp; Audit</h4>
+      <p>Every commit contains metadata &mdash; who made the change, when, and why (through the commit message). This creates an auditable trail critical for regulated industries and open-source projects. In AI, it lets you trace which code change caused a model accuracy drop.</p>
+    </div>
+  </div>
+
+  <h2>Types of Version Control Systems</h2>
+
+  <div class="diagram-wrap">
+    <div class="diagram-title">Evolution of Version Control Systems</div>
+    <svg viewBox="0 0 560 135" xmlns="http://www.w3.org/2000/svg" font-family="Inter,sans-serif">
+      <rect x="10" y="15" width="160" height="105" rx="10" fill="#eff6ff" stroke="#93c5fd" stroke-width="1.5"/>
+      <text x="90" y="36" text-anchor="middle" font-size="12" font-weight="700" fill="#1d4ed8">Local VCS</text>
+      <rect x="28" y="46" width="124" height="16" rx="4" fill="#bfdbfe"/>
+      <text x="90" y="58" text-anchor="middle" font-size="9.5" fill="#1e40af">version 3 (current)</text>
+      <rect x="28" y="66" width="124" height="14" rx="4" fill="#dbeafe"/>
+      <text x="90" y="76.5" text-anchor="middle" font-size="9" fill="#3b82f6">version 2</text>
+      <rect x="28" y="84" width="124" height="14" rx="4" fill="#eff6ff"/>
+      <text x="90" y="94.5" text-anchor="middle" font-size="9" fill="#60a5fa">version 1</text>
+      <text x="90" y="113" text-anchor="middle" font-size="9" fill="#64748b">Single computer only</text>
+      <text x="90" y="126" text-anchor="middle" font-size="8.5" fill="#94a3b8">Example: RCS</text>
+      <text x="183" y="72" font-size="18" fill="#94a3b8">&#8594;</text>
+      <rect x="200" y="15" width="160" height="105" rx="10" fill="#f5f3ff" stroke="#c4b5fd" stroke-width="1.5"/>
+      <text x="280" y="36" text-anchor="middle" font-size="12" font-weight="700" fill="#6d28d9">Centralised VCS</text>
+      <rect x="228" y="46" width="104" height="20" rx="5" fill="#8b5cf6"/>
+      <text x="280" y="60.5" text-anchor="middle" font-size="10" fill="white" font-weight="600">Central Server</text>
+      <line x1="258" y1="68" x2="235" y2="86" stroke="#c4b5fd" stroke-width="1.5" stroke-dasharray="3,2"/>
+      <line x1="280" y1="68" x2="280" y2="86" stroke="#c4b5fd" stroke-width="1.5" stroke-dasharray="3,2"/>
+      <line x1="302" y1="68" x2="325" y2="86" stroke="#c4b5fd" stroke-width="1.5" stroke-dasharray="3,2"/>
+      <rect x="218" y="86" width="32" height="14" rx="3" fill="#ddd6fe"/><text x="234" y="96.5" text-anchor="middle" font-size="8" fill="#4c1d95">Dev1</text>
+      <rect x="264" y="86" width="32" height="14" rx="3" fill="#ddd6fe"/><text x="280" y="96.5" text-anchor="middle" font-size="8" fill="#4c1d95">Dev2</text>
+      <rect x="310" y="86" width="32" height="14" rx="3" fill="#ddd6fe"/><text x="326" y="96.5" text-anchor="middle" font-size="8" fill="#4c1d95">Dev3</text>
+      <text x="280" y="113" text-anchor="middle" font-size="9" fill="#64748b">Single point of failure</text>
+      <text x="280" y="126" text-anchor="middle" font-size="8.5" fill="#94a3b8">Example: SVN, CVS</text>
+      <text x="373" y="72" font-size="18" fill="#94a3b8">&#8594;</text>
+      <rect x="390" y="15" width="160" height="105" rx="10" fill="#ecfdf5" stroke="#6ee7b7" stroke-width="1.5"/>
+      <text x="470" y="36" text-anchor="middle" font-size="12" font-weight="700" fill="#065f46">Distributed VCS</text>
+      <rect x="422" y="46" width="96" height="18" rx="4" fill="#10b981"/>
+      <text x="470" y="58.5" text-anchor="middle" font-size="10" fill="white" font-weight="600">Remote Repo</text>
+      <line x1="448" y1="65" x2="428" y2="80" stroke="#6ee7b7" stroke-width="1.5"/>
+      <line x1="470" y1="65" x2="470" y2="80" stroke="#6ee7b7" stroke-width="1.5"/>
+      <line x1="492" y1="65" x2="512" y2="80" stroke="#6ee7b7" stroke-width="1.5"/>
+      <rect x="408" y="80" width="38" height="22" rx="3" fill="#d1fae5" stroke="#6ee7b7"/><text x="427" y="94" text-anchor="middle" font-size="8" fill="#065f46">Full Copy</text>
+      <rect x="451" y="80" width="38" height="22" rx="3" fill="#d1fae5" stroke="#6ee7b7"/><text x="470" y="94" text-anchor="middle" font-size="8" fill="#065f46">Full Copy</text>
+      <rect x="494" y="80" width="38" height="22" rx="3" fill="#d1fae5" stroke="#6ee7b7"/><text x="513" y="94" text-anchor="middle" font-size="8" fill="#065f46">Full Copy</text>
+      <text x="470" y="113" text-anchor="middle" font-size="9" fill="#64748b">Every dev has full history</text>
+      <text x="470" y="126" text-anchor="middle" font-size="8.5" fill="#94a3b8">Example: Git, Mercurial</text>
+    </svg>
+  </div>
+
+  <div class="card-grid cols3">
+    <div class="card accent-top">
+      <h4><span class="tag blue">Type 1</span> Local VCS</h4>
+      <p>Tracks file changes in a simple local database on a <strong>single machine only</strong>. The earliest form of version control. <strong>RCS (Revision Control System)</strong> is the classic example. No network required, but absolutely no team collaboration possible. If your hard drive fails, all history is lost.</p>
+    </div>
+    <div class="card accent-top purple">
+      <h4><span class="tag purple">Type 2</span> Centralised VCS</h4>
+      <p>A single server holds all versioned files; all clients check out from this central place. Examples: <strong>SVN (Subversion)</strong>, <strong>CVS</strong>, <strong>Perforce</strong>. Enables collaboration, but has a <strong>single point of failure</strong> &mdash; if the server goes down, nobody can commit or view history.</p>
+    </div>
+    <div class="card accent-top green">
+      <h4><span class="tag green">Type 3</span> Distributed VCS</h4>
+      <p>Every developer has a <strong>complete clone</strong> of the entire repository including its full history. Examples: <strong>Git</strong>, <strong>Mercurial</strong>. You can commit offline; any copy can serve as the authoritative server. This is the modern standard and what Git uses.</p>
+    </div>
+  </div>
+</div>
+
+<!-- PAGE 4: GIT & GITHUB -->
+<div class="page">
+  <div class="page-header">
+    <div class="page-header-left">
+      <div class="section-num purple">2</div>
+      <div>
+        <div style="font-weight:700;font-size:16px;">Git &amp; GitHub</div>
+        <div class="breadcrumb">DEFINITIONS &middot; REPOSITORIES &middot; DIFFERENCES</div>
+      </div>
+    </div>
+    <div class="page-num">Page 4</div>
+  </div>
+
+  <div class="card-grid cols2">
+    <div class="def-box" style="margin:0;">
+      <div class="def-label">What is Git?</div>
+      <p><strong>Git</strong> is a free, open-source <strong>Distributed Version Control System (DVCS)</strong> created by <strong>Linus Torvalds in April 2005</strong> originally to manage the Linux kernel source code. Git operates entirely on your local machine &mdash; it requires no internet connection to take snapshots, view history, branch, or commit. It stores data as a series of <em>snapshots</em> (not diffs), uses SHA-1 hashing for data integrity, and is designed for speed and support for non-linear distributed workflows.</p>
+    </div>
+    <div class="def-box purple" style="margin:0;">
+      <div class="def-label">What is GitHub?</div>
+      <p><strong>GitHub</strong> is a <strong>cloud-based web hosting platform</strong> for Git repositories, acquired by Microsoft in 2018. GitHub adds collaboration tooling on top of Git &mdash; Pull Requests, Issues, Projects, GitHub Actions (CI/CD), and code review features. GitHub is <em>not</em> Git; it is the most popular remote server for storing and sharing Git repositories over the internet. Other alternatives include GitLab, Bitbucket, and Azure DevOps.</p>
+    </div>
+  </div>
+
+  <div class="section-divider"></div>
+  <h2>Git vs. GitHub &mdash; Detailed Comparison</h2>
+  <table class="compare-table">
+    <thead><tr><th>Aspect</th><th>Git</th><th>GitHub</th></tr></thead>
+    <tbody>
+      <tr><td><strong>Nature</strong></td><td>Software / command-line tool</td><td>Web platform / service</td></tr>
+      <tr><td><strong>Location</strong></td><td>Runs locally on your machine</td><td>Runs on cloud servers (remote)</td></tr>
+      <tr><td><strong>Internet required?</strong></td><td>No &mdash; fully offline capable</td><td>Yes &mdash; requires internet access</td></tr>
+      <tr><td><strong>Primary purpose</strong></td><td>Tracking changes in source code</td><td>Collaboration, sharing, CI/CD, project management</td></tr>
+      <tr><td><strong>Interface</strong></td><td>Terminal / Command line (CLI)</td><td>Web browser, GitHub Desktop, GitHub CLI</td></tr>
+      <tr><td><strong>Created by</strong></td><td>Linus Torvalds (2005)</td><td>Tom Preston-Werner, Chris Wanstrath (2008)</td></tr>
+      <tr><td><strong>Alternatives</strong></td><td>Mercurial, SVN, CVS, Perforce</td><td>GitLab, Bitbucket, Azure DevOps, Gitea</td></tr>
+      <tr><td><strong>Cost</strong></td><td>Free and open-source always</td><td>Free tier + paid plans (Teams, Enterprise)</td></tr>
+    </tbody>
+  </table>
+
+  <div class="section-divider"></div>
+  <h2>What is a Repository?</h2>
+  <div class="def-box green">
+    <div class="def-label">Definition</div>
+    <p>A <strong>Repository</strong> (commonly called a "repo") is the <strong>core data structure of Git</strong> &mdash; a special directory that stores the complete history of all changes ever made to a project, along with metadata such as author information, timestamps, branch pointers, and tags. The repository lives inside a hidden <code>.git</code> folder at the root of your project directory. Everything Git knows about your project &mdash; every commit, every branch, every object &mdash; lives inside this single folder.</p>
+  </div>
+
+  <h2>Types of Repositories</h2>
+  <div class="card-grid cols2">
+    <div class="card accent-top">
+      <h4>&#128187; Local Repository</h4>
+      <p>A repository that resides on <strong>your own computer</strong> inside the <code>.git</code> directory. All Git operations &mdash; committing, branching, viewing history, staging &mdash; happen against the local repository. It is completely independent and works without any network connection. Each developer has their own private local repository for their working copy of the project.</p>
+    </div>
+    <div class="card accent-top purple">
+      <h4>&#9729;&#65039; Remote Repository</h4>
+      <p>A repository hosted on a <strong>server or cloud platform</strong> (like GitHub). It acts as the central authoritative source of truth that all team members synchronise with. You <code>push</code> your local commits to it and <code>pull</code> others' changes from it. A remote repository typically does not have a working directory &mdash; it stores only the bare Git data objects.</p>
+    </div>
+    <div class="card accent-top green">
+      <h4>&#128274; Private Repository</h4>
+      <p>A repository whose access is <strong>restricted to specific invited collaborators only</strong>. The code, commit history, and issues are invisible to the public. Used for proprietary software, client projects, internal tools, and AI model codebases where intellectual property must be protected. GitHub requires a paid plan for unlimited private collaborators in organisations.</p>
+    </div>
+    <div class="card accent-top orange">
+      <h4>&#127760; Public Repository</h4>
+      <p>A repository <strong>visible to anyone on the internet</strong>. Anyone can view the code, clone it, and (with the owner's permission) submit Pull Requests. Public repositories are the foundation of open-source software. Most popular AI/ML frameworks &mdash; TensorFlow, PyTorch, Hugging Face Transformers &mdash; are public repositories on GitHub.</p>
+    </div>
+    <div class="card accent-top teal">
+      <h4>&#127860; Forked Repository</h4>
+      <p>A <strong>personal copy of someone else's repository</strong> created on your own GitHub account. Forking creates an independent duplicate that you can freely modify without affecting the original project. When your changes are ready, you can propose them back to the original repository via a Pull Request. Essential for open-source contributions.</p>
+    </div>
+    <div class="card accent-top red">
+      <h4>&#128220; Bare Repository</h4>
+      <p>A repository that <strong>contains only the version history</strong> (the contents of the <code>.git</code> folder) with <em>no working directory</em> for editing files. Bare repositories are used exclusively as server-side or remote repositories &mdash; you cannot directly edit files in them; you can only push to and fetch from them. GitHub stores all repos as bare repositories on its servers.</p>
+    </div>
+  </div>
+</div>
+
+<!-- PAGE 5: GIT ARCHITECTURE -->
+<div class="page">
+  <div class="page-header">
+    <div class="page-header-left">
+      <div class="section-num green">3</div>
+      <div>
+        <div style="font-weight:700;font-size:16px;">Git Architecture &amp; Workflow</div>
+        <div class="breadcrumb">FOUR AREAS &middot; COMPONENTS &middot; PHASES &middot; COMMANDS</div>
+      </div>
+    </div>
+    <div class="page-num">Page 5</div>
+  </div>
+
+  <div class="diagram-wrap">
+    <div class="diagram-title">Complete Git Architecture &mdash; Four Areas, Their Components and Connections</div>
+    <svg viewBox="0 0 560 165" xmlns="http://www.w3.org/2000/svg" font-family="Inter,sans-serif">
+      <defs>
+        <marker id="a1" markerWidth="6" markerHeight="6" refX="3" refY="3" orient="auto"><path d="M0,0 L6,3 L0,6 Z" fill="#059669"/></marker>
+        <marker id="a2" markerWidth="6" markerHeight="6" refX="3" refY="3" orient="auto"><path d="M0,0 L6,3 L0,6 Z" fill="#7c3aed"/></marker>
+        <marker id="a3" markerWidth="6" markerHeight="6" refX="3" refY="3" orient="auto"><path d="M0,0 L6,3 L0,6 Z" fill="#dc2626"/></marker>
+      </defs>
+      <!-- Working Directory -->
+      <rect x="5" y="18" width="118" height="128" rx="10" fill="#eff6ff" stroke="#93c5fd" stroke-width="2"/>
+      <text x="64" y="38" text-anchor="middle" font-size="11" font-weight="700" fill="#1d4ed8">Working</text>
+      <text x="64" y="52" text-anchor="middle" font-size="11" font-weight="700" fill="#1d4ed8">Directory</text>
+      <rect x="16" y="60" width="96" height="14" rx="3" fill="#bfdbfe"/>
+      <text x="64" y="70.5" text-anchor="middle" font-size="9" fill="#1e40af">model.py (modified)</text>
+      <rect x="16" y="78" width="96" height="14" rx="3" fill="#bfdbfe"/>
+      <text x="64" y="88.5" text-anchor="middle" font-size="9" fill="#1e40af">train.py (new file)</text>
+      <rect x="16" y="96" width="96" height="14" rx="3" fill="#dbeafe"/>
+      <text x="64" y="106.5" text-anchor="middle" font-size="9" fill="#3b82f6">config.yaml (clean)</text>
+      <text x="64" y="128" text-anchor="middle" font-size="9" fill="#64748b" font-weight="600">Your actual files</text>
+      <text x="64" y="141" text-anchor="middle" font-size="8.5" fill="#94a3b8">on your hard drive</text>
+      <!-- git add arrow -->
+      <path d="M124 85 L162 85" stroke="#059669" stroke-width="2" marker-end="url(#a1)"/>
+      <text x="143" y="78" text-anchor="middle" font-size="8.5" fill="#059669" font-weight="700">git add</text>
+      <!-- Staging Area -->
+      <rect x="164" y="18" width="118" height="128" rx="10" fill="#f5f3ff" stroke="#c4b5fd" stroke-width="2"/>
+      <text x="223" y="38" text-anchor="middle" font-size="11" font-weight="700" fill="#6d28d9">Staging Area</text>
+      <text x="223" y="52" text-anchor="middle" font-size="11" font-weight="700" fill="#6d28d9">(Index)</text>
+      <rect x="175" y="60" width="96" height="14" rx="3" fill="#c4b5fd"/>
+      <text x="223" y="70.5" text-anchor="middle" font-size="9" fill="#4c1d95">model.py &#10003;</text>
+      <rect x="175" y="78" width="96" height="14" rx="3" fill="#c4b5fd"/>
+      <text x="223" y="88.5" text-anchor="middle" font-size="9" fill="#4c1d95">train.py &#10003;</text>
+      <rect x="175" y="96" width="96" height="14" rx="3" fill="#ede9fe"/>
+      <text x="223" y="106.5" text-anchor="middle" font-size="9" fill="#7c3aed">Ready to commit</text>
+      <text x="223" y="128" text-anchor="middle" font-size="9" fill="#64748b" font-weight="600">Snapshot preview</text>
+      <text x="223" y="141" text-anchor="middle" font-size="8.5" fill="#94a3b8">Next commit draft</text>
+      <!-- git commit arrow -->
+      <path d="M283 85 L322 85" stroke="#059669" stroke-width="2" marker-end="url(#a1)"/>
+      <text x="302" y="78" text-anchor="middle" font-size="8.5" fill="#059669" font-weight="700">git commit</text>
+      <!-- Local Repo -->
+      <rect x="324" y="18" width="118" height="128" rx="10" fill="#ecfdf5" stroke="#6ee7b7" stroke-width="2"/>
+      <text x="383" y="38" text-anchor="middle" font-size="11" font-weight="700" fill="#065f46">Local</text>
+      <text x="383" y="52" text-anchor="middle" font-size="11" font-weight="700" fill="#065f46">Repository</text>
+      <rect x="335" y="60" width="96" height="14" rx="3" fill="#10b981"/>
+      <text x="383" y="70.5" text-anchor="middle" font-size="9" fill="white" font-weight="600">commit abc123</text>
+      <rect x="335" y="78" width="96" height="14" rx="3" fill="#34d399"/>
+      <text x="383" y="88.5" text-anchor="middle" font-size="9" fill="white">commit def456</text>
+      <rect x="335" y="96" width="96" height="14" rx="3" fill="#6ee7b7"/>
+      <text x="383" y="106.5" text-anchor="middle" font-size="9" fill="#065f46">commit ghi789</text>
+      <text x="383" y="128" text-anchor="middle" font-size="9" fill="#64748b" font-weight="600">.git folder</text>
+      <text x="383" y="141" text-anchor="middle" font-size="8.5" fill="#94a3b8">Full object database</text>
+      <!-- git push arrow -->
+      <path d="M443 78 L477 78" stroke="#dc2626" stroke-width="2" marker-end="url(#a3)"/>
+      <text x="460" y="71" text-anchor="middle" font-size="8.5" fill="#dc2626" font-weight="700">git push</text>
+      <!-- git pull arrow back -->
+      <path d="M477 98 L443 98" stroke="#7c3aed" stroke-width="2" marker-end="url(#a2)"/>
+      <text x="460" y="112" text-anchor="middle" font-size="8.5" fill="#7c3aed" font-weight="700">git pull</text>
+      <!-- Remote Repo -->
+      <rect x="479" y="18" width="78" height="128" rx="10" fill="#fff7ed" stroke="#fdba74" stroke-width="2"/>
+      <text x="518" y="38" text-anchor="middle" font-size="10" font-weight="700" fill="#92400e">Remote</text>
+      <text x="518" y="52" text-anchor="middle" font-size="10" font-weight="700" fill="#92400e">Repo</text>
+      <text x="518" y="66" text-anchor="middle" font-size="9" fill="#b45309">(GitHub)</text>
+      <rect x="488" y="76" width="60" height="13" rx="3" fill="#f97316"/>
+      <text x="518" y="86" text-anchor="middle" font-size="9" fill="white">abc123</text>
+      <rect x="488" y="93" width="60" height="13" rx="3" fill="#fb923c"/>
+      <text x="518" y="103" text-anchor="middle" font-size="9" fill="white">def456</text>
+      <rect x="488" y="110" width="60" height="13" rx="3" fill="#fed7aa"/>
+      <text x="518" y="120" text-anchor="middle" font-size="9" fill="#92400e">ghi789</text>
+      <text x="518" y="138" text-anchor="middle" font-size="8.5" fill="#94a3b8">Cloud-hosted</text>
+      <text x="518" y="141" text-anchor="middle" font-size="8" fill="#94a3b8">bare repo</text>
+    </svg>
+  </div>
+
+  <div class="card-grid cols2">
+    <div class="card accent-top">
+      <h4><span class="tag blue">Area 1</span> Working Directory</h4>
+      <p>Your <strong>actual project folder</strong> on disk &mdash; the files you see and edit in your code editor. Git classifies these as <em>tracked</em> (files Git knows from a prior commit) or <em>untracked</em> (new files Git has never seen). Modified tracked files appear as "modified"; new files appear as "untracked" in <code>git status</code>.</p>
+    </div>
+    <div class="card accent-top purple">
+      <h4><span class="tag purple">Area 2</span> Staging Area (Index)</h4>
+      <p>A <strong>preparation zone</strong> &mdash; a temporary holding area between your working directory and repository. When you run <code>git add</code>, Git takes a snapshot of that file and places it here. You can stage some files and leave others unstaged, giving fine-grained control over what each commit contains.</p>
+    </div>
+    <div class="card accent-top green">
+      <h4><span class="tag green">Area 3</span> Local Repository (.git)</h4>
+      <p>The <strong>hidden <code>.git</code> folder</strong> that stores the complete object database &mdash; all commits, branches, tags, and configuration. When you <code>git commit</code>, Git permanently records the staged snapshot here using SHA-1 hashed objects (blobs for file content, trees for directory structure, commit objects).</p>
+    </div>
+    <div class="card accent-top orange">
+      <h4><span class="tag orange">Area 4</span> Remote Repository (GitHub)</h4>
+      <p>A version of your repository hosted on a <strong>server</strong>. When you <code>git push</code>, your local commits are uploaded to the remote. When you <code>git pull</code>, remote changes are downloaded and merged locally. The remote is the <strong>shared source of truth</strong> for the entire team.</p>
+    </div>
+  </div>
+
+  <h2>Key Commands (Section 3 &mdash; Commands Appear Here Only)</h2>
+  <div class="code-block">
+<span class="comment"># ── INITIALISE / CLONE ─────────────────────────────────────────────────</span>
+<span class="cmd">git init</span>                           <span class="comment"># Create a new local repository in current directory</span>
+<span class="cmd">git clone</span> <span class="str">&lt;URL&gt;</span>                     <span class="comment"># Download a full copy of a remote repository</span>
+
+<span class="comment"># ── INSPECT CURRENT STATE ──────────────────────────────────────────────</span>
+<span class="cmd">git status</span>                          <span class="comment"># Show modified, staged, and untracked files</span>
+<span class="cmd">git diff</span>                            <span class="comment"># Show unstaged changes vs last commit</span>
+<span class="cmd">git log</span> <span class="flag">--oneline --graph --all</span>     <span class="comment"># Visual branch/commit history</span>
+
+<span class="comment"># ── STAGE &amp; COMMIT ─────────────────────────────────────────────────────</span>
+<span class="cmd">git add</span> <span class="str">filename.py</span>                <span class="comment"># Stage a specific file</span>
+<span class="cmd">git add</span> <span class="flag">.</span>                           <span class="comment"># Stage ALL changes in current directory</span>
+<span class="cmd">git commit</span> <span class="flag">-m</span> <span class="str">"feat: add LSTM model"</span> <span class="comment"># Commit staged changes with a message</span>
+<span class="cmd">git commit</span> <span class="flag">--amend</span>                 <span class="comment"># Modify the most recent commit (message or files)</span>
+
+<span class="comment"># ── BRANCHING ──────────────────────────────────────────────────────────</span>
+<span class="cmd">git branch</span> <span class="str">feature-attention</span>       <span class="comment"># Create a new branch</span>
+<span class="cmd">git checkout</span> <span class="str">feature-attention</span>      <span class="comment"># Switch to a branch</span>
+<span class="cmd">git checkout</span> <span class="flag">-b</span> <span class="str">feature-attention</span>   <span class="comment"># Create AND switch in one command</span>
+<span class="cmd">git branch</span> <span class="flag">-d</span> <span class="str">feature-attention</span>    <span class="comment"># Delete a merged branch</span>
+
+<span class="comment"># ── MERGING &amp; REMOTE SYNC ──────────────────────────────────────────────</span>
+<span class="cmd">git merge</span> <span class="str">feature-attention</span>        <span class="comment"># Merge a branch into current branch</span>
+<span class="cmd">git rebase</span> <span class="str">main</span>                    <span class="comment"># Rebase current branch onto main</span>
+<span class="cmd">git push</span> origin main               <span class="comment"># Upload local commits to remote</span>
+<span class="cmd">git pull</span> origin main               <span class="comment"># Fetch + merge remote changes</span>
+<span class="cmd">git fetch</span> origin                   <span class="comment"># Download remote changes without merging</span>
+<span class="cmd">git stash</span>                          <span class="comment"># Temporarily shelve uncommitted changes</span>
+<span class="cmd">git stash pop</span>                      <span class="comment"># Re-apply most recently stashed changes</span>
+  </div>
+</div>
+
+<!-- PAGE 6: COMMITS -->
+<div class="page">
+  <div class="page-header">
+    <div class="page-header-left">
+      <div class="section-num orange">4</div>
+      <div>
+        <div style="font-weight:700;font-size:16px;">Commits</div>
+        <div class="breadcrumb">CONCEPT &middot; ANATOMY &middot; CHAIN &middot; TYPES &amp; WHAT EACH DOES</div>
+      </div>
+    </div>
+    <div class="page-num">Page 6</div>
+  </div>
+
+  <div class="def-box orange">
+    <div class="def-label">What is a Commit?</div>
+    <p>A <strong>commit</strong> is a <strong>permanent, immutable snapshot of your staged changes</strong> stored in the Git repository. It is the fundamental unit of history in Git. Each commit is uniquely identified by a <strong>SHA-1 hash</strong> (a 40-character hexadecimal string) and captures the <em>complete state of all tracked files</em> at that exact moment &mdash; not just the diff. Once created, a commit object can never be changed; it can only be referenced or built upon. This immutability guarantees the integrity of your project history.</p>
+  </div>
+
+  <div class="card-grid cols2">
+    <div class="diagram-wrap" style="margin:0;">
+      <div class="diagram-title">Inside a Git Commit Object</div>
+      <svg viewBox="0 0 270 115" xmlns="http://www.w3.org/2000/svg" font-family="monospace">
+        <rect x="5" y="5" width="260" height="105" rx="8" fill="#1e293b"/>
+        <text x="15" y="24" font-size="10" fill="#60a5fa" font-weight="700">commit  a3f2c1d9e8b7f4...</text>
+        <line x1="15" y1="30" x2="255" y2="30" stroke="#334155" stroke-width="1"/>
+        <text x="15" y="45" font-size="9" fill="#94a3b8">Tree:  </text><text x="60" y="45" font-size="9" fill="#a78bfa">f1e2d3c4... (snapshot of files)</text>
+        <text x="15" y="59" font-size="9" fill="#94a3b8">Parent: </text><text x="60" y="59" font-size="9" fill="#f59e0b">b9c1f3a2... (previous commit)</text>
+        <text x="15" y="73" font-size="9" fill="#94a3b8">Author: </text><text x="60" y="73" font-size="9" fill="#34d399">Riya Sharma &lt;riya@ai.com&gt;</text>
+        <text x="15" y="87" font-size="9" fill="#94a3b8">Date:   </text><text x="60" y="87" font-size="9" fill="#34d399">Wed Jun 24 10:42:00 2026</text>
+        <text x="15" y="101" font-size="9" fill="#94a3b8">Msg:    </text><text x="60" y="101" font-size="9" fill="#fca5a5">feat: add LSTM training loop</text>
+      </svg>
+    </div>
+    <div class="diagram-wrap" style="margin:0;">
+      <div class="diagram-title">Commits Form a Linked Chain</div>
+      <svg viewBox="0 0 270 115" xmlns="http://www.w3.org/2000/svg" font-family="Inter,sans-serif">
+        <defs><marker id="ca" markerWidth="5" markerHeight="5" refX="2.5" refY="2.5" orient="auto"><path d="M0,0 L5,2.5 L0,5 Z" fill="#475569"/></marker></defs>
+        <rect x="8" y="20" width="72" height="42" rx="7" fill="#1e293b" stroke="#3b82f6" stroke-width="1.5"/>
+        <text x="44" y="37" text-anchor="middle" font-size="9" fill="#60a5fa" font-weight="600">C1: a3f2c1</text>
+        <text x="44" y="50" text-anchor="middle" font-size="8" fill="#64748b">init project</text>
+        <text x="44" y="62" text-anchor="middle" font-size="7.5" fill="#475569">parent: none</text>
+        <path d="M118 41 L83 41" stroke="#475569" stroke-width="1.5" marker-end="url(#ca)"/>
+        <rect x="120" y="20" width="72" height="42" rx="7" fill="#1e293b" stroke="#8b5cf6" stroke-width="1.5"/>
+        <text x="156" y="37" text-anchor="middle" font-size="9" fill="#a78bfa" font-weight="600">C2: b9c1f3</text>
+        <text x="156" y="50" text-anchor="middle" font-size="8" fill="#64748b">add dataset</text>
+        <text x="156" y="62" text-anchor="middle" font-size="7.5" fill="#475569">parent: a3f2c1</text>
+        <path d="M230 41 L195 41" stroke="#475569" stroke-width="1.5" marker-end="url(#ca)"/>
+        <rect x="195" y="20" width="72" height="42" rx="7" fill="#1e293b" stroke="#10b981" stroke-width="1.5"/>
+        <text x="231" y="37" text-anchor="middle" font-size="9" fill="#34d399" font-weight="600">C3: c7d4e8</text>
+        <text x="231" y="50" text-anchor="middle" font-size="8" fill="#64748b">train model</text>
+        <text x="231" y="62" text-anchor="middle" font-size="7.5" fill="#475569">parent: b9c1f3</text>
+        <rect x="185" y="74" width="80" height="18" rx="4" fill="#dc2626"/>
+        <text x="225" y="86" text-anchor="middle" font-size="9" fill="white" font-weight="700">HEAD &#8594; main</text>
+        <text x="135" y="105" text-anchor="middle" font-size="8.5" fill="#64748b">Each commit points back to its parent</text>
+      </svg>
+    </div>
+  </div>
+
+  <h2>Commit Types &mdash; Conventional Commits Standard</h2>
+  <p>The <strong>Conventional Commits</strong> specification is an industry-wide standard for writing structured commit messages. It enables automatic changelog generation, semantic versioning, and greatly improved readability across teams. Format: <code>&lt;type&gt;(optional scope): &lt;short description&gt;</code></p>
+
+  <div class="commit-card">
+    <span class="commit-tag" style="background:#dbeafe;color:#1d4ed8;">feat</span>
+    <div class="commit-info"><h4>Feature Commit</h4><p>Introduces a <strong>new feature or capability</strong> to the codebase. The most common type in active development. Example: <code>feat: add BERT fine-tuning pipeline</code>. Triggers a <strong>MINOR</strong> semantic version bump (1.0.0 &rarr; 1.1.0). In AI projects, this could mean adding a new model architecture or training strategy.</p></div>
+  </div>
+  <div class="commit-card">
+    <span class="commit-tag" style="background:#fee2e2;color:#991b1b;">fix</span>
+    <div class="commit-info"><h4>Bug Fix Commit</h4><p>Patches a <strong>bug or defect</strong> in the existing code. Example: <code>fix: resolve NaN loss during training</code>. Triggers a <strong>PATCH</strong> version bump (1.0.0 &rarr; 1.0.1). Directly corresponds to something a user noticed as broken that is now repaired.</p></div>
+  </div>
+  <div class="commit-card">
+    <span class="commit-tag" style="background:#d1fae5;color:#065f46;">docs</span>
+    <div class="commit-info"><h4>Documentation Commit</h4><p>Changes that affect <strong>only documentation</strong> &mdash; README files, docstrings, API references, wikis. Example: <code>docs: update model training instructions</code>. Does not change any source code logic. Does not trigger a version bump.</p></div>
+  </div>
+  <div class="commit-card">
+    <span class="commit-tag" style="background:#fef3c7;color:#92400e;">refactor</span>
+    <div class="commit-info"><h4>Refactor Commit</h4><p>A change that <strong>neither fixes a bug nor adds a feature</strong> &mdash; improves code structure, readability, or performance without altering external behaviour. Example: <code>refactor: extract model layers into separate module</code>. Very common in AI code cleanup.</p></div>
+  </div>
+  <div class="commit-card">
+    <span class="commit-tag" style="background:#ecfdf5;color:#065f46;border:1px solid #6ee7b7;">test</span>
+    <div class="commit-info"><h4>Test Commit</h4><p>Adding or correcting <strong>automated tests</strong> without modifying production code. Example: <code>test: add unit tests for data preprocessing pipeline</code>. Critical in AI pipelines to verify that data transformations, feature engineering steps, and model evaluations produce correct outputs.</p></div>
+  </div>
+  <div class="commit-card">
+    <span class="commit-tag" style="background:#fdf4ff;color:#6d28d9;border:1px solid #e9d5ff;">chore</span>
+    <div class="commit-info"><h4>Chore Commit</h4><p>Maintenance tasks that <strong>don't modify source or test files</strong> &mdash; updating build scripts, package dependencies, CI configuration. Example: <code>chore: upgrade torch from 2.2.0 to 2.3.0</code>. The most common type when updating ML library versions in AI projects.</p></div>
+  </div>
+  <div class="commit-card">
+    <span class="commit-tag" style="background:#fff7ed;color:#c2410c;border:1px solid #fed7aa;">feat!</span>
+    <div class="commit-info"><h4>Breaking Change Commit</h4><p>Introduces an <strong>incompatible API or behaviour change</strong>. Indicated by appending <code>!</code> after the type or adding <code>BREAKING CHANGE:</code> in the commit footer. Example: <code>feat!: redesign model configuration schema</code>. Triggers a <strong>MAJOR</strong> version bump (1.0.0 &rarr; 2.0.0).</p></div>
+  </div>
+</div>
+
+<!-- PAGE 7: BRANCHING -->
+<div class="page">
+  <div class="page-header">
+    <div class="page-header-left">
+      <div class="section-num red">5</div>
+      <div>
+        <div style="font-weight:700;font-size:16px;">Branching</div>
+        <div class="breadcrumb">CONCEPT &middot; HEAD POINTER &middot; STRATEGY &middot; DIAGRAMS</div>
+      </div>
+    </div>
+    <div class="page-num">Page 7</div>
+  </div>
+
+  <div class="def-box" style="border-left-color:#dc2626;background:linear-gradient(135deg,#fff1f2,#fef2f2);">
+    <div class="def-label" style="color:#dc2626;">What is a Branch?</div>
+    <p>A <strong>branch</strong> in Git is a <strong>lightweight, movable pointer to a specific commit</strong>. Internally it is nothing more than a 41-byte file containing a SHA-1 hash. When you create a branch, Git creates this tiny pointer &mdash; it does <em>not</em> copy any files or commit objects. This makes branch creation in Git nearly instantaneous and storage-free, regardless of project size. A branch represents an <strong>independent line of development</strong>, allowing you to work on a feature, bug fix, or ML experiment in complete isolation without disturbing the stable codebase.</p>
+  </div>
+
+  <div class="def-box orange" style="margin-top:8px;">
+    <div class="def-label">The HEAD Pointer</div>
+    <p><strong>HEAD</strong> is Git's special pointer that always answers the question: <em>"Where am I right now?"</em> HEAD points to the currently checked-out branch (which in turn points to the latest commit on that branch). When you switch branches with <code>git checkout</code>, HEAD moves to point to the new branch. In a <em>detached HEAD</em> state, HEAD points directly to a commit rather than a branch &mdash; this happens when you check out a specific commit hash or tag.</p>
+  </div>
+
+  <div class="diagram-wrap">
+    <div class="diagram-title">Diagram 1 &mdash; Creating a New Branch: a New Pointer is Born from the Same Commit</div>
+    <svg viewBox="0 0 540 115" xmlns="http://www.w3.org/2000/svg" font-family="Inter,sans-serif">
+      <defs>
+        <marker id="b1" markerWidth="5" markerHeight="5" refX="2.5" refY="2.5" orient="auto"><path d="M0,0 L5,2.5 L0,5 Z" fill="#475569"/></marker>
+        <marker id="b2" markerWidth="5" markerHeight="5" refX="2.5" refY="2.5" orient="auto"><path d="M0,0 L5,2.5 L0,5 Z" fill="#dc2626"/></marker>
+      </defs>
+      <!-- Main commits -->
+      <circle cx="55" cy="58" r="18" fill="#3b82f6" stroke="#1d4ed8" stroke-width="2"/>
+      <text x="55" y="62" text-anchor="middle" font-size="10" fill="white" font-weight="700">C1</text>
+      <line x1="73" y1="58" x2="97" y2="58" stroke="#3b82f6" stroke-width="2.5"/>
+      <circle cx="115" cy="58" r="18" fill="#3b82f6" stroke="#1d4ed8" stroke-width="2"/>
+      <text x="115" y="62" text-anchor="middle" font-size="10" fill="white" font-weight="700">C2</text>
+      <line x1="133" y1="58" x2="157" y2="58" stroke="#3b82f6" stroke-width="2.5"/>
+      <circle cx="175" cy="58" r="18" fill="#3b82f6" stroke="#1d4ed8" stroke-width="2"/>
+      <text x="175" y="62" text-anchor="middle" font-size="10" fill="white" font-weight="700">C3</text>
+      <!-- Branch label -->
+      <rect x="155" y="10" width="108" height="16" rx="4" fill="#1d4ed8"/>
+      <text x="209" y="21.5" text-anchor="middle" font-size="9" fill="white" font-weight="600">git branch feature-x  (here)</text>
+      <line x1="175" y1="27" x2="175" y2="39" stroke="#64748b" stroke-width="1.5" stroke-dasharray="3,2"/>
+      <!-- feature-x diverges -->
+      <path d="M175 76 C185 90 220 95 235 95" stroke="#dc2626" stroke-width="2.5" fill="none"/>
+      <circle cx="252" cy="95" r="16" fill="#dc2626" stroke="#991b1b" stroke-width="2"/>
+      <text x="252" y="99" text-anchor="middle" font-size="9" fill="white" font-weight="700">F1</text>
+      <line x1="269" y1="95" x2="290" y2="95" stroke="#dc2626" stroke-width="2.5"/>
+      <circle cx="308" cy="95" r="16" fill="#dc2626" stroke="#991b1b" stroke-width="2"/>
+      <text x="308" y="99" text-anchor="middle" font-size="9" fill="white" font-weight="700">F2</text>
+      <text x="280" y="112" text-anchor="middle" font-size="9" fill="#dc2626" font-weight="600">feature-x branch (independent work)</text>
+      <!-- main continues -->
+      <line x1="193" y1="58" x2="217" y2="58" stroke="#3b82f6" stroke-width="2.5"/>
+      <circle cx="235" cy="58" r="18" fill="#3b82f6" stroke="#1d4ed8" stroke-width="2"/>
+      <text x="235" y="62" text-anchor="middle" font-size="9" fill="white" font-weight="700">C4</text>
+      <text x="235" y="80" text-anchor="middle" font-size="9" fill="#1d4ed8" font-weight="600">main</text>
+      <!-- HEAD -->
+      <rect x="400" y="42" width="62" height="18" rx="4" fill="#dc2626"/>
+      <text x="431" y="54" text-anchor="middle" font-size="9" fill="white" font-weight="700">HEAD</text>
+      <path d="M400 51 L328 95" stroke="#dc2626" stroke-width="1.5" stroke-dasharray="3,2" marker-end="url(#b2)"/>
+      <text x="468" y="54" font-size="9" fill="#64748b">&#8594; points to current branch</text>
+      <text x="10" y="58" text-anchor="middle" font-size="9" fill="#3b82f6" font-weight="700">main</text>
+    </svg>
+  </div>
+
+  <div class="diagram-wrap" style="margin-top:8px;">
+    <div class="diagram-title">Diagram 2 &mdash; Multiple Feature Branches Running in Parallel (Real-World AI Team)</div>
+    <svg viewBox="0 0 540 155" xmlns="http://www.w3.org/2000/svg" font-family="Inter,sans-serif">
+      <defs><marker id="b3" markerWidth="5" markerHeight="5" refX="2.5" refY="2.5" orient="auto"><path d="M0,0 L5,2.5 L0,5 Z" fill="#475569"/></marker></defs>
+      <!-- main -->
+      <circle cx="48" cy="78" r="14" fill="#1e293b" stroke="#3b82f6" stroke-width="2"/>
+      <text x="48" y="82" text-anchor="middle" font-size="9" fill="white">C1</text>
+      <line x1="62" y1="78" x2="93" y2="78" stroke="#94a3b8" stroke-width="1.5"/>
+      <circle cx="107" cy="78" r="14" fill="#1e293b" stroke="#3b82f6" stroke-width="2"/>
+      <text x="107" y="82" text-anchor="middle" font-size="9" fill="white">C2</text>
+      <text x="48" y="100" text-anchor="middle" font-size="9" fill="#3b82f6" font-weight="700">main</text>
+      <!-- feature-a: data preprocessing (top) -->
+      <path d="M107 63 C120 35 155 28 168 28" stroke="#10b981" stroke-width="2" fill="none"/>
+      <circle cx="182" cy="28" r="13" fill="#10b981"/><text x="182" y="32" text-anchor="middle" font-size="9" fill="white">A1</text>
+      <line x1="196" y1="28" x2="216" y2="28" stroke="#10b981" stroke-width="2"/>
+      <circle cx="229" cy="28" r="13" fill="#10b981"/><text x="229" y="32" text-anchor="middle" font-size="9" fill="white">A2</text>
+      <line x1="243" y1="28" x2="263" y2="28" stroke="#10b981" stroke-width="2"/>
+      <circle cx="277" cy="28" r="13" fill="#10b981"/><text x="277" y="32" text-anchor="middle" font-size="9" fill="white">A3</text>
+      <text x="229" y="14" text-anchor="middle" font-size="9" fill="#10b981" font-weight="700">feature/data-preprocessing</text>
+      <!-- feature-b: model architecture (middle) -->
+      <line x1="121" y1="78" x2="169" y2="78" stroke="#8b5cf6" stroke-width="2"/>
+      <circle cx="183" cy="78" r="13" fill="#8b5cf6"/><text x="183" y="82" text-anchor="middle" font-size="9" fill="white">B1</text>
+      <line x1="197" y1="78" x2="217" y2="78" stroke="#8b5cf6" stroke-width="2"/>
+      <circle cx="230" cy="78" r="13" fill="#8b5cf6"/><text x="230" y="82" text-anchor="middle" font-size="9" fill="white">B2</text>
+      <line x1="244" y1="78" x2="264" y2="78" stroke="#8b5cf6" stroke-width="2"/>
+      <circle cx="278" cy="78" r="13" fill="#8b5cf6"/><text x="278" y="82" text-anchor="middle" font-size="9" fill="white">B3</text>
+      <text x="230" y="100" text-anchor="middle" font-size="9" fill="#8b5cf6" font-weight="700">feature/model-architecture</text>
+      <!-- hotfix: urgent patch (bottom) -->
+      <path d="M107 92 C120 118 152 124 166 124" stroke="#f59e0b" stroke-width="2" fill="none"/>
+      <circle cx="180" cy="124" r="13" fill="#f59e0b"/><text x="180" y="128" text-anchor="middle" font-size="9" fill="white">H1</text>
+      <line x1="194" y1="124" x2="214" y2="124" stroke="#f59e0b" stroke-width="2"/>
+      <circle cx="228" cy="124" r="13" fill="#f59e0b"/><text x="228" y="128" text-anchor="middle" font-size="9" fill="white">H2</text>
+      <text x="204" y="145" text-anchor="middle" font-size="9" fill="#f59e0b" font-weight="700">hotfix/critical-inference-bug</text>
+      <!-- Legend -->
+      <text x="380" y="32" font-size="9.5" fill="#10b981">&#9679; feature/data-preprocessing</text>
+      <text x="380" y="50" font-size="9" fill="#64748b">  Engineer A: cleaning dataset</text>
+      <text x="380" y="70" font-size="9.5" fill="#8b5cf6">&#9679; feature/model-architecture</text>
+      <text x="380" y="88" font-size="9" fill="#64748b">  Engineer B: new transformer</text>
+      <text x="380" y="108" font-size="9.5" fill="#f59e0b">&#9679; hotfix/critical-inference-bug</text>
+      <text x="380" y="126" font-size="9" fill="#64748b">  Engineer C: prod fix</text>
+      <text x="380" y="148" font-size="8.5" fill="#94a3b8">All start from same C2 commit</text>
+    </svg>
+  </div>
+
+  <h2>Git Flow &mdash; The Standard Branching Strategy</h2>
+  <div class="card-grid cols2">
+    <div>
+      <div class="commit-card">
+        <span class="commit-tag" style="background:#1e293b;color:#60a5fa;border:1px solid #3b82f6;">main</span>
+        <div class="commit-info"><h4>Main / Master Branch</h4><p><strong>Production-ready, stable code only.</strong> Every commit on main represents a deployed release. No direct commits are ever made here &mdash; only merges from release or hotfix branches. Deploying AI models from main is standard practice.</p></div>
+      </div>
+      <div class="commit-card">
+        <span class="commit-tag" style="background:#fef3c7;color:#92400e;">develop</span>
+        <div class="commit-info"><h4>Develop Branch</h4><p>The <strong>primary integration branch</strong> for all completed features. Feature branches merge here first. Acts as the staging area &mdash; code here should always be in a working (if not necessarily release-ready) state.</p></div>
+      </div>
+      <div class="commit-card">
+        <span class="commit-tag" style="background:#d1fae5;color:#065f46;">feature/</span>
+        <div class="commit-info"><h4>Feature Branches</h4><p>Short-lived branches created from <code>develop</code>. Each branch represents exactly one task or user story. Naming convention: <code>feature/add-attention-layer</code>, <code>feature/data-augmentation</code>.</p></div>
+      </div>
+    </div>
+    <div>
+      <div class="commit-card">
+        <span class="commit-tag" style="background:#fee2e2;color:#991b1b;">hotfix/</span>
+        <div class="commit-info"><h4>Hotfix Branches</h4><p>Branched directly from <strong>main</strong> to address critical production bugs immediately. After fixing, merged back into both <code>main</code> AND <code>develop</code> so the fix is not lost in future releases.</p></div>
+      </div>
+      <div class="commit-card">
+        <span class="commit-tag" style="background:#fdf4ff;color:#6d28d9;">release/</span>
+        <div class="commit-info"><h4>Release Branches</h4><p>Created from <code>develop</code> when a release is ready for QA. Only bug fixes, documentation updates, and version bumps happen here. Merged into both <code>main</code> and <code>develop</code> when complete.</p></div>
+      </div>
+      <div class="commit-card">
+        <span class="commit-tag" style="background:#ecfdf5;color:#065f46;">experiment/</span>
+        <div class="commit-info"><h4>Experiment Branches (AI-Specific)</h4><p>In AI projects, engineers create <code>experiment/</code> branches to test new architectures, hyperparameters, or training datasets. These branches may never merge &mdash; they exist purely to capture a reproducible code state tied to an ML experiment run.</p></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- PAGE 8: MERGING & REBASING -->
+<div class="page">
+  <div class="page-header">
+    <div class="page-header-left">
+      <div class="section-num teal">6</div>
+      <div>
+        <div style="font-weight:700;font-size:16px;">Merging &amp; Rebasing</div>
+        <div class="breadcrumb">MERGE TYPES &middot; REBASE CONCEPT &middot; SQUASH &middot; DIAGRAMS</div>
+      </div>
+    </div>
+    <div class="page-num">Page 8</div>
+  </div>
+
+  <div class="def-box" style="border-left-color:#0891b2;background:linear-gradient(135deg,#ecfeff,#f0fdfa);">
+    <div class="def-label" style="color:#0891b2;">What is Merging?</div>
+    <p><strong>Merging</strong> is the process of <strong>integrating the history of one branch into another</strong>. When you merge a feature branch back into main, Git locates the <em>common ancestor commit</em> (the point where both branches diverged), then combines the changes made on each branch since that point. Git preserves the full history of both branches, creating an accurate record of how development actually happened.</p>
+  </div>
+
+  <div class="card-grid cols2">
+    <div class="diagram-wrap" style="margin:0;">
+      <div class="diagram-title">Fast-Forward Merge &mdash; Pointer Advances</div>
+      <svg viewBox="0 0 270 120" xmlns="http://www.w3.org/2000/svg" font-family="Inter,sans-serif">
+        <defs><marker id="m1" markerWidth="5" markerHeight="5" refX="2.5" refY="2.5" orient="auto"><path d="M0,0 L5,2.5 L0,5 Z" fill="#475569"/></marker></defs>
+        <text x="10" y="14" font-size="9" fill="#64748b" font-weight="700">BEFORE</text>
+        <circle cx="30" cy="35" r="13" fill="#3b82f6"/><text x="30" y="39" text-anchor="middle" font-size="8" fill="white">C1</text>
+        <line x1="43" y1="35" x2="58" y2="35" stroke="#3b82f6" stroke-width="2"/>
+        <circle cx="72" cy="35" r="13" fill="#3b82f6"/><text x="72" y="39" text-anchor="middle" font-size="8" fill="white">C2</text>
+        <path d="M72 21 C82 10 102 8 112 8" stroke="#10b981" stroke-width="1.5" fill="none"/>
+        <circle cx="124" cy="8" r="11" fill="#10b981"/><text x="124" y="12" text-anchor="middle" font-size="8" fill="white">F1</text>
+        <line x1="136" y1="8" x2="152" y2="8" stroke="#10b981" stroke-width="1.5"/>
+        <circle cx="163" cy="8" r="11" fill="#10b981"/><text x="163" y="12" text-anchor="middle" font-size="8" fill="white">F2</text>
+        <rect x="56" y="46" width="36" height="12" rx="3" fill="#1d4ed8"/>
+        <text x="74" y="55" text-anchor="middle" font-size="7.5" fill="white">main</text>
+        <rect x="148" y="-5" width="48" height="12" rx="3" fill="#059669"/>
+        <text x="172" y="4" text-anchor="middle" font-size="7.5" fill="white">feature</text>
+        <text x="135" y="70" text-anchor="middle" font-size="9" fill="#64748b" font-weight="700">AFTER (Fast-Forward)</text>
+        <circle cx="30" cy="95" r="13" fill="#3b82f6"/><text x="30" y="99" text-anchor="middle" font-size="8" fill="white">C1</text>
+        <line x1="43" y1="95" x2="57" y2="95" stroke="#3b82f6" stroke-width="2"/>
+        <circle cx="70" cy="95" r="13" fill="#3b82f6"/><text x="70" y="99" text-anchor="middle" font-size="8" fill="white">C2</text>
+        <line x1="83" y1="95" x2="97" y2="95" stroke="#3b82f6" stroke-width="2"/>
+        <circle cx="110" cy="95" r="13" fill="#3b82f6"/><text x="110" y="99" text-anchor="middle" font-size="8" fill="white">F1</text>
+        <line x1="124" y1="95" x2="138" y2="95" stroke="#3b82f6" stroke-width="2"/>
+        <circle cx="152" cy="95" r="13" fill="#3b82f6"/><text x="152" y="99" text-anchor="middle" font-size="8" fill="white">F2</text>
+        <rect x="130" y="110" width="44" height="10" rx="3" fill="#1d4ed8"/>
+        <text x="152" y="118" text-anchor="middle" font-size="7.5" fill="white">main (moved)</text>
+      </svg>
+    </div>
+    <div class="diagram-wrap" style="margin:0;">
+      <div class="diagram-title">Three-Way Merge &mdash; Creates Merge Commit</div>
+      <svg viewBox="0 0 270 120" xmlns="http://www.w3.org/2000/svg" font-family="Inter,sans-serif">
+        <circle cx="30" cy="60" r="13" fill="#1e293b" stroke="#3b82f6" stroke-width="2"/><text x="30" y="64" text-anchor="middle" font-size="8" fill="white">C1</text>
+        <line x1="43" y1="60" x2="58" y2="60" stroke="#94a3b8" stroke-width="2"/>
+        <circle cx="72" cy="60" r="13" fill="#1e293b" stroke="#3b82f6" stroke-width="2"/><text x="72" y="64" text-anchor="middle" font-size="8" fill="white">C2</text>
+        <!-- common ancestor label -->
+        <text x="72" y="82" text-anchor="middle" font-size="7.5" fill="#94a3b8">common ancestor</text>
+        <!-- main diverges up -->
+        <path d="M72 46 C82 28 105 22 115 22" stroke="#3b82f6" stroke-width="2" fill="none"/>
+        <circle cx="128" cy="22" r="11" fill="#3b82f6"/><text x="128" y="26" text-anchor="middle" font-size="8" fill="white">C3</text>
+        <text x="128" y="12" text-anchor="middle" font-size="8" fill="#3b82f6" font-weight="600">main</text>
+        <!-- feature diverges down -->
+        <path d="M72 73 C82 90 102 95 112 95" stroke="#dc2626" stroke-width="2" fill="none"/>
+        <circle cx="126" cy="95" r="11" fill="#dc2626"/><text x="126" y="99" text-anchor="middle" font-size="8" fill="white">F1</text>
+        <line x1="138" y1="95" x2="155" y2="95" stroke="#dc2626" stroke-width="1.5"/>
+        <circle cx="166" cy="95" r="11" fill="#dc2626"/><text x="166" y="99" text-anchor="middle" font-size="8" fill="white">F2</text>
+        <text x="144" y="111" text-anchor="middle" font-size="8" fill="#dc2626" font-weight="600">feature</text>
+        <!-- Merge commit -->
+        <path d="M139 22 C185 22 205 45 210 58" stroke="#3b82f6" stroke-width="1.5" fill="none"/>
+        <path d="M178 95 C198 95 206 78 210 65" stroke="#dc2626" stroke-width="1.5" fill="none"/>
+        <circle cx="215" cy="60" r="15" fill="#7c3aed" stroke="#6d28d9" stroke-width="2"/>
+        <text x="215" y="56" text-anchor="middle" font-size="7.5" fill="white" font-weight="700">Merge</text>
+        <text x="215" y="67" text-anchor="middle" font-size="7.5" fill="white" font-weight="700">M1</text>
+        <text x="215" y="80" text-anchor="middle" font-size="7.5" fill="#7c3aed">merge commit</text>
+      </svg>
+    </div>
+  </div>
+
+  <div class="def-box purple" style="margin-top:10px;">
+    <div class="def-label">What is Rebasing?</div>
+    <p><strong>Rebasing</strong> re-applies your branch's commits <em>on top of</em> another branch's latest commit, creating a <strong>clean, linear history</strong>. Git takes each commit from your feature branch, temporarily removes them, fast-forwards your branch to the tip of the target branch, then replays each commit one by one as brand-new commits with new SHA hashes. The result looks as though you wrote all your changes <em>after</em> the latest main commit &mdash; no merge commit, no divergence in the log. Because it rewrites commit hashes, rebase must <strong>never be used on shared or public branches.</strong></p>
+  </div>
+
+  <div class="diagram-wrap">
+    <div class="diagram-title">Diagram 3 &mdash; Rebase: Feature Commits Replayed on Top of Latest Main</div>
+    <svg viewBox="0 0 540 100" xmlns="http://www.w3.org/2000/svg" font-family="Inter,sans-serif">
+      <!-- Before -->
+      <text x="10" y="14" font-size="9.5" fill="#64748b" font-weight="700">BEFORE REBASE</text>
+      <circle cx="30" cy="40" r="13" fill="#1e293b" stroke="#3b82f6" stroke-width="2"/><text x="30" y="44" text-anchor="middle" font-size="8" fill="white">C1</text>
+      <line x1="43" y1="40" x2="58" y2="40" stroke="#94a3b8" stroke-width="2"/>
+      <circle cx="72" cy="40" r="13" fill="#1e293b" stroke="#3b82f6" stroke-width="2"/><text x="72" y="44" text-anchor="middle" font-size="8" fill="white">C2</text>
+      <path d="M72 26 C82 14 100 12 110 12" stroke="#dc2626" stroke-width="2" fill="none"/>
+      <circle cx="122" cy="12" r="11" fill="#dc2626"/><text x="122" y="16" text-anchor="middle" font-size="8" fill="white">F1</text>
+      <line x1="134" y1="12" x2="148" y2="12" stroke="#dc2626" stroke-width="1.5"/>
+      <circle cx="160" cy="12" r="11" fill="#dc2626"/><text x="160" y="16" text-anchor="middle" font-size="8" fill="white">F2</text>
+      <line x1="85" y1="40" x2="100" y2="40" stroke="#3b82f6" stroke-width="2"/>
+      <circle cx="114" cy="40" r="13" fill="#3b82f6"/><text x="114" y="44" text-anchor="middle" font-size="8" fill="white">C3</text>
+      <text x="114" y="60" text-anchor="middle" font-size="8" fill="#3b82f6" font-weight="600">main</text>
+      <text x="140" y="60" text-anchor="middle" font-size="8" fill="#dc2626" font-weight="600">feature</text>
+      <!-- Arrow label -->
+      <text x="215" y="35" text-anchor="middle" font-size="16" fill="#94a3b8">&#8594;</text>
+      <text x="215" y="52" text-anchor="middle" font-size="8.5" fill="#7c3aed">git rebase main</text>
+      <!-- After -->
+      <text x="255" y="14" font-size="9.5" fill="#64748b" font-weight="700">AFTER REBASE (linear history)</text>
+      <circle cx="270" cy="40" r="13" fill="#1e293b" stroke="#3b82f6" stroke-width="2"/><text x="270" y="44" text-anchor="middle" font-size="8" fill="white">C1</text>
+      <line x1="283" y1="40" x2="298" y2="40" stroke="#94a3b8" stroke-width="2"/>
+      <circle cx="312" cy="40" r="13" fill="#1e293b" stroke="#3b82f6" stroke-width="2"/><text x="312" y="44" text-anchor="middle" font-size="8" fill="white">C2</text>
+      <line x1="325" y1="40" x2="340" y2="40" stroke="#3b82f6" stroke-width="2"/>
+      <circle cx="354" cy="40" r="13" fill="#3b82f6"/><text x="354" y="44" text-anchor="middle" font-size="8" fill="white">C3</text>
+      <line x1="367" y1="40" x2="382" y2="40" stroke="#dc2626" stroke-width="2"/>
+      <circle cx="396" cy="40" r="13" fill="#dc2626"/><text x="396" y="44" text-anchor="middle" font-size="8" fill="white">F1'</text>
+      <line x1="409" y1="40" x2="424" y2="40" stroke="#dc2626" stroke-width="2"/>
+      <circle cx="438" cy="40" r="13" fill="#dc2626"/><text x="438" y="44" text-anchor="middle" font-size="8" fill="white">F2'</text>
+      <text x="396" y="62" text-anchor="middle" font-size="8" fill="#dc2626">New SHAs (F1', F2')</text>
+      <text x="396" y="75" text-anchor="middle" font-size="7.5" fill="#94a3b8">replayed on top of C3</text>
+      <text x="354" y="60" text-anchor="middle" font-size="8" fill="#3b82f6" font-weight="600">main</text>
+      <rect x="410" y="80" width="78" height="14" rx="4" fill="#dc2626"/>
+      <text x="449" y="90" text-anchor="middle" font-size="8" fill="white">feature (rebased)</text>
+    </svg>
+  </div>
+
+  <h2>Squash Merging</h2>
+  <div class="def-box green">
+    <div class="def-label">What is Squash Merging?</div>
+    <p><strong>Squash merging</strong> combines all commits from a feature branch into a <strong>single new commit</strong> that is placed on the target branch. Instead of preserving every small, intermediate commit (like "WIP", "fix typo", "try again"), squash merging presents the entire feature as one clean, cohesive commit. This results in a very clean, readable main branch history. The original feature branch's individual commits are not preserved in the main history. This is the preferred merge strategy on many GitHub-hosted AI projects using Pull Requests.</p>
+  </div>
+
+  <table class="compare-table" style="margin-top:8px;">
+    <thead><tr><th>Aspect</th><th>Merge</th><th>Rebase</th><th>Squash Merge</th></tr></thead>
+    <tbody>
+      <tr><td><strong>History</strong></td><td>Non-linear, full history</td><td>Linear, rewrites SHAs</td><td>Linear, single commit</td></tr>
+      <tr><td><strong>Merge commit?</strong></td><td>Yes (3-way)</td><td>No</td><td>No (one squashed commit)</td></tr>
+      <tr><td><strong>Safe on shared branches?</strong></td><td>&#10003; Yes</td><td>&#10007; No</td><td>&#10003; Yes</td></tr>
+      <tr><td><strong>Best used for</strong></td><td>Long-lived branches, releases</td><td>Cleaning local commits before PR</td><td>Pull Request merges</td></tr>
+    </tbody>
+  </table>
+
+  <div class="tip-box orange" style="margin-top:8px;">
+    <div class="tip-icon">&#9888;&#65039;</div>
+    <div class="tip-text"><strong>The Golden Rule of Rebasing:</strong> Never rebase a branch that other people are working on. Because rebase creates brand-new commit objects (with different SHA hashes), anyone who based their work on the original commits will have severe conflicts. Only rebase your <em>local, private</em> feature branches before pushing them for the first time.</div>
+  </div>
+</div>
+
+<!-- PAGE 9: REMOTE OPERATIONS -->
+<div class="page">
+  <div class="page-header">
+    <div class="page-header-left">
+      <div class="section-num pink">7</div>
+      <div>
+        <div style="font-weight:700;font-size:16px;">Remote Operations</div>
+        <div class="breadcrumb">PUSH &middot; PULL &middot; FETCH &middot; CLONE &middot; CONFLICTS &middot; REMOTE TRACKING</div>
+      </div>
+    </div>
+    <div class="page-num">Page 9</div>
+  </div>
+
+  <div class="diagram-wrap">
+    <div class="diagram-title">Complete Remote Operation Flow &mdash; Local Machine to GitHub</div>
+    <svg viewBox="0 0 540 148" xmlns="http://www.w3.org/2000/svg" font-family="Inter,sans-serif">
+      <defs>
+        <marker id="r1" markerWidth="5" markerHeight="5" refX="2.5" refY="2.5" orient="auto"><path d="M0,0 L5,2.5 L0,5 Z" fill="#dc2626"/></marker>
+        <marker id="r2" markerWidth="5" markerHeight="5" refX="2.5" refY="2.5" orient="auto"><path d="M0,0 L5,2.5 L0,5 Z" fill="#3b82f6"/></marker>
+        <marker id="r3" markerWidth="5" markerHeight="5" refX="2.5" refY="2.5" orient="auto"><path d="M0,0 L5,2.5 L0,5 Z" fill="#7c3aed"/></marker>
+        <marker id="r4" markerWidth="5" markerHeight="5" refX="2.5" refY="2.5" orient="auto"><path d="M0,0 L5,2.5 L0,5 Z" fill="#059669"/></marker>
+        <marker id="r5" markerWidth="5" markerHeight="5" refX="2.5" refY="2.5" orient="auto"><path d="M0,0 L5,2.5 L0,5 Z" fill="#10b981"/></marker>
+      </defs>
+      <!-- Local box -->
+      <rect x="8" y="12" width="228" height="126" rx="10" fill="#f8f9fc" stroke="#e2e8f0" stroke-width="2"/>
+      <text x="122" y="32" text-anchor="middle" font-size="11" font-weight="700" fill="#0f172a">&#128187; Local Machine</text>
+      <rect x="20" y="42" width="95" height="28" rx="6" fill="#dbeafe" stroke="#93c5fd"/>
+      <text x="67" y="60" text-anchor="middle" font-size="9.5" fill="#1d4ed8" font-weight="600">Working Dir</text>
+      <path d="M115 56 L128 56" stroke="#10b981" stroke-width="2" marker-end="url(#r5)"/>
+      <text x="121" y="50" text-anchor="middle" font-size="7.5" fill="#059669" font-weight="600">add+commit</text>
+      <rect x="130" y="42" width="95" height="28" rx="6" fill="#ede9fe" stroke="#c4b5fd"/>
+      <text x="177" y="60" text-anchor="middle" font-size="9.5" fill="#6d28d9" font-weight="600">Local Repo (.git)</text>
+      <!-- remote-tracking label -->
+      <rect x="20" y="80" width="205" height="22" rx="5" fill="#f1f5f9" stroke="#cbd5e1"/>
+      <text x="122" y="95" text-anchor="middle" font-size="9" fill="#475569">Remote-Tracking: <tspan fill="#7c3aed" font-weight="600">origin/main</tspan>, <tspan fill="#7c3aed" font-weight="600">origin/develop</tspan></text>
+      <text x="122" y="118" text-anchor="middle" font-size="8.5" fill="#64748b">git fetch updates remote-tracking refs</text>
+      <text x="122" y="131" text-anchor="middle" font-size="8.5" fill="#64748b">git pull = fetch + merge</text>
+      <!-- Arrows -->
+      <path d="M238 48 L296 48" stroke="#dc2626" stroke-width="2" marker-end="url(#r1)"/>
+      <text x="267" y="42" text-anchor="middle" font-size="8.5" fill="#dc2626" font-weight="600">git push</text>
+      <path d="M298 70 L240 70" stroke="#3b82f6" stroke-width="2" stroke-dasharray="4,2" marker-end="url(#r2)"/>
+      <text x="269" y="64" text-anchor="middle" font-size="8.5" fill="#3b82f6" font-weight="600">git fetch</text>
+      <path d="M298 95 L240 95" stroke="#7c3aed" stroke-width="2" marker-end="url(#r3)"/>
+      <text x="269" y="89" text-anchor="middle" font-size="8.5" fill="#7c3aed" font-weight="600">git pull</text>
+      <path d="M298 118 L240 118" stroke="#059669" stroke-width="2" stroke-dasharray="3,2" marker-end="url(#r4)"/>
+      <text x="269" y="112" text-anchor="middle" font-size="8.5" fill="#059669" font-weight="600">git clone</text>
+      <!-- Remote box -->
+      <rect x="300" y="12" width="232" height="126" rx="10" fill="#fff7ed" stroke="#fdba74" stroke-width="2"/>
+      <text x="416" y="32" text-anchor="middle" font-size="11" font-weight="700" fill="#92400e">&#9729;&#65039; GitHub (Remote)</text>
+      <rect x="314" y="42" width="205" height="20" rx="5" fill="#f97316"/>
+      <text x="416" y="55.5" text-anchor="middle" font-size="10" fill="white" font-weight="600">origin/main (default remote branch)</text>
+      <rect x="314" y="66" width="205" height="18" rx="5" fill="#fb923c"/>
+      <text x="416" y="78.5" text-anchor="middle" font-size="9" fill="white">Complete commit history &amp; objects</text>
+      <rect x="314" y="88" width="205" height="18" rx="5" fill="#fed7aa"/>
+      <text x="416" y="100.5" text-anchor="middle" font-size="9" fill="#92400e">Pull Requests &middot; Issues &middot; Actions (CI/CD)</text>
+      <rect x="314" y="110" width="205" height="18" rx="5" fill="#fef3c7"/>
+      <text x="416" y="122.5" text-anchor="middle" font-size="9" fill="#b45309">Collaborators &middot; Code Review &middot; Wikis</text>
+    </svg>
+  </div>
+
+  <div class="card-grid cols2">
+    <div class="def-box" style="margin:0;">
+      <div class="def-label">git push</div>
+      <p><strong>Push</strong> uploads your local commits to the corresponding branch on the remote repository. Git transfers all new commit objects that the remote doesn't yet have. If the remote has commits you lack, Git rejects the push &mdash; you must pull first to incorporate their work before yours can be added on top.</p>
+    </div>
+    <div class="def-box purple" style="margin:0;">
+      <div class="def-label">git pull</div>
+      <p><strong>Pull</strong> is a <em>combination</em> of two operations: <code>git fetch</code> followed immediately by <code>git merge</code>. It downloads all changes from the remote and integrates them into your current branch in one step. This is the most common way to update your local branch with the latest teammates' work.</p>
+    </div>
+    <div class="def-box green" style="margin:0;">
+      <div class="def-label">git fetch</div>
+      <p><strong>Fetch</strong> downloads all changes from the remote into your local repository but <strong>does not modify your working directory or current branch</strong> at all. It only updates the remote-tracking references (like <code>origin/main</code>). This lets you inspect what has changed on the remote before deciding whether and how to merge.</p>
+    </div>
+    <div class="def-box orange" style="margin:0;">
+      <div class="def-label">git clone</div>
+      <p><strong>Clone</strong> creates a complete local copy of a remote repository &mdash; including all commits, branches, and tags. It automatically sets up the remote as <code>origin</code> and checks out the default branch. Cloning is how you first get any project onto your machine, including AI/ML repositories like PyTorch or Hugging Face models.</p>
+    </div>
+  </div>
+
+  <div class="section-divider"></div>
+  <h2>Merge Conflicts</h2>
+  <div class="def-box" style="border-left-color:#dc2626;background:linear-gradient(135deg,#fff1f2,#fef2f2);margin-bottom:8px;">
+    <div class="def-label" style="color:#dc2626;">What is a Merge Conflict?</div>
+    <p>A <strong>merge conflict</strong> occurs when two branches have made <strong>different changes to the exact same lines</strong> of the same file, and Git cannot automatically decide which version is correct. Git pauses the merge and marks the conflicting sections inside the file using conflict markers. The developer must manually open the file, examine both versions, decide what the correct final version should be (often combining elements of both), remove the conflict markers, and then stage the resolved file to complete the merge.</p>
+  </div>
+
+  <div class="diagram-wrap">
+    <div class="diagram-title">How Conflict Markers Look Inside a File</div>
+    <svg viewBox="0 0 540 88" xmlns="http://www.w3.org/2000/svg" font-family="monospace">
+      <rect x="5" y="5" width="530" height="78" rx="8" fill="#1e293b"/>
+      <text x="18" y="22" font-size="10" fill="#60a5fa">&lt;&lt;&lt;&lt;&lt;&lt;&lt; HEAD  (your current branch changes)</text>
+      <text x="18" y="38" font-size="10" fill="#34d399">    learning_rate = 0.001</text>
+      <text x="18" y="52" font-size="10" fill="#f59e0b">=======  (separator between two versions)</text>
+      <text x="18" y="66" font-size="10" fill="#fca5a5">    learning_rate = 0.0001</text>
+      <text x="18" y="80" font-size="10" fill="#60a5fa">&gt;&gt;&gt;&gt;&gt;&gt;&gt; feature/hyperparameter-tuning  (incoming branch changes)</text>
+    </svg>
+  </div>
+
+  <h2>Remote-Tracking Branches</h2>
+  <p>When you clone or fetch a repository, Git creates <strong>remote-tracking branches</strong> such as <code>origin/main</code> and <code>origin/develop</code>. These are <em>local read-only references</em> that reflect the state of the remote branches <strong>at the time of your last fetch or pull</strong>. They serve as bookmarks so Git can calculate what has diverged between your local branches and the remote. You cannot commit directly to them.</p>
+
+  <div class="tip-box green">
+    <div class="tip-icon">&#10003;</div>
+    <div class="tip-text"><strong>Best Practice &mdash; Pull Before You Push:</strong> Always run <code>git pull</code> (or <code>git fetch</code> and review) before pushing, to avoid unnecessary conflicts. In AI teams working on shared training scripts, config files, or requirements.txt, this single habit prevents the majority of merge conflicts.</div>
+  </div>
+</div>
+
+<!-- PAGE 10: ADVANCED TOPICS PART 1 — Git Stash & Cherry-Pick -->
+<div class="page">
+  <div class="page-header">
+    <div class="page-header-left">
+      <div class="section-num" style="background:#b45309;">8</div>
+      <div>
+        <div style="font-weight:700;font-size:16px;">Advanced Topics &mdash; Part 1</div>
+        <div class="breadcrumb">GIT STASH &middot; GIT CHERRY-PICK &middot; GIT TAGS &middot; .GITIGNORE</div>
+      </div>
+    </div>
+    <div class="page-num">Page 10</div>
+  </div>
+
+  <!-- GIT STASH -->
+  <h2>&#128230; Git Stash &mdash; Temporarily Save Uncommitted Work</h2>
+  <div class="def-box orange">
+    <div class="def-label">What is Git Stash?</div>
+    <p><strong>Git stash</strong> temporarily saves your <strong>uncommitted changes</strong> (both staged and unstaged) onto a private stack, then restores your working directory to a clean state — as if you hadn't changed anything yet. You can later <strong>re-apply</strong> those saved changes and continue where you left off. Think of it like putting your current work in a drawer so you can deal with something urgent, then coming back to that drawer afterwards.</p>
+  </div>
+
+  <h3 style="margin-top:14px;">When Do You Use It?</h3>
+  <div class="card-grid cols2" style="margin-bottom:12px;">
+    <div class="card accent-top orange">
+      <h4>&#128680; Urgent Context Switch</h4>
+      <p>You're halfway through editing a model's training loop when your team lead asks you to urgently fix a bug on the <code>main</code> branch. You can't commit half-done work, so you stash it, switch branches to fix the bug, then come back and pop your stash to resume exactly where you left off.</p>
+    </div>
+    <div class="card accent-top purple">
+      <h4>&#128203; Reviewing a Colleague's PR</h4>
+      <p>You need to checkout a teammate's branch to review their code, but you have local uncommitted changes that would conflict. Stash your work, checkout their branch, review it, then return to your branch and pop your stash back out.</p>
+    </div>
+  </div>
+
+  <h3>Key Rules to Remember</h3>
+  <ul class="styled-list purple">
+    <li><strong>Stash is a stack</strong> — you can have multiple stashes saved at once. Each is identified by an index: <code>stash@{0}</code> is the most recent, <code>stash@{1}</code> is the one before that, and so on.</li>
+    <li><strong>Stashes are local only</strong> — they live on your machine and are never pushed to a remote repository. Teammates cannot see your stash.</li>
+    <li><strong>Untracked files are excluded by default</strong> — if you've created a brand new file that you haven't run <code>git add</code> on yet, it won't be stashed unless you explicitly add the <code>--include-untracked</code> flag.</li>
+    <li><strong>Stash does not replace commits</strong> — stash is for temporary, in-progress work only. When you're done with a feature, you still need to commit it properly.</li>
+  </ul>
+
+  <div class="section-divider"></div>
+
+  <!-- GIT CHERRY-PICK -->
+  <h2>&#127353; Git Cherry-Pick &mdash; Apply a Single Specific Commit</h2>
+  <div class="def-box">
+    <div class="def-label">What is Cherry-Pick?</div>
+    <p><strong>Cherry-pick</strong> lets you take one specific commit from any branch and apply its changes onto your current branch — <em>without</em> merging the entire source branch. Git creates a brand new commit on your branch containing the same change, but it gets a different SHA hash because it's technically a new commit object in a different location in history.</p>
+  </div>
+
+  <div class="card-grid cols2" style="margin-top:10px;">
+    <div class="card accent-top green">
+      <h4>&#9989; Classic Use Case</h4>
+      <p>A critical bug fix was committed to the <code>develop</code> branch. You need that fix on <code>main</code> immediately — but <code>develop</code> also has half-finished features you don't want to release. Cherry-pick lets you copy just that one bug fix commit across to <code>main</code>, leaving the rest of <code>develop</code> untouched.</p>
+    </div>
+    <div class="card accent-top red">
+      <h4>&#9888;&#65039; Important Caution</h4>
+      <p>Cherry-picking creates a <strong>duplicate commit</strong> with a different SHA. If you later merge the original branch, Git may see the same change twice and create a conflict. Use cherry-pick sparingly — it's a targeted tool for emergencies, not a substitute for proper branching and merging.</p>
+    </div>
+  </div>
+
+  <div class="section-divider"></div>
+
+  <!-- GIT TAGS -->
+  <h2>&#127991;&#65039; Git Tags &mdash; Permanent Version Markers</h2>
+  <div class="def-box green">
+    <div class="def-label">What is a Tag?</div>
+    <p>A <strong>tag</strong> is a <strong>permanent, named label</strong> that points to one specific commit forever. Unlike a branch (which moves forward with every new commit), a tag <em>never moves</em> — it always points to the same commit it was created on. Tags are used to mark <strong>release versions</strong> such as <code>v1.0.0</code>, <code>v2.3.1</code>. In AI engineering, tags mark the exact code commit that corresponds to a specific trained model deployment.</p>
+  </div>
+
+  <div class="card-grid cols2" style="margin-top:10px;">
+    <div class="card accent-top">
+      <h4>Lightweight Tag</h4>
+      <p>Simply a named pointer to a commit — nothing more. No extra information is stored. Think of it like a sticky note on a commit. Created with: <code>git tag v1.0.0</code>. Useful for quick personal bookmarks but <strong>not recommended for official releases</strong>.</p>
+    </div>
+    <div class="card accent-top green">
+      <h4>Annotated Tag (Preferred)</h4>
+      <p>A full Git object that stores: the tagger's name, email, the date, and a tagging message. Can also be <strong>GPG-signed</strong> for cryptographic verification. Created with: <code>git tag -a v1.0.0 -m "Release v1.0.0"</code>. <strong>Always use annotated tags for official releases.</strong></p>
+    </div>
+  </div>
+
+  <div class="tip-box orange" style="margin-top:10px;">
+    <div class="tip-icon">&#9888;&#65039;</div>
+    <div class="tip-text"><strong>Tags are not pushed automatically.</strong> A regular <code>git push</code> does not upload your tags to the remote. You must explicitly run <code>git push origin --tags</code> to share them with the team.</div>
+  </div>
+
+  <div class="section-divider"></div>
+
+  <!-- .GITIGNORE -->
+  <h2>&#128683; .gitignore &mdash; Telling Git What to Ignore</h2>
+  <div class="def-box" style="border-left-color:#dc2626;background:linear-gradient(135deg,#fff1f2,#fef2f2);">
+    <div class="def-label" style="color:#dc2626;">What is .gitignore?</div>
+    <p>The <strong><code>.gitignore</code></strong> file is a plain-text file at the root of your repository that lists <strong>patterns of files and folders Git should completely ignore</strong>. Any path matching a pattern in this file will never appear in <code>git status</code>, will never be staged, and will never be committed — Git treats it as if it doesn't exist. The <code>.gitignore</code> file itself should be committed to the repository so the whole team shares the same rules.</p>
+  </div>
+
+  <h3 style="margin-top:12px;">Critical Patterns for AI Projects</h3>
+  <div class="card-grid cols3" style="margin-top:6px;">
+    <div class="card accent-top red">
+      <h4>&#128274; Secrets &amp; Keys</h4>
+      <p><code>.env</code><br><code>secrets.yaml</code><br><code>*.pem</code><br><code>*.key</code><br>Never commit credentials. Rotate immediately if accidentally committed.</p>
+    </div>
+    <div class="card accent-top orange">
+      <h4>&#129504; Model &amp; Data Files</h4>
+      <p><code>*.pt</code>, <code>*.pkl</code>, <code>*.h5</code><br><code>checkpoints/</code><br><code>data/raw/</code><br><code>*.csv</code>, <code>*.parquet</code><br>Use DVC for these instead.</p>
+    </div>
+    <div class="card accent-top purple">
+      <h4>&#128640; Env &amp; Logs</h4>
+      <p><code>venv/</code><br><code>__pycache__/</code><br><code>*.pyc</code><br><code>.ipynb_checkpoints/</code><br><code>mlruns/</code>, <code>wandb/</code></p>
+    </div>
+  </div>
+</div>
+
+<!-- PAGE 10b: ADVANCED TOPICS — GIT LOG, DIFF & HISTORY INSPECTION -->
+<div class="page">
+  <div class="page-header">
+    <div class="page-header-left">
+      <div class="section-num" style="background:#b45309;">8</div>
+      <div>
+        <div style="font-weight:700;font-size:16px;">Advanced Topics &mdash; Git Log &amp; Diff</div>
+        <div class="breadcrumb">GIT LOG &middot; GIT DIFF &middot; READING HISTORY &middot; DEBUGGING WITH GIT</div>
+      </div>
+    </div>
+    <div class="page-num">Page 10b</div>
+  </div>
+
+  <h2>&#128221; Git Log &mdash; Reading Your Project's History</h2>
+  <div class="def-box">
+    <div class="def-label">What is git log?</div>
+    <p><strong>git log</strong> is the command you use to <strong>read and explore your repository's commit history</strong>. It starts from <code>HEAD</code> (your current position) and walks backwards through every commit that led to this point, displaying information about each one: its SHA hash, who made it, when, and the commit message. In AI engineering, <code>git log</code> is how you trace <em>exactly which code change caused a model accuracy drop</em> — you can identify the exact commit, inspect it, and revert it if needed.</p>
+  </div>
+
+  <h3 style="margin-top:14px;">Useful Ways to Use git log</h3>
+  <div class="card-grid cols2" style="margin-bottom:12px;">
+    <div class="card accent-top">
+      <h4>&#128196; <code>git log --oneline</code></h4>
+      <p>Shows one commit per line with a shortened SHA and just the subject line of the commit message. The most readable format for quickly scanning recent history. Use this daily to see what you and your team have committed.</p>
+    </div>
+    <div class="card accent-top purple">
+      <h4>&#127795; <code>git log --oneline --graph</code></h4>
+      <p>Adds an ASCII art diagram showing the branch and merge structure visually. Lets you see at a glance how feature branches diverged and where they were merged back in. Essential for understanding complex multi-branch histories.</p>
+    </div>
+    <div class="card accent-top green">
+      <h4>&#128100; <code>git log --author="Name"</code></h4>
+      <p>Filters history to show only commits made by a specific person. Useful when you want to review what a particular teammate contributed, or to audit your own commits before a PR review.</p>
+    </div>
+    <div class="card accent-top orange">
+      <h4>&#128197; <code>git log --since="2 weeks ago"</code></h4>
+      <p>Filters history to commits after a specific date. Combine with <code>--until</code> to set a date range. Excellent for sprint retrospectives — see everything the team changed in the past two weeks.</p>
+    </div>
+  </div>
+
+  <div class="section-divider"></div>
+
+  <h2>&#128269; Git Diff &mdash; Seeing Exactly What Changed</h2>
+  <div class="def-box green">
+    <div class="def-label">What is git diff?</div>
+    <p><strong>git diff</strong> shows you the <strong>exact line-by-line differences</strong> between two states of your code. Lines prefixed with <code>+</code> (shown in green) are additions. Lines prefixed with <code>-</code> (shown in red) are deletions. Git diff is how you answer the question: <em>"What exactly did I change since the last commit?"</em> In AI engineering, running <code>git diff</code> before committing is a professional habit that catches accidental debugging prints, hardcoded paths, and incomplete edits before they reach the repository.</p>
+  </div>
+
+  <h3 style="margin-top:14px;">Three Forms of git diff You Must Know</h3>
+  <div class="card-grid cols3" style="margin-bottom:14px;">
+    <div class="card accent-top">
+      <h4><code>git diff</code></h4>
+      <p><strong>Unstaged changes only.</strong> Shows the difference between your current working files and the last commit. These are changes you've made but haven't run <code>git add</code> on yet. This is the default and most common use.</p>
+    </div>
+    <div class="card accent-top green">
+      <h4><code>git diff --staged</code></h4>
+      <p><strong>Staged changes only.</strong> Shows the difference between what you've staged with <code>git add</code> and the last commit. Run this immediately before <code>git commit</code> to do a final review of exactly what you are about to commit.</p>
+    </div>
+    <div class="card accent-top purple">
+      <h4><code>git diff A..B</code></h4>
+      <p><strong>Between any two points.</strong> Compare two branch names, two commit SHAs, or two tags. For example, <code>git diff main..feature/lstm</code> shows all differences between the main branch and your feature branch — exactly what a PR would add.</p>
+    </div>
+  </div>
+
+  <div class="diagram-wrap">
+    <div class="diagram-title">git diff — Where Each Form Reads From</div>
+    <svg viewBox="0 0 540 90" xmlns="http://www.w3.org/2000/svg" font-family="Inter,sans-serif">
+      <defs><marker id="df1" markerWidth="5" markerHeight="5" refX="2.5" refY="2.5" orient="auto"><path d="M0,0 L5,2.5 L0,5 Z" fill="#059669"/></marker></defs>
+      <!-- Three areas -->
+      <rect x="10" y="15" width="120" height="50" rx="8" fill="#dbeafe" stroke="#93c5fd" stroke-width="1.5"/>
+      <text x="70" y="36" text-anchor="middle" font-size="10" fill="#1d4ed8" font-weight="700">Working Directory</text>
+      <text x="70" y="52" text-anchor="middle" font-size="8.5" fill="#475569">Files you're editing</text>
+      <text x="70" y="63" text-anchor="middle" font-size="8" fill="#64748b">right now</text>
+
+      <rect x="200" y="15" width="120" height="50" rx="8" fill="#d1fae5" stroke="#6ee7b7" stroke-width="1.5"/>
+      <text x="260" y="36" text-anchor="middle" font-size="10" fill="#065f46" font-weight="700">Staging Area</text>
+      <text x="260" y="52" text-anchor="middle" font-size="8.5" fill="#475569">Files after</text>
+      <text x="260" y="63" text-anchor="middle" font-size="8" fill="#64748b">git add</text>
+
+      <rect x="390" y="15" width="140" height="50" rx="8" fill="#1e293b" stroke="#3b82f6" stroke-width="1.5"/>
+      <text x="460" y="36" text-anchor="middle" font-size="10" fill="#60a5fa" font-weight="700">Last Commit</text>
+      <text x="460" y="52" text-anchor="middle" font-size="8.5" fill="#94a3b8">Saved snapshot</text>
+      <text x="460" y="63" text-anchor="middle" font-size="8" fill="#64748b">in history</text>
+
+      <!-- Arrows with labels -->
+      <path d="M70 65 C70 80 260 80 260 66" stroke="#059669" stroke-width="1.8" fill="none" stroke-dasharray="3,2" marker-end="url(#df1)"/>
+      <text x="165" y="88" text-anchor="middle" font-size="8.5" fill="#059669" font-weight="600">git diff (unstaged)</text>
+
+      <path d="M260 65 C260 78 460 78 460 66" stroke="#7c3aed" stroke-width="1.8" fill="none" stroke-dasharray="3,2" marker-end="url(#df1)"/>
+      <text x="370" y="88" text-anchor="middle" font-size="8.5" fill="#7c3aed" font-weight="600">git diff --staged</text>
+    </svg>
+  </div>
+
+  <div class="tip-box blue" style="margin-top:10px;">
+    <div class="tip-icon">&#128161;</div>
+    <div class="tip-text"><strong>Professional Habit:</strong> Before every <code>git commit</code>, always run <code>git diff --staged</code> first. This gives you one final chance to review every line you're about to save permanently. Senior engineers never commit without checking their diff — it prevents committing debug prints, test API keys, and incomplete changes.</div>
+  </div>
+
+  <div class="section-divider"></div>
+
+  <h2>&#128269; Putting It Together &mdash; Debugging a Model Regression with Git</h2>
+  <div class="card-grid cols2">
+    <div class="def-box" style="margin:0;">
+      <div class="def-label">Scenario</div>
+      <p>Your model's validation accuracy dropped from 92% to 84% after last week's work. You need to find which commit caused it. Use <code>git log --oneline</code> to list recent commits, identify the suspicious range, then use <code>git diff SHA1..SHA2</code> to see exactly what changed between two commits. Once found, <code>git revert</code> that commit safely.</p>
+    </div>
+    <div class="def-box green" style="margin:0;">
+      <div class="def-label">git bisect (Advanced)</div>
+      <p><strong>git bisect</strong> automates this regression hunt. You tell Git a "good" commit (accuracy was fine) and a "bad" commit (accuracy is broken). Git then does a binary search through history — checking out commits halfway in between and asking you to test each one — until it pinpoints the exact commit that introduced the regression.</p>
+    </div>
+  </div>
+</div>
+
+<!-- PAGE 11: ADVANCED TOPICS PART 2 -->
+<div class="page">
+  <div class="page-header">
+    <div class="page-header-left">
+      <div class="section-num" style="background:#0f766e;">9</div>
+      <div>
+        <div style="font-weight:700;font-size:16px;">Advanced Topics &mdash; Part 2</div>
+        <div class="breadcrumb">PULL REQUESTS &middot; CODE REVIEW &middot; GITHUB ACTIONS &middot; GITHUB ISSUES</div>
+      </div>
+    </div>
+    <div class="page-num">Page 11</div>
+  </div>
+
+  <h2>Pull Requests (PRs)</h2>
+  <div class="def-box" style="border-left-color:#0891b2;background:linear-gradient(135deg,#ecfeff,#f0fdfa);">
+    <div class="def-label" style="color:#0891b2;">Definition</div>
+    <p>A <strong>Pull Request</strong> is a <strong>GitHub-level feature</strong> that lets you formally propose merging your branch into another branch (usually <code>main</code> or <code>develop</code>). It opens a dedicated discussion space where teammates can review every changed line of code, leave inline comments, suggest improvements, and ultimately <strong>approve</strong> or <strong>request changes</strong> before the merge is permitted. PRs are the primary collaboration mechanism on GitHub and the standard way AI teams review model code, training scripts, and configuration changes before they reach production.</p>
+  </div>
+
+  <div class="diagram-wrap">
+    <div class="diagram-title">Pull Request Lifecycle &mdash; From Branch to Merged Code</div>
+    <svg viewBox="0 0 540 72" xmlns="http://www.w3.org/2000/svg" font-family="Inter,sans-serif">
+      <defs><marker id="pr1" markerWidth="5" markerHeight="5" refX="2.5" refY="2.5" orient="auto"><path d="M0,0 L5,2.5 L0,5 Z" fill="#059669"/></marker></defs>
+      <rect x="5" y="15" width="82" height="42" rx="8" fill="#dbeafe" stroke="#93c5fd"/>
+      <text x="46" y="32" text-anchor="middle" font-size="9" fill="#1d4ed8" font-weight="700">1. Create</text>
+      <text x="46" y="46" text-anchor="middle" font-size="8.5" fill="#1d4ed8">feature branch</text>
+      <text x="46" y="58" text-anchor="middle" font-size="8" fill="#64748b">&amp; push commits</text>
+      <path d="M88 36 L106 36" stroke="#059669" stroke-width="2" marker-end="url(#pr1)"/>
+      <rect x="108" y="15" width="82" height="42" rx="8" fill="#ede9fe" stroke="#c4b5fd"/>
+      <text x="149" y="32" text-anchor="middle" font-size="9" fill="#6d28d9" font-weight="700">2. Open PR</text>
+      <text x="149" y="46" text-anchor="middle" font-size="8.5" fill="#6d28d9">on GitHub with</text>
+      <text x="149" y="58" text-anchor="middle" font-size="8" fill="#64748b">description</text>
+      <path d="M191 36 L209 36" stroke="#059669" stroke-width="2" marker-end="url(#pr1)"/>
+      <rect x="211" y="15" width="82" height="42" rx="8" fill="#fef3c7" stroke="#fcd34d"/>
+      <text x="252" y="32" text-anchor="middle" font-size="9" fill="#92400e" font-weight="700">3. Review</text>
+      <text x="252" y="46" text-anchor="middle" font-size="8.5" fill="#92400e">teammates review,</text>
+      <text x="252" y="58" text-anchor="middle" font-size="8" fill="#64748b">leave comments</text>
+      <path d="M294 36 L312 36" stroke="#059669" stroke-width="2" marker-end="url(#pr1)"/>
+      <rect x="314" y="15" width="82" height="42" rx="8" fill="#d1fae5" stroke="#6ee7b7"/>
+      <text x="355" y="32" text-anchor="middle" font-size="9" fill="#065f46" font-weight="700">4. Approve</text>
+      <text x="355" y="46" text-anchor="middle" font-size="8.5" fill="#065f46">CI passes, all</text>
+      <text x="355" y="58" text-anchor="middle" font-size="8" fill="#64748b">reviewers approve</text>
+      <path d="M397 36 L415 36" stroke="#059669" stroke-width="2" marker-end="url(#pr1)"/>
+      <rect x="417" y="15" width="118" height="42" rx="8" fill="#1e293b" stroke="#3b82f6"/>
+      <text x="476" y="32" text-anchor="middle" font-size="9" fill="#60a5fa" font-weight="700">5. Merge</text>
+      <text x="476" y="46" text-anchor="middle" font-size="8.5" fill="#94a3b8">branch merged</text>
+      <text x="476" y="58" text-anchor="middle" font-size="8" fill="#64748b">into main/develop</text>
+    </svg>
+  </div>
+
+  <h2>Code Review on GitHub</h2>
+  <p><strong>Code review</strong> is the structured process of having teammates examine proposed code changes before they are merged. On GitHub, reviews happen inside a Pull Request and include three possible outcomes: <strong>Comment</strong> (general feedback without explicit approval), <strong>Approve</strong> (the reviewer signs off and approves the merge), or <strong>Request Changes</strong> (the reviewer blocks the merge and requires specific fixes before re-reviewing).</p>
+
+  <div class="card-grid cols3" style="margin-top:8px;">
+    <div class="card accent-top">
+      <h4>&#128065;&#65039; What Reviewers Check</h4>
+      <p>Logic correctness, code readability, naming conventions, missing tests, security vulnerabilities, performance concerns, and adherence to the team's coding standards. In AI, reviewers also check for data leakage, incorrect loss functions, and hardcoded values.</p>
+    </div>
+    <div class="card accent-top green">
+      <h4>&#128203; Branch Protection Rules</h4>
+      <p>GitHub allows repository admins to <strong>require a minimum number of PR approvals</strong> before any merge is permitted. This enforces the code review process at the infrastructure level. Configured under Repository Settings &rarr; Branches.</p>
+    </div>
+    <div class="card accent-top purple">
+      <h4>&#10024; Draft PRs</h4>
+      <p>A <strong>Draft Pull Request</strong> signals that work is in progress and not yet ready for review. It appears in the PR list but cannot be accidentally merged. Used by AI engineers to get early feedback on a new model architecture before it's complete.</p>
+    </div>
+  </div>
+
+  <div class="section-divider"></div>
+  <h2>GitHub Actions &mdash; CI/CD for AI Engineers</h2>
+  <div class="def-box orange">
+    <div class="def-label">What is GitHub Actions?</div>
+    <p><strong>GitHub Actions</strong> is GitHub's built-in <strong>CI/CD (Continuous Integration / Continuous Deployment) platform</strong> that automates workflows directly from your repository. A workflow is defined as a YAML file placed inside <code>.github/workflows/</code> and is triggered by specific GitHub events such as a push to main, a new Pull Request, a scheduled time, or a manual trigger. Each workflow consists of one or more <strong>jobs</strong> that run in sequence or parallel, and each job consists of <strong>steps</strong> that execute commands or pre-built community <em>Actions</em>.</p>
+  </div>
+
+  <div class="card-grid cols3">
+    <div class="card accent-top">
+      <h4>&#128260; Continuous Integration</h4>
+      <p>Automatically run test suites, linters (<code>flake8</code>, <code>black</code>), and type checkers (<code>mypy</code>) on every push or PR. This catches regressions in data preprocessing or training logic before they reach main. The PR is blocked from merging if any check fails.</p>
+    </div>
+    <div class="card accent-top green">
+      <h4>&#129514; Model Validation</h4>
+      <p>On each PR, automatically run a lightweight model evaluation job &mdash; train on a small subset, evaluate on a validation split, assert that key metrics (accuracy, F1, loss) remain above a threshold. Alerts the team immediately when a code change breaks model behaviour.</p>
+    </div>
+    <div class="card accent-top purple">
+      <h4>&#128640; Deployment Automation</h4>
+      <p>When a version tag (<code>v1.2.0</code>) is pushed, Actions can automatically build a Docker container with the model, push it to a registry (DockerHub, ECR), and deploy the updated inference API to a cloud environment (AWS, GCP, Azure) without any manual steps.</p>
+    </div>
+  </div>
+
+  <h2>GitHub Issues</h2>
+  <p><strong>Issues</strong> are GitHub's built-in task and bug tracking system. Every repository has an Issues tab where team members can create tickets describing bugs, feature requests, questions, or tasks. Issues can be assigned to specific team members, labelled (e.g., <code>bug</code>, <code>enhancement</code>, <code>model-performance</code>), linked to milestones, and referenced from commit messages or PR descriptions. When a PR contains <code>Fixes #42</code> in its description, GitHub <strong>automatically closes Issue #42</strong> when that PR is merged.</p>
+
+  <div class="tip-box blue">
+    <div class="tip-icon">&#128161;</div>
+    <div class="tip-text"><strong>Issues + PR + Actions = Complete Workflow:</strong> A junior AI engineer's full professional workflow is: create an Issue describing the task &rarr; create a feature branch &rarr; write code &rarr; push &rarr; Actions run tests automatically &rarr; open a PR referencing the Issue &rarr; teammates review &rarr; merge &rarr; Issue auto-closes &rarr; Actions deploy. This is the complete, industry-standard loop.</div>
+  </div>
+</div>
+
+<!-- PAGE 12: GIT INTERNALS & OBJECTS -->
+<div class="page">
+  <div class="page-header">
+    <div class="page-header-left">
+      <div class="section-num" style="background:#9333ea;">10</div>
+      <div>
+        <div style="font-weight:700;font-size:16px;">Git Internals &mdash; How Git Stores Data</div>
+        <div class="breadcrumb">GIT OBJECTS &middot; BLOB &middot; TREE &middot; COMMIT OBJECT &middot; SHA-1 INTEGRITY</div>
+      </div>
+    </div>
+    <div class="page-num">Page 12</div>
+  </div>
+
+  <div class="def-box purple">
+    <div class="def-label">Git's Object Database</div>
+    <p>Underneath Git's commands lies a simple but powerful <strong>content-addressable object store</strong>. Everything Git stores &mdash; every version of every file, every directory structure, every commit &mdash; is saved as an <strong>object</strong> in the <code>.git/objects/</code> directory. Each object is identified by its <strong>SHA-1 hash</strong>: a 40-character hexadecimal fingerprint computed from the object's content. If two files have identical content, they share one object. If a single byte changes, a completely different SHA-1 is produced &mdash; this is what makes Git's history tamper-proof and its deduplication efficient.</p>
+  </div>
+
+  <h2>The Four Types of Git Objects</h2>
+
+  <div class="diagram-wrap">
+    <div class="diagram-title">Git Object Hierarchy &mdash; Blob &rarr; Tree &rarr; Commit &rarr; Tag</div>
+    <svg viewBox="0 0 540 155" xmlns="http://www.w3.org/2000/svg" font-family="Inter,sans-serif">
+      <defs>
+        <marker id="go1" markerWidth="5" markerHeight="5" refX="2.5" refY="2.5" orient="auto"><path d="M0,0 L5,2.5 L0,5 Z" fill="#059669"/></marker>
+      </defs>
+      <!-- Blob objects -->
+      <text x="20" y="16" font-size="10" font-weight="700" fill="#1d4ed8">BLOB objects</text>
+      <rect x="10" y="22" width="100" height="32" rx="7" fill="#dbeafe" stroke="#93c5fd"/>
+      <text x="60" y="36" text-anchor="middle" font-size="9" fill="#1d4ed8" font-weight="600">blob: model.py</text>
+      <text x="60" y="48" text-anchor="middle" font-size="8" fill="#64748b">SHA: a1b2c3...</text>
+      <rect x="120" y="22" width="100" height="32" rx="7" fill="#dbeafe" stroke="#93c5fd"/>
+      <text x="170" y="36" text-anchor="middle" font-size="9" fill="#1d4ed8" font-weight="600">blob: train.py</text>
+      <text x="170" y="48" text-anchor="middle" font-size="8" fill="#64748b">SHA: d4e5f6...</text>
+      <rect x="230" y="22" width="100" height="32" rx="7" fill="#dbeafe" stroke="#93c5fd"/>
+      <text x="280" y="36" text-anchor="middle" font-size="9" fill="#1d4ed8" font-weight="600">blob: config.yaml</text>
+      <text x="280" y="48" text-anchor="middle" font-size="8" fill="#64748b">SHA: g7h8i9...</text>
+      <!-- Arrows up to tree -->
+      <path d="M60 55 C60 68 188 68 188 78" stroke="#059669" stroke-width="1.5" fill="none" marker-end="url(#go1)"/>
+      <path d="M170 55 L170 78" stroke="#059669" stroke-width="1.5" marker-end="url(#go1)"/>
+      <path d="M280 55 C280 68 195 68 195 78" stroke="#059669" stroke-width="1.5" fill="none" marker-end="url(#go1)"/>
+      <!-- Tree object -->
+      <text x="130" y="75" font-size="10" font-weight="700" fill="#059669">TREE object</text>
+      <rect x="120" y="80" width="150" height="40" rx="7" fill="#d1fae5" stroke="#6ee7b7" stroke-width="1.5"/>
+      <text x="195" y="96" text-anchor="middle" font-size="9" fill="#065f46" font-weight="600">tree: / (root directory)</text>
+      <text x="195" y="110" text-anchor="middle" font-size="8" fill="#064e3b">references blob SHAs + filenames</text>
+      <!-- Arrow to commit -->
+      <path d="M195 121 L195 136" stroke="#059669" stroke-width="1.5" marker-end="url(#go1)"/>
+      <!-- Commit object -->
+      <text x="130" y="133" font-size="10" font-weight="700" fill="#7c3aed">COMMIT object</text>
+      <rect x="110" y="137" width="170" height="14" rx="5" fill="#ede9fe" stroke="#c4b5fd"/>
+      <text x="195" y="147.5" text-anchor="middle" font-size="8.5" fill="#6d28d9">commit: points to tree + parent + metadata</text>
+      <!-- Tag object -->
+      <rect x="360" y="22" width="170" height="125" rx="10" fill="#fff7ed" stroke="#fdba74" stroke-width="1.5"/>
+      <text x="445" y="40" text-anchor="middle" font-size="10" font-weight="700" fill="#92400e">Object Summary</text>
+      <text x="375" y="58" font-size="9" fill="#b45309" font-weight="600">Blob</text>
+      <text x="375" y="71" font-size="8.5" fill="#475569">Stores file content (raw bytes).</text>
+      <text x="375" y="83" font-size="8.5" fill="#475569">One blob per unique file version.</text>
+      <text x="375" y="99" font-size="9" fill="#059669" font-weight="600">Tree</text>
+      <text x="375" y="112" font-size="8.5" fill="#475569">Represents a directory. Lists blobs</text>
+      <text x="375" y="124" font-size="8.5" fill="#475569">and sub-trees with their filenames.</text>
+      <text x="375" y="138" font-size="9" fill="#7c3aed" font-weight="600">Commit</text>
+      <text x="375" y="148" font-size="8.5" fill="#475569">Points to a tree, parent, author, message.</text>
+    </svg>
+  </div>
+
+  <div class="card-grid cols3">
+    <div class="card accent-top">
+      <h4>&#128196; Blob Object</h4>
+      <p>A <strong>blob (binary large object)</strong> stores the raw content of a single file version. It contains <em>only</em> the file's bytes &mdash; no filename, no permissions. Two files in different directories with identical content share the same blob object, saving space. One new blob is created every time a file's content changes.</p>
+    </div>
+    <div class="card accent-top green">
+      <h4>&#128193; Tree Object</h4>
+      <p>A <strong>tree</strong> represents a <strong>directory snapshot</strong>. It contains a list of entries, each mapping a filename or subdirectory name to a blob SHA (for files) or another tree SHA (for subdirectories), plus file permission modes. The root tree of a commit represents the complete project directory structure at that point in time.</p>
+    </div>
+    <div class="card accent-top purple">
+      <h4>&#128228; Commit Object</h4>
+      <p>A <strong>commit object</strong> points to a <em>root tree</em> (the project snapshot), stores the parent commit SHA(s), records author and committer metadata (name, email, timestamp), and contains the commit message. The commit object is what you interact with via <code>git log</code> &mdash; it is the top-level entry point into a complete project snapshot.</p>
+    </div>
+  </div>
+
+  <div class="section-divider"></div>
+  <h2>SHA-1 and Data Integrity</h2>
+  <div class="def-box">
+    <div class="def-label">How SHA-1 Protects Your History</div>
+    <p>Every Git object is identified by a <strong>SHA-1 hash computed from its entire content</strong>. This means that if anyone (or any disk error) changes even a single bit of any commit, file, or tree object, its SHA-1 changes completely. Since commits reference parent commits by their SHA-1, and trees reference blobs by their SHA-1, the entire history forms a <strong>cryptographically linked chain</strong>. Git verifies these hashes automatically &mdash; if data is corrupted, Git will detect it immediately. This is why Git history is considered tamper-evident and trustworthy for AI model reproducibility and compliance requirements. Note: Git is transitioning from SHA-1 to SHA-256 (via <code>git init --object-format=sha256</code>) for improved security.</p>
+  </div>
+</div>
+
+<!-- PAGE 13: GIT WORKFLOWS & COLLABORATION PATTERNS -->
+<div class="page">
+  <div class="page-header">
+    <div class="page-header-left">
+      <div class="section-num" style="background:#0369a1;">11</div>
+      <div>
+        <div style="font-weight:700;font-size:16px;">Git Workflows &amp; Collaboration Patterns</div>
+        <div class="breadcrumb">GITFLOW &middot; GITHUB FLOW &middot; TRUNK-BASED &middot; FORKING WORKFLOW</div>
+      </div>
+    </div>
+    <div class="page-num">Page 13</div>
+  </div>
+
+  <div class="def-box" style="border-left-color:#0369a1;background:linear-gradient(135deg,#eff6ff,#f0f9ff);">
+    <div class="def-label" style="color:#0369a1;">Why Workflows Matter</div>
+    <p>A <strong>Git workflow</strong> is a team agreement on <em>how branches are named, created, merged, and deleted</em>. Without a defined workflow, teams quickly develop conflicting histories, accidental merges, and unclear deployment processes. Choosing the right workflow depends on team size, release frequency, and the nature of the project. For AI teams, workflow choice directly impacts how experiments are tracked, how models are versioned, and how quickly bug fixes reach production.</p>
+  </div>
+
+  <h2>1. Git Flow</h2>
+  <div class="diagram-wrap">
+    <div class="diagram-title">Git Flow &mdash; Full Branch Model for Structured Releases</div>
+    <svg viewBox="0 0 540 110" xmlns="http://www.w3.org/2000/svg" font-family="Inter,sans-serif">
+      <defs><marker id="wf1" markerWidth="5" markerHeight="5" refX="2.5" refY="2.5" orient="auto"><path d="M0,0 L5,2.5 L0,5 Z" fill="#059669"/></marker></defs>
+      <!-- main line -->
+      <line x1="20" y1="30" x2="520" y2="30" stroke="#3b82f6" stroke-width="3"/>
+      <text x="10" y="25" font-size="8.5" fill="#3b82f6" font-weight="700">main</text>
+      <circle cx="60" cy="30" r="7" fill="#3b82f6"/><text x="60" y="23" text-anchor="middle" font-size="7" fill="#64748b">v1.0</text>
+      <circle cx="290" cy="30" r="7" fill="#3b82f6"/><text x="290" y="23" text-anchor="middle" font-size="7" fill="#64748b">v1.1</text>
+      <circle cx="480" cy="30" r="7" fill="#3b82f6"/><text x="480" y="23" text-anchor="middle" font-size="7" fill="#64748b">v1.2</text>
+      <!-- develop line -->
+      <line x1="60" y1="55" x2="480" y2="55" stroke="#f59e0b" stroke-width="2.5"/>
+      <text x="10" y="50" font-size="8.5" fill="#f59e0b" font-weight="700">develop</text>
+      <circle cx="80" cy="55" r="6" fill="#f59e0b"/>
+      <circle cx="160" cy="55" r="6" fill="#f59e0b"/>
+      <circle cx="250" cy="55" r="6" fill="#f59e0b"/>
+      <circle cx="370" cy="55" r="6" fill="#f59e0b"/>
+      <circle cx="460" cy="55" r="6" fill="#f59e0b"/>
+      <!-- develop merges to main -->
+      <path d="M250 49 L285 36" stroke="#059669" stroke-width="1.5" fill="none" marker-end="url(#wf1)"/>
+      <path d="M460 49 L476 36" stroke="#059669" stroke-width="1.5" fill="none" marker-end="url(#wf1)"/>
+      <!-- feature branches -->
+      <path d="M80 61 C90 75 120 78 130 78" stroke="#10b981" stroke-width="1.5" fill="none"/>
+      <line x1="130" y1="78" x2="148" y2="78" stroke="#10b981" stroke-width="1.5"/>
+      <path d="M155 78 C163 78 168 65 170 60" stroke="#10b981" stroke-width="1.5" fill="none"/>
+      <text x="115" y="91" text-anchor="middle" font-size="7.5" fill="#10b981">feature/A</text>
+      <path d="M160 61 C170 80 200 82 210 82" stroke="#8b5cf6" stroke-width="1.5" fill="none"/>
+      <line x1="210" y1="82" x2="238" y2="82" stroke="#8b5cf6" stroke-width="1.5"/>
+      <path d="M244 82 C252 82 256 68 258 60" stroke="#8b5cf6" stroke-width="1.5" fill="none"/>
+      <text x="225" y="96" text-anchor="middle" font-size="7.5" fill="#8b5cf6">feature/B</text>
+      <!-- hotfix -->
+      <path d="M290 24 C295 10 340 8 350 8" stroke="#dc2626" stroke-width="1.5" fill="none"/>
+      <line x1="350" y1="8" x2="365" y2="8" stroke="#dc2626" stroke-width="1.5"/>
+      <path d="M368 8 C375 8 378 20 380 26" stroke="#dc2626" stroke-width="1.5" fill="none"/>
+      <text x="358" y="4" text-anchor="middle" font-size="7.5" fill="#dc2626" font-weight="600">hotfix</text>
+      <path d="M376 55 L376 34" stroke="#dc2626" stroke-width="1.5" stroke-dasharray="2,2" marker-end="url(#wf1)"/>
+      <!-- Legend -->
+      <text x="10" y="107" font-size="8.5" fill="#3b82f6">&#9679; main: stable releases</text>
+      <text x="110" y="107" font-size="8.5" fill="#f59e0b">&#9679; develop: integration</text>
+      <text x="210" y="107" font-size="8.5" fill="#10b981">&#9679; feature: new work</text>
+      <text x="300" y="107" font-size="8.5" fill="#dc2626">&#9679; hotfix: urgent patch</text>
+      <text x="395" y="107" font-size="8.5" fill="#8b5cf6">&#9679; release: pre-launch</text>
+    </svg>
+  </div>
+  <p style="font-size:12.5px;"><strong>Best for:</strong> Structured, versioned software with scheduled releases. Uses main (production), develop (integration), feature/, release/, and hotfix/ branches. Complex but very controlled. Good for enterprise AI product teams shipping model APIs on a quarterly release cycle.</p>
+
+  <h2>2. GitHub Flow</h2>
+  <div class="def-box green">
+    <div class="def-label">GitHub Flow &mdash; Simple, Fast, Modern</div>
+    <p>GitHub Flow is a <strong>simplified, lightweight workflow</strong> designed around continuous deployment. It has just <strong>two rules</strong>: (1) anything on <code>main</code> is always deployable, and (2) to work on anything new, create a descriptively named branch from <code>main</code>, open a Pull Request, get it reviewed, merge it, and deploy immediately. There are no separate develop, release, or hotfix branches. This simplicity makes it ideal for teams deploying frequently &mdash; multiple times per day. Most modern SaaS AI products use GitHub Flow.</p>
+  </div>
+  <p style="font-size:12.5px;margin-bottom:6px;"><strong>Best for:</strong> Teams doing continuous deployment. Clean, minimal branching model &mdash; perfect for web-based AI services that deploy after every merged PR.</p>
+
+  <h2>3. Trunk-Based Development</h2>
+  <div class="def-box orange">
+    <div class="def-label">Trunk-Based Development</div>
+    <p>In <strong>Trunk-Based Development</strong>, all developers commit <strong>small, frequent changes directly to a single shared branch</strong> called <code>main</code> (or <code>trunk</code>), several times a day. Short-lived feature branches lasting no more than 1-2 days are acceptable, but the emphasis is on integrating continuously to avoid long-lived divergences. This workflow requires robust automated testing (CI) to ensure main is always green. It is the workflow Google and Facebook use internally at massive scale. Increasingly popular in large AI labs with mature CI/CD pipelines.</p>
+  </div>
+
+  <h2>4. Forking Workflow</h2>
+  <div class="def-box purple">
+    <div class="def-label">Forking Workflow &mdash; Open-Source Standard</div>
+    <p>In the <strong>Forking Workflow</strong>, every contributor (especially external ones) has their own <strong>fork</strong> (personal server-side copy) of the official repository. Contributors push changes to <em>their own fork</em>, never to the official repo, and then open Pull Requests from their fork's branch to the official repository's branch. This isolates contributors from the official codebase entirely &mdash; maintainers can review and accept contributions without giving strangers push access. This is the <strong>standard workflow for all open-source projects</strong> on GitHub, including contributing to frameworks like LangChain, Hugging Face, or scikit-learn.</p>
+  </div>
+
+  <div class="tip-box blue">
+    <div class="tip-icon">&#128161;</div>
+    <div class="tip-text"><strong>Which workflow to use as a Junior AI Engineer?</strong> Most AI startups and product teams use <strong>GitHub Flow</strong> for its simplicity. Large regulated enterprises use <strong>Git Flow</strong>. Open-source contributions use the <strong>Forking Workflow</strong>. Understanding all four makes you adaptable to any team you join.</div>
+  </div>
+</div>
+
+<!-- PAGE 14: DVC, COMMIT BEST PRACTICES, CONFIG -->
+<div class="page">
+  <div class="page-header">
+    <div class="page-header-left">
+      <div class="section-num" style="background:#be185d;">12</div>
+      <div>
+        <div style="font-weight:700;font-size:16px;">DVC, Git Config &amp; Commit Best Practices</div>
+        <div class="breadcrumb">DATA VERSION CONTROL &middot; GIT CONFIGURATION &middot; WRITING GOOD COMMITS</div>
+      </div>
+    </div>
+    <div class="page-num">Page 14</div>
+  </div>
+
+  <h2>DVC &mdash; Data Version Control for AI Engineers</h2>
+  <div class="def-box" style="border-left-color:#be185d;background:linear-gradient(135deg,#fdf2f8,#fce7f3);">
+    <div class="def-label" style="color:#be185d;">What is DVC?</div>
+    <p><strong>DVC (Data Version Control)</strong> is an open-source tool that extends Git to handle the large binary files that AI/ML projects produce &mdash; datasets, trained model weights, feature stores, and evaluation results. Git is not designed for files over 100 MB (GitHub even blocks files over 100 MB). DVC solves this by storing only a small <strong>pointer file</strong> (<code>.dvc</code> file) in Git while the actual large file is pushed to remote storage (Amazon S3, Google Cloud Storage, Azure Blob, a shared NFS drive, etc.). This means your full experiment is reproducible: checking out any Git commit also restores the exact data and model state for that experiment.</p>
+  </div>
+
+  <div class="card-grid cols3">
+    <div class="card accent-top">
+      <h4>&#128200; How DVC Works</h4>
+      <p>DVC tracks large files via a content-addressable cache (similar to Git's object store). Running <code>dvc add data.csv</code> adds a <code>data.csv.dvc</code> pointer file to Git and caches the actual file locally, then pushes to remote storage with <code>dvc push</code>. Teammates run <code>dvc pull</code> to download it.</p>
+    </div>
+    <div class="card accent-top green">
+      <h4>&#128279; Git + DVC Together</h4>
+      <p>Git tracks: code, configs, requirements, <code>.dvc</code> pointer files, <code>dvc.yaml</code> pipeline definitions. DVC tracks: actual data files, model binaries, experiment results. Together they provide <strong>full ML experiment reproducibility</strong> tied to a Git commit SHA.</p>
+    </div>
+    <div class="card accent-top purple">
+      <h4>&#129514; DVC Pipelines</h4>
+      <p>DVC can define <strong>ML pipelines</strong> as a DAG (directed acyclic graph) of stages in a <code>dvc.yaml</code> file. Each stage has inputs, outputs, and a command. Re-running <code>dvc repro</code> only re-executes stages whose dependencies have changed &mdash; similar to how <code>make</code> works for build systems.</p>
+    </div>
+  </div>
+
+  <div class="section-divider"></div>
+  <h2>Git Configuration</h2>
+  <div class="def-box">
+    <div class="def-label">git config</div>
+    <p>Git has three levels of configuration: <strong>System</strong> (applies to all users on the machine, stored at <code>/etc/gitconfig</code>), <strong>Global</strong> (applies to all repositories for your user, stored at <code>~/.gitconfig</code>), and <strong>Local</strong> (applies only to the current repository, stored at <code>.git/config</code>). Local overrides global, which overrides system. Before using Git for the first time, you must configure at minimum your name and email, as these are embedded in every commit you create.</p>
+  </div>
+  <div class="card-grid cols2">
+    <div class="card accent-top">
+      <h4>&#128100; Identity Settings</h4>
+      <p>Your <strong>name</strong> and <strong>email</strong> are embedded into every commit object. They are public in any public repository. Set them globally once: name maps to the "Author" field; email maps to your GitHub account for avatar display in commit history and blame views.</p>
+    </div>
+    <div class="card accent-top green">
+      <h4>&#9881;&#65039; Useful Global Settings</h4>
+      <p>Configure your preferred text editor for commit messages (<code>core.editor</code>), default branch name for new repos (<code>init.defaultBranch main</code>), credential helper to avoid typing passwords repeatedly, and colour output (<code>color.ui auto</code>) for readable terminal output.</p>
+    </div>
+  </div>
+
+  <div class="section-divider"></div>
+  <h2>&#9999;&#65039; Writing Great Commit Messages</h2>
+
+  <div class="def-box orange">
+    <div class="def-label">Why Commit Messages Matter</div>
+    <p>A commit message is a <strong>permanent note to your future self and your teammates</strong> explaining what you changed and why. When something breaks six months later, your team will use <code>git log</code> and <code>git blame</code> to find the relevant commit. A message like <em>"fix stuff"</em> is useless. A message like <em>"fix: resolve NaN loss caused by zero-division in batch normalisation layer"</em> is invaluable. Good commit messages transform your project history from a confusing list of timestamps into a readable, professional record of decisions.</p>
+  </div>
+
+  <h3 style="margin-top:14px;">The Two Parts of a Commit Message</h3>
+  <div class="card-grid cols2" style="margin-bottom:14px;">
+    <div class="card accent-top">
+      <h4>Part 1 — Subject Line (Required)</h4>
+      <p>The <strong>first line</strong> of your commit message. This is what appears in <code>git log --oneline</code>, on GitHub's commit list, and in email notifications. Keep it <strong>short, clear, and imperative</strong>. It's the headline of your change.</p>
+    </div>
+    <div class="card accent-top purple">
+      <h4>Part 2 — Body (Optional but Valuable)</h4>
+      <p>Written after a <strong>blank line</strong> below the subject. The body explains <em>what</em> the problem was and <em>why</em> this approach was chosen — not <em>how</em> (the code already shows that). Incredibly valuable for complex changes that need context.</p>
+    </div>
+  </div>
+
+  <h3>The 7 Rules of a Great Commit Message</h3>
+  <div class="card-grid cols2" style="margin-bottom:10px;">
+    <div>
+      <div class="commit-card">
+        <div class="commit-tag" style="background:#dbeafe;color:#1d4ed8;">Rule 1</div>
+        <div class="commit-info">
+          <h4>Limit subject to 50 characters</h4>
+          <p>Forces clarity. Displays fully in all Git tools without wrapping or truncating. Count before you commit.</p>
+        </div>
+      </div>
+      <div class="commit-card">
+        <div class="commit-tag" style="background:#ede9fe;color:#6d28d9;">Rule 2</div>
+        <div class="commit-info">
+          <h4>Capitalise the subject line</h4>
+          <p>Standard writing convention. "Add dropout layer" not "add dropout layer". Reads more naturally in log views.</p>
+        </div>
+      </div>
+      <div class="commit-card">
+        <div class="commit-tag" style="background:#d1fae5;color:#065f46;">Rule 3</div>
+        <div class="commit-info">
+          <h4>No period at the end of the subject</h4>
+          <p>Subject lines are titles, not sentences. "Fix training loop" — not "Fix training loop." The period wastes one of your 50 characters.</p>
+        </div>
+      </div>
+      <div class="commit-card">
+        <div class="commit-tag" style="background:#fef3c7;color:#92400e;">Rule 4</div>
+        <div class="commit-info">
+          <h4>Use the imperative mood</h4>
+          <p>Write as if giving a command: <strong>"Add LSTM layer"</strong> — not "Added" or "Adding". Git's own messages do this ("Merge branch..."). Think: "This commit will [your subject line]."</p>
+        </div>
+      </div>
+    </div>
+    <div>
+      <div class="commit-card">
+        <div class="commit-tag" style="background:#fee2e2;color:#991b1b;">Rule 5</div>
+        <div class="commit-info">
+          <h4>Wrap body at 72 characters</h4>
+          <p>Git doesn't auto-wrap text. The 72-character limit is the standard terminal and diff-view width. Manually add line breaks in the body.</p>
+        </div>
+      </div>
+      <div class="commit-card">
+        <div class="commit-tag" style="background:#dbeafe;color:#1d4ed8;">Rule 6</div>
+        <div class="commit-info">
+          <h4>Body explains WHAT &amp; WHY, not HOW</h4>
+          <p>The <em>code</em> shows how. The <em>commit body</em> explains what problem existed and why this particular solution was chosen. Context that will be invaluable 6 months later.</p>
+        </div>
+      </div>
+      <div class="commit-card">
+        <div class="commit-tag" style="background:#ede9fe;color:#6d28d9;">Rule 7</div>
+        <div class="commit-info">
+          <h4>Blank line between subject and body</h4>
+          <p>Tools like <code>git log --oneline</code> and GitHub use this blank line to know where the subject ends. Without it, everything runs together as one paragraph.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="def-box green">
+    <div class="def-label">&#9989; Example of a Perfect Commit Message</div>
+    <p><strong>Subject:</strong> <code>feat(training): Add cosine annealing LR scheduler</code></p>
+    <p style="margin-top:6px;"><strong>Body:</strong> The model was hitting loss plateaus after epoch 15 with the constant learning rate of 0.001. Cosine annealing was chosen over step decay because it provides smoother convergence on the validation set and avoids the sharp loss jumps caused by sudden LR drops. Tested over 5 runs — validation accuracy improved from 88.2% to 91.4%.</p>
+  </div>
+</div>
+
+<!-- PAGE 15: BEST PRACTICES & QUICK REFERENCE -->
+<div class="page">
+  <div class="page-header">
+    <div class="page-header-left">
+      <div class="section-num" style="background:#065f46;">13</div>
+      <div>
+        <div style="font-weight:700;font-size:16px;">Best Practices &amp; Quick Reference</div>
+        <div class="breadcrumb">AI ENGINEER BEST PRACTICES &middot; COMMON MISTAKES &middot; DAILY WORKFLOW</div>
+      </div>
+    </div>
+    <div class="page-num">Page 15</div>
+  </div>
+
+  <h2>&#9989; Best Practices for Junior AI Engineers</h2>
+  <p style="font-size:13px;margin-bottom:12px;">These are the habits that separate a professional AI engineer from a beginner. Follow these consistently from day one.</p>
+
+  <div class="card-grid cols2">
+    <div>
+      <div class="def-box green" style="margin-bottom:10px;">
+        <div class="def-label">&#128228; Commit Early &amp; Often</div>
+        <p>Each commit should represent <strong>one single logical change</strong>. Small, focused commits are easier to review, understand, and revert. Avoid large monolithic commits that touch 20 files at once — they are impossible to review meaningfully and catastrophic to roll back.</p>
+      </div>
+      <div class="def-box" style="margin-bottom:10px;">
+        <div class="def-label">&#9997;&#65039; Write Meaningful Commit Messages</div>
+        <p>Follow the Conventional Commits standard and the 7 rules from the previous page. <strong>"fix: resolve NaN loss in batch normalisation"</strong> is infinitely more useful than <strong>"fix stuff"</strong>. Your commit history is your project's permanent scientific record.</p>
+      </div>
+      <div class="def-box orange" style="margin-bottom:10px;">
+        <div class="def-label">&#128683; Never Commit to Main Directly</div>
+        <p>Even for quick solo fixes, always work on a <strong>feature branch</strong> and open a Pull Request. This keeps <code>main</code> always deployable, forces you to review your own work, and builds the PR habit essential for team environments.</p>
+      </div>
+      <div class="def-box" style="border-left-color:#dc2626;background:linear-gradient(135deg,#fff1f2,#fef2f2);margin-bottom:0;">
+        <div class="def-label" style="color:#dc2626;">&#128274; Keep .gitignore Updated From Day One</div>
+        <p>Set up your <code>.gitignore</code> <em>before</em> writing a single line of code. Preventing model weights, datasets, and API keys from entering Git history is far easier than attempting to remove them after they've been pushed to a remote.</p>
+      </div>
+    </div>
+
+    <div>
+      <div class="def-box purple" style="margin-bottom:10px;">
+        <div class="def-label">&#128190; Use DVC for Large Files</div>
+        <p>Git is not designed for files over 100 MB. GitHub blocks files over 100 MB outright. Use <strong>DVC alongside Git</strong> to version datasets and trained model artefacts in cloud storage (S3, GCS, Azure Blob), keeping the Git repository lean and fast to clone.</p>
+      </div>
+      <div class="def-box green" style="margin-bottom:10px;">
+        <div class="def-label">&#128202; Pull Before You Push</div>
+        <p>Always run <code>git pull</code> to synchronise with the remote repository <em>before</em> you push your changes. This ensures you resolve any conflicts with your teammates' work locally before they reach the shared remote branch.</p>
+      </div>
+      <div class="def-box" style="margin-bottom:10px;">
+        <div class="def-label">&#128064; Review Your Own Diff Before Committing</div>
+        <p>Run <code>git diff --staged</code> before every <code>git commit</code>. Read your own changes line by line. This catches debugging prints, hardcoded local paths, test API keys, and incomplete edits <em>before</em> they become permanent.</p>
+      </div>
+      <div class="def-box orange" style="margin-bottom:0;">
+        <div class="def-label">&#127991;&#65039; Tag Every Model Release</div>
+        <p>Use annotated tags (<code>git tag -a v1.0.0 -m "..."</code>) to mark each commit that corresponds to a deployed model version. This creates a <strong>permanent, reproducible link</strong> between your code state and your model's behaviour in production.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="section-divider"></div>
+  <h2>&#10060; Common Mistakes to Avoid</h2>
+  <div class="card-grid cols3">
+    <div class="card" style="border-top:3px solid #dc2626;background:#fff1f2;">
+      <h4>&#10060; Committing to main directly</h4>
+      <p style="font-size:12px;color:#991b1b;">Bypasses code review, breaks CI gates, and can push untested code to production. Always use a feature branch — even for tiny fixes.</p>
+    </div>
+    <div class="card" style="border-top:3px solid #dc2626;background:#fff1f2;">
+      <h4>&#10060; Huge, infrequent commits</h4>
+      <p style="font-size:12px;color:#991b1b;">Committing three days of work at once makes code review impossible and reverting extremely destructive. Break work into small logical steps and commit each one.</p>
+    </div>
+    <div class="card" style="border-top:3px solid #dc2626;background:#fff1f2;">
+      <h4>&#10060; Rebasing shared branches</h4>
+      <p style="font-size:12px;color:#991b1b;">Rebasing a branch that teammates have built their work on top of rewrites its history and causes catastrophic conflicts. Only rebase local, unshared branches.</p>
+    </div>
+    <div class="card" style="border-top:3px solid #dc2626;background:#fff1f2;">
+      <h4>&#10060; Committing large files</h4>
+      <p style="font-size:12px;color:#991b1b;">Model weights and datasets bloat the repository permanently. Once in history, large files cannot be cleanly removed without rewriting all history. Use DVC from the start.</p>
+    </div>
+    <div class="card" style="border-top:3px solid #dc2626;background:#fff1f2;">
+      <h4>&#10060; Committing .env / secrets</h4>
+      <p style="font-size:12px;color:#991b1b;">API keys in Git history are visible forever, even after deletion in a later commit. If this happens, <strong>rotate the credential immediately</strong> — removing it from history is not sufficient.</p>
+    </div>
+    <div class="card" style="border-top:3px solid #dc2626;background:#fff1f2;">
+      <h4>&#10060; Force-pushing to main</h4>
+      <p style="font-size:12px;color:#991b1b;"><code>git push --force</code> rewrites remote history and destroys teammates' work. One of the most destructive Git actions possible. Prevent it with branch protection rules.</p>
+    </div>
+  </div>
+
+  <div class="section-divider"></div>
+  <h2>&#127968; The Junior AI Engineer's Daily Git Workflow</h2>
+  <div class="diagram-wrap">
+    <div class="diagram-title">Six-Step Day-to-Day Workflow</div>
+    <svg viewBox="0 0 540 68" xmlns="http://www.w3.org/2000/svg" font-family="Inter,sans-serif">
+      <defs><marker id="wk1" markerWidth="5" markerHeight="5" refX="2.5" refY="2.5" orient="auto"><path d="M0,0 L5,2.5 L0,5 Z" fill="#059669"/></marker></defs>
+      <rect x="4" y="12" width="72" height="44" rx="7" fill="#dbeafe" stroke="#93c5fd"/>
+      <text x="40" y="28" text-anchor="middle" font-size="8.5" fill="#1d4ed8" font-weight="700">1. git pull</text>
+      <text x="40" y="41" text-anchor="middle" font-size="7.5" fill="#64748b">Sync with</text>
+      <text x="40" y="52" text-anchor="middle" font-size="7.5" fill="#64748b">team first</text>
+      <path d="M77 34 L92 34" stroke="#059669" stroke-width="1.5" marker-end="url(#wk1)"/>
+      <rect x="93" y="12" width="76" height="44" rx="7" fill="#ede9fe" stroke="#c4b5fd"/>
+      <text x="131" y="28" text-anchor="middle" font-size="8.5" fill="#6d28d9" font-weight="700">2. branch</text>
+      <text x="131" y="41" text-anchor="middle" font-size="7.5" fill="#64748b">git checkout</text>
+      <text x="131" y="52" text-anchor="middle" font-size="7.5" fill="#64748b">-b feature/x</text>
+      <path d="M170 34 L185 34" stroke="#059669" stroke-width="1.5" marker-end="url(#wk1)"/>
+      <rect x="186" y="12" width="76" height="44" rx="7" fill="#d1fae5" stroke="#6ee7b7"/>
+      <text x="224" y="28" text-anchor="middle" font-size="8.5" fill="#065f46" font-weight="700">3. code</text>
+      <text x="224" y="41" text-anchor="middle" font-size="7.5" fill="#64748b">Write code,</text>
+      <text x="224" y="52" text-anchor="middle" font-size="7.5" fill="#64748b">run tests</text>
+      <path d="M263 34 L278 34" stroke="#059669" stroke-width="1.5" marker-end="url(#wk1)"/>
+      <rect x="279" y="12" width="76" height="44" rx="7" fill="#fef3c7" stroke="#fcd34d"/>
+      <text x="317" y="28" text-anchor="middle" font-size="8.5" fill="#92400e" font-weight="700">4. add+commit</text>
+      <text x="317" y="41" text-anchor="middle" font-size="7.5" fill="#64748b">Stage files,</text>
+      <text x="317" y="52" text-anchor="middle" font-size="7.5" fill="#64748b">commit often</text>
+      <path d="M356 34 L371 34" stroke="#059669" stroke-width="1.5" marker-end="url(#wk1)"/>
+      <rect x="372" y="12" width="70" height="44" rx="7" fill="#fee2e2" stroke="#fca5a5"/>
+      <text x="407" y="28" text-anchor="middle" font-size="8.5" fill="#991b1b" font-weight="700">5. push PR</text>
+      <text x="407" y="41" text-anchor="middle" font-size="7.5" fill="#64748b">Push branch,</text>
+      <text x="407" y="52" text-anchor="middle" font-size="7.5" fill="#64748b">open PR</text>
+      <path d="M443 34 L458 34" stroke="#059669" stroke-width="1.5" marker-end="url(#wk1)"/>
+      <rect x="459" y="12" width="76" height="44" rx="7" fill="#1e293b" stroke="#3b82f6"/>
+      <text x="497" y="28" text-anchor="middle" font-size="8.5" fill="#60a5fa" font-weight="700">6. review</text>
+      <text x="497" y="41" text-anchor="middle" font-size="7.5" fill="#94a3b8">Code review,</text>
+      <text x="497" y="52" text-anchor="middle" font-size="7.5" fill="#94a3b8">merge, deploy</text>
+    </svg>
+  </div>
+
+  <div class="tip-box blue" style="margin-top:12px;">
+    <div class="tip-icon">&#127891;</div>
+    <div class="tip-text"><strong>The Junior AI Engineer's Git Mindset:</strong> Think of Git not merely as a backup tool but as a <em>scientific lab notebook</em> for your AI experiments. Every meaningful experiment, architecture change, or preprocessing tweak deserves its own commit or branch with a clear message describing the hypothesis and outcome. This discipline makes your work <strong>reproducible</strong>, <strong>collaborative</strong>, and <strong>professional</strong>. Mastering Git is the non-negotiable foundation that everything else in your career is built upon.</div>
+  </div>
+
+  <div style="margin-top:14px;padding:12px 16px;background:var(--surface);border-radius:10px;border:1px solid var(--border);">
+    <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--text3);margin-bottom:8px;">Notes Summary &mdash; Topics Covered in This Document</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:4px;">
+      <div style="font-size:11px;color:var(--text2);">&#10003; Version Control (types)</div>
+      <div style="font-size:11px;color:var(--text2);">&#10003; Git &amp; GitHub definitions</div>
+      <div style="font-size:11px;color:var(--text2);">&#10003; Repository types</div>
+      <div style="font-size:11px;color:var(--text2);">&#10003; Git Architecture (4 areas)</div>
+      <div style="font-size:11px;color:var(--text2);">&#10003; Complete workflow &amp; commands</div>
+      <div style="font-size:11px;color:var(--text2);">&#10003; Commits &amp; types (Conventional)</div>
+      <div style="font-size:11px;color:var(--text2);">&#10003; Branching &amp; HEAD pointer</div>
+      <div style="font-size:11px;color:var(--text2);">&#10003; Git Flow strategy</div>
+      <div style="font-size:11px;color:var(--text2);">&#10003; Merging (FF, 3-way, squash)</div>
+      <div style="font-size:11px;color:var(--text2);">&#10003; Rebasing &amp; golden rule</div>
+      <div style="font-size:11px;color:var(--text2);">&#10003; Remote operations</div>
+      <div style="font-size:11px;color:var(--text2);">&#10003; Merge conflicts</div>
+      <div style="font-size:11px;color:var(--text2);">&#10003; Stash &amp; cherry-pick</div>
+      <div style="font-size:11px;color:var(--text2);">&#10003; Tags (lightweight &amp; annotated)</div>
+      <div style="font-size:11px;color:var(--text2);">&#10003; .gitignore for AI projects</div>
+      <div style="font-size:11px;color:var(--text2);">&#10003; Pull Requests &amp; code review</div>
+      <div style="font-size:11px;color:var(--text2);">&#10003; GitHub Actions (CI/CD)</div>
+      <div style="font-size:11px;color:var(--text2);">&#10003; GitHub Issues &amp; workflow</div>
+      <div style="font-size:11px;color:var(--text2);">&#10003; Git internals &amp; SHA-1</div>
+      <div style="font-size:11px;color:var(--text2);">&#10003; Git Flow, GitHub Flow, Trunk</div>
+      <div style="font-size:11px;color:var(--text2);">&#10003; DVC for ML datasets</div>
+      <div style="font-size:11px;color:var(--text2);">&#10003; Commit message rules</div>
+      <div style="font-size:11px;color:var(--text2);">&#10003; Best practices &amp; mistakes</div>
+    </div>
+  </div>
+</div>
+
+</body>
+</html>
